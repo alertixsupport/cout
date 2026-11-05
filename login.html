@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>COUT.APP | Acceso Prestamistas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-base: #090a0f;
+      --bg-surface: #12151f;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: #2563eb;
+      --accent-primary: #2563eb;
+      --accent-flame: #f97316;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-tertiary: #64748b;
+      --status-error: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      width: 100%;
+      min-height: 100vh;
+      background-color: var(--bg-base);
+      background-image: 
+        radial-gradient(at 50% 0%, rgba(37, 99, 235, 0.12) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(249, 115, 22, 0.05) 0px, transparent 50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      color: var(--text-primary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes flameFlicker {
+      0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 4px rgba(249, 115, 22, 0.4)); }
+      50% { transform: scale(1.06) rotate(-2deg); filter: drop-shadow(0 0 10px rgba(249, 115, 22, 0.7)); }
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 400px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 32px 28px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .brand-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+
+    .brand-logo-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(249, 115, 22, 0.1);
+      border: 1px solid rgba(249, 115, 22, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: flameFlicker 3s ease-in-out infinite;
+    }
+
+    .brand-logo-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--accent-flame);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .logo-text {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+    }
+
+    .logo-text span {
+      color: var(--accent-flame);
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    .login-form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-field label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+    }
+
+    .input-icon-group {
+      position: relative;
+      width: 100%;
+    }
+
+    .input-icon-group svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      stroke: var(--text-tertiary);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .input-icon-group input {
+      width: 100%;
+      height: 44px;
+      padding: 0 16px 0 42px;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-icon-group input:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .btn-submit {
+      width: 100%;
+      height: 44px;
+      margin-top: 6px;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.2s ease;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-submit:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+
+    .error-banner {
+      width: 100%;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: #fca5a5;
+      font-size: 12px;
+      font-weight: 500;
+      text-align: center;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    /* --- PANTALLA DE CARGA / ESCANEO DE DATOS (3 SEGUNDOS) --- */
+    .loader-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(9, 10, 15, 0.92);
+      backdrop-filter: blur(12px);
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .loader-overlay.is-active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .scanner-box {
+      width: 70px;
+      height: 70px;
+      border-radius: 16px;
+      background: rgba(37, 99, 235, 0.1);
+      border: 1px solid rgba(37, 99, 235, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .scanner-box svg {
+      width: 32px;
+      height: 32px;
+      stroke: var(--accent-primary);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    @keyframes scanLine {
+      0% { top: 0%; opacity: 0.8; }
+      50% { top: 90%; opacity: 1; }
+      100% { top: 0%; opacity: 0.8; }
+    }
+
+    .scanner-line {
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      background: #60a5fa;
+      box-shadow: 0 0 10px #60a5fa;
+      animation: scanLine 1.5s ease-in-out infinite;
+    }
+
+    .loader-texts {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .loader-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: 0.5px;
+    }
+
+    .loader-subtitle {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* --- VENTANA EMERGENTE (MODAL) PROFESIONAL DE ALTA GAMA --- */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 7, 11, 0.85);
+      backdrop-filter: blur(10px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-backdrop.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-window {
+      background: var(--bg-surface);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 420px;
+      padding: 32px 28px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85);
+      transform: scale(0.92) translateY(15px);
+      transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .modal-backdrop.is-open .modal-window {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-window::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 4px;
+      background: linear-gradient(90deg, #ef4444, #f97316);
+    }
+
+    .modal-icon-alert {
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px auto;
+    }
+
+    .modal-icon-alert svg {
+      width: 28px;
+      height: 28px;
+      stroke: var(--status-error);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .modal-window h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+
+    .modal-window p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-modal-pay {
+      flex: 1;
+      height: 44px;
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .btn-modal-pay:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(5, 150, 105, 0.5);
+    }
+
+    .btn-modal-pay svg {
+      width: 16px;
+      height: 16px;
+      stroke: #ffffff;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .btn-modal-close {
+      height: 44px;
+      padding: 0 18px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      color: var(--text-secondary);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-modal-close:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-primary);
+    }
+
+    .login-footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Pantalla de Carga / Análisis de Datos (3 Segundos) -->
+  <div class="loader-overlay" id="loaderOverlay">
+    <div class="scanner-box">
+      <div class="scanner-line"></div>
+      <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+    </div>
+    <div class="loader-texts">
+      <div class="loader-title" id="loaderTitle">Analizando credenciales...</div>
+      <div class="loader-subtitle" id="loaderSubtitle">Sincronizando con servidor seguro</div>
+    </div>
+  </div>
+
+  <!-- Contenedor Principal del Login -->
+  <div class="login-container">
+    <div class="brand-header">
+      <div class="brand-logo-icon" title="Cout.app">
+        <svg viewBox="0 0 24 24">
+          <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.542 2-6 .5 2 2 3.5 3.5 5.5A5.5 5.5 0 0 1 17 15a5 5 0 0 1-10 0c0-.3.033-.6.097-.892A5.474 5.474 0 0 0 8.5 14.5z"/>
+          <path d="M12 22a4 4 0 0 0 4-4c0-1.5-1-2.5-2-3.5-.5 1-1 1.5-2 2s-1.5-.5-2-1.5c-1 1-2 2-2 3a4 4 0 0 0 4 4z"/>
+        </svg>
+      </div>
+      <div>
+        <h1 class="logo-text">cout<span>.app</span></h1>
+        <p class="brand-subtitle">Portal Corporativo de Prestamistas</p>
+      </div>
+    </div>
+
+    <div class="error-banner" id="errorBanner"></div>
+
+    <form class="login-form" id="loginForm">
+      <div class="form-field">
+        <label for="usuario">Usuario</label>
+        <div class="input-icon-group">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          <input type="text" id="usuario" required autocomplete="username" placeholder="Ingrese su usuario">
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="clave">Contraseña</label>
+        <div class="input-icon-group">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          <input type="password" id="clave" required autocomplete="current-password" placeholder="••••••••">
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" id="btnSubmit">Iniciar Sesión</button>
+    </form>
+
+    <div class="login-footer">
+      Sistema Segregado de Gestión Financiera &bull; COUT
+    </div>
+  </div>
+
+  <!-- Ventana Emergente (Modal) Profesional de Cuenta Inactiva -->
+  <div class="modal-backdrop" id="expiredModalBackdrop">
+    <div class="modal-window">
+      <div class="modal-icon-alert">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      </div>
+      <h3>Suscripción Vencida</h3>
+      <p>Su cuenta se encuentra inactiva o con la suscripción vencida. Contacte al administrador o realice su abono para continuar.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn-modal-close" id="closeModalBtn">Cerrar</button>
+        <a href="#" class="btn-modal-pay" id="btnGoPay">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          Pagar
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db } from '../app.js';
+    import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const loginForm = document.getElementById('loginForm');
+    const usuarioInput = document.getElementById('usuario');
+    const claveInput = document.getElementById('clave');
+    const errorBanner = document.getElementById('errorBanner');
+    const btnSubmit = document.getElementById('btnSubmit');
+
+    const loaderOverlay = document.getElementById('loaderOverlay');
+    const loaderTitle = document.getElementById('loaderTitle');
+    const loaderSubtitle = document.getElementById('loaderSubtitle');
+
+    const expiredModalBackdrop = document.getElementById('expiredModalBackdrop');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const btnGoPay = document.getElementById('btnGoPay');
+
+    closeModalBtn.addEventListener('click', () => {
+      expiredModalBackdrop.classList.remove('is-open');
+    });
+
+    // Animación de carga de 3 segundos al hacer clic en Pagar
+    btnGoPay.addEventListener('click', (e) => {
+      e.preventDefault();
+      expiredModalBackdrop.classList.remove('is-open');
+      
+      loaderTitle.textContent = "Preparando pasarela de pagos...";
+      loaderSubtitle.textContent = "Conectando con entorno seguro";
+      loaderOverlay.classList.add('is-active');
+
+      setTimeout(() => {
+        window.location.href = 'pagosonline.html';
+      }, 3000);
+    });
+
+    function mostrarError(mensaje) {
+      errorBanner.textContent = mensaje;
+      errorBanner.style.display = 'block';
+    }
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorBanner.style.display = 'none';
+
+      const usuarioIngresado = usuarioInput.value.trim();
+      const claveIngresada = claveInput.value.trim();
+
+      if (!usuarioIngresado || !claveIngresada) {
+        mostrarError("Por favor, complete todos los campos.");
+        return;
+      }
+
+      // Activar pantalla de carga por 3 segundos con animación de análisis
+      loaderTitle.textContent = "Analizando credenciales...";
+      loaderSubtitle.textContent = "Escaneando base de datos de prestamistas";
+      loaderOverlay.classList.add('is-active');
+      btnSubmit.disabled = true;
+
+      try {
+        const prestamistasRef = collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas");
+        const snapshot = await getDocs(prestamistasRef);
+
+        let prestamistaValido = null;
+
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          if (data.usuario === usuarioIngresado && data.clave === claveIngresada) {
+            prestamistaValido = { id: docSnap.id, ...data };
+          }
+        });
+
+        // Simular el cumplimiento total de los 3 segundos exactos de animación profesional
+        setTimeout(() => {
+          loaderOverlay.classList.remove('is-active');
+          btnSubmit.disabled = false;
+
+          if (!prestamistaValido) {
+            mostrarError("Usuario o contraseña incorrectos.");
+            return;
+          }
+
+          // Validar si la cuenta está vencida
+          const ahora = new Date();
+          const venceEn = prestamistaValido.venceEn ? new Date(prestamistaValido.venceEn) : null;
+
+          if (!venceEn || venceEn <= ahora) {
+            expiredModalBackdrop.classList.add('is-open');
+            return;
+          }
+
+          // Guardar sesión y redirigir
+          sessionStorage.setItem('cout_prestamista_auth', 'true');
+          sessionStorage.setItem('cout_prestamista_id', prestamistaValido.id);
+          sessionStorage.setItem('cout_prestamista_nombre', prestamistaValido.nombre || 'Prestamista');
+
+          window.location.replace('dashprestamistas.html');
+        }, 3000);
+
+      } catch (err) {
+        setTimeout(() => {
+          loaderOverlay.classList.remove('is-active');
+          btnSubmit.disabled = false;
+          console.error("Error al validar credenciales:", err);
+          mostrarError("Error de conexión con el servidor. Intente nuevamente.");
+        }, 1500);
+      }
+    });
+  </script>
+</body>
+</html>
