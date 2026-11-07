@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>COUT.APP | Gestión Corporativa de Prestamistas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-base: #090a0f;
+      --bg-surface: #12151f;
+      --bg-surface-hover: #181c2b;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: #2563eb;
+      --accent-primary: #2563eb;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-tertiary: #64748b;
+      
+      --status-active: #059669;
+      --status-active-bg: rgba(5, 150, 105, 0.1);
+      --status-suspended: #dc2626;
+      --status-suspended-bg: rgba(220, 38, 38, 0.1);
+      
+      --btn-money: #059669;
+      --btn-contract: #0284c7;
+      --btn-suspend: #d97706;
+      --btn-edit: #7c3aed;
+      --btn-delete: #e11d48;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      width: 100%;
+      min-height: 100vh;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      padding-bottom: 40px;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 24px 16px;
+      width: 100%;
+    }
+
+    /* Navbar Corporativo */
+    header {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 16px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    @media (min-width: 640px) {
+      header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(37, 99, 235, 0.12);
+      border: 1px solid rgba(37, 99, 235, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-logo-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--accent-primary);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .logo-text {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+    }
+
+    .logo-text span {
+      color: var(--accent-primary);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+    }
+
+    @media (min-width: 640px) {
+      .header-actions {
+        width: auto;
+      }
+    }
+
+    .btn-create-user {
+      flex: 1;
+      background: var(--accent-primary);
+      border: none;
+      border-radius: 8px;
+      height: 40px;
+      padding: 0 16px;
+      color: white;
+      font-weight: 600;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-create-user:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-back {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-back:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+    }
+
+    /* Toolbar: Buscador y KPIs */
+    .dashboard-toolbar {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    @media (min-width: 768px) {
+      .dashboard-toolbar {
+        grid-template-columns: 1fr auto;
+        align-items: center;
+      }
+    }
+
+    .search-input-wrapper {
+      position: relative;
+      width: 100%;
+    }
+
+    .search-input-wrapper svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      stroke: var(--text-tertiary);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .search-input-wrapper input {
+      width: 100%;
+      height: 42px;
+      padding: 0 16px 0 40px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input-wrapper input:focus {
+      border-color: var(--border-focus);
+    }
+
+    .kpi-pills-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .kpi-pill {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .kpi-pill strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    /* Tarjetas de Prestamistas Corporativas */
+    .prestamistas-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .prestamista-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .prestamista-card:hover {
+      background: var(--bg-surface-hover);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .prestamista-card.is-suspended {
+      border-color: rgba(220, 38, 38, 0.3);
+      background: rgba(220, 38, 38, 0.02);
+    }
+
+    @media (min-width: 768px) {
+      .prestamista-card {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+      }
+    }
+
+    .card-user-meta {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .avatar-initial-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text-primary);
+      flex-shrink: 0;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .user-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* Estructura formal de datos */
+    .user-details-table {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+    }
+
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .detail-item svg {
+      width: 13px;
+      height: 13px;
+      stroke: var(--text-tertiary);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .detail-item span {
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .detail-item code {
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 1px 4px;
+      border-radius: 4px;
+      color: #e2e8f0;
+      font-size: 11px;
+    }
+
+    /* Triangulito Rojo Parpadeante para datos faltantes */
+    @keyframes blinkWarning {
+      0% { opacity: 0.3; transform: scale(0.95); }
+      50% { opacity: 1; transform: scale(1.1); }
+      100% { opacity: 0.3; transform: scale(0.95); }
+    }
+
+    .missing-data-warning {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      height: 14px;
+      animation: blinkWarning 1.6s ease-in-out infinite;
+      vertical-align: middle;
+      cursor: help;
+      margin-left: 2px;
+    }
+
+    .missing-data-warning svg {
+      width: 13px;
+      height: 13px;
+      fill: #ef4444;
+      stroke: #fca5a5;
+      stroke-width: 1;
+    }
+
+    .timer-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 6px;
+      width: fit-content;
+      margin-top: 2px;
+    }
+
+    .timer-badge.active {
+      background: var(--status-active-bg);
+      color: #34d399;
+      border: 1px solid rgba(5, 150, 105, 0.2);
+    }
+
+    .timer-badge.suspended {
+      background: var(--status-suspended-bg);
+      color: #f87171;
+      border: 1px solid rgba(220, 38, 38, 0.2);
+    }
+
+    .dot-indicator {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+    }
+
+    .timer-badge.active .dot-indicator { background: #34d399; }
+    .timer-badge.suspended .dot-indicator { background: #f87171; }
+
+    /* Barra de Acciones */
+    .card-actions-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: flex-end;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 12px;
+    }
+
+    @media (min-width: 768px) {
+      .card-actions-bar {
+        border-top: none;
+        padding-top: 0;
+      }
+    }
+
+    .action-icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.02);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .action-icon-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .action-icon-btn.btn-pay svg { stroke: var(--btn-money); }
+    .action-icon-btn.btn-pay:hover { background: rgba(5, 150, 105, 0.15); border-color: rgba(5, 150, 105, 0.4); }
+
+    .action-icon-btn.btn-history svg { stroke: var(--btn-contract); }
+    .action-icon-btn.btn-history:hover { background: rgba(2, 132, 199, 0.15); border-color: rgba(2, 132, 199, 0.4); }
+
+    .action-icon-btn.btn-pause svg { stroke: var(--btn-suspend); }
+    .action-icon-btn.btn-pause:hover { background: rgba(217, 119, 6, 0.15); border-color: rgba(217, 119, 6, 0.4); }
+
+    .action-icon-btn.btn-edit-usr svg { stroke: var(--btn-edit); }
+    .action-icon-btn.btn-edit-usr:hover { background: rgba(124, 58, 237, 0.15); border-color: rgba(124, 58, 237, 0.4); }
+
+    .action-icon-btn.btn-remove-usr svg { stroke: var(--btn-delete); }
+    .action-icon-btn.btn-remove-usr:hover { background: rgba(225, 29, 72, 0.15); border-color: rgba(225, 29, 72, 0.4); }
+
+    /* Modales Corporativos */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 7, 11, 0.8);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .modal-backdrop.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-window {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 440px;
+      padding: 24px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      transform: translateY(8px);
+      transition: transform 0.2s;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-backdrop.is-open .modal-window {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .form-field {
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-field label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+    }
+
+    .input-icon-group {
+      position: relative;
+    }
+
+    .input-icon-group svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      stroke: var(--text-tertiary);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .input-icon-group input, .input-icon-group select {
+      width: 100%;
+      height: 38px;
+      padding: 0 12px 0 38px;
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-icon-group input:focus, .input-icon-group select:focus {
+      border-color: var(--border-focus);
+    }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .btn-secondary {
+      height: 36px;
+      padding: 0 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+    }
+
+    .btn-submit {
+      height: 36px;
+      padding: 0 16px;
+      background: var(--accent-primary);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-submit:hover {
+      background: #1d4ed8;
+    }
+
+    /* Auditoría */
+    .payment-records-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 240px;
+      overflow-y: auto;
+      margin-bottom: 16px;
+    }
+
+    .payment-record-card {
+      background: var(--bg-base);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .payment-record-card .amount {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: #34d399;
+      font-size: 13px;
+    }
+
+    .payment-record-card .time-stamp {
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+
+    .btn-del-record {
+      background: transparent;
+      border: none;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .btn-del-record:hover {
+      color: var(--status-suspended);
+    }
+
+    .btn-del-record svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Navbar Corporativo -->
+    <header>
+      <div class="brand-section">
+        <div class="brand-logo-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <h1 class="logo-text">cout<span>.app</span></h1>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn-create-user" id="openRegisterModal">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Nuevo Prestamista
+        </button>
+        <a href="paneljefe.html" class="btn-back" title="Volver al Panel Principal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        </a>
+      </div>
+    </header>
+
+    <!-- Toolbar: Buscador y Contador Corporativo -->
+    <div class="dashboard-toolbar">
+      <div class="search-input-wrapper">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="searchInput" placeholder="Buscar por nombre, DNI, WhatsApp, usuario...">
+      </div>
+
+      <div class="kpi-pills-group">
+        <div class="kpi-pill">
+          <span>Total Registrados:</span>
+          <strong id="totalUsersCount">0</strong>
+        </div>
+        <div class="kpi-pill">
+          <span>Activos:</span>
+          <strong id="activeUsersCount" style="color: #34d399;">0</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de Prestamistas -->
+    <div class="prestamistas-grid" id="prestamistasGrid">
+      <!-- Carga inicial -->
+    </div>
+  </div>
+
+  <!-- Modal: Registrar Prestamista -->
+  <div class="modal-backdrop" id="registerModalOverlay">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3>Alta de Prestamista</h3>
+      </div>
+      <form id="createPrestamistaForm">
+        <div class="form-field">
+          <label for="nombre">Nombre Completo</label>
+          <div class="input-icon-group">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <input type="text" id="nombre" required placeholder="Ej: Carlos Pérez">
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="dni">DNI / Documento</label>
+          <div class="input-icon-group">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><line x1="7" y1="8" x2="17" y2="8"></line><line x1="7" y1="12" x2="13" y2="12"></line></svg>
+            <input type="text" id="dni" required placeholder="Ej: 35123456">
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="whatsapp">WhatsApp Directo</label>
+          <div class="input-icon-group">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            <input type="text" id="whatsapp" required placeholder="Ej: +5491123456789">
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="edad">Edad</label>
+          <div class="input-icon-group">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <input type="number" id="edad" min="18" max="100" required placeholder="Ej: 34">
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="usuario">Usuario de Sistema</label>
+          <div class="input-icon-group">
+            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg>
+            <input type="text" id="usuario" required placeholder="Ej: cperez">
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="clave">Contraseña</label>
+          <div class="input-icon-group">
+            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <input type="password" id="clave" required placeholder="••••••••">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div class="form-field">
+            <label for="tiempoCantidad">Habilitación Inicial</label>
+            <div class="input-icon-group">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <input type="number" id="tiempoCantidad" value="30" min="1" required>
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="tiempoUnidad">Unidad</label>
+            <div class="input-icon-group">
+              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              <select id="tiempoUnidad">
+                <option value="dias" selected>Días</option>
+                <option value="horas">Horas</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="closeRegisterModal">Cancelar</button>
+          <button type="submit" class="btn-submit">Registrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Registrar Abono ($) -->
+  <div class="modal-backdrop" id="moneyModalOverlay">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3>Registrar Abono y Extensión</h3>
+      </div>
+      <form id="moneyForm">
+        <input type="hidden" id="moneyPrestamistaId">
+        <div class="form-field">
+          <label for="montoPago">Monto Abonado ($ ARS)</label>
+          <div class="input-icon-group">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            <input type="number" id="montoPago" step="0.01" min="0" required placeholder="Ej: 25000">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div class="form-field">
+            <label for="extCantidad">Extensión</label>
+            <div class="input-icon-group">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <input type="number" id="extCantidad" value="30" min="1" required>
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="extUnidad">Unidad</label>
+            <div class="input-icon-group">
+              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              <select id="extUnidad">
+                <option value="dias" selected>Días</option>
+                <option value="horas">Horas</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="closeMoneyModal">Cancelar</button>
+          <button type="submit" class="btn-submit">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Auditoría de Pagos -->
+  <div class="modal-backdrop" id="contractModalOverlay">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3>Auditoría de Pagos</h3>
+      </div>
+      <div class="payment-records-list" id="pagosListContainer">
+        <!-- Dinámico -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" id="closeContractModal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Suspender / Modificar Tiempo -->
+  <div class="modal-backdrop" id="suspendModalOverlay">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3>Gestionar Suspensión</h3>
+      </div>
+      <form id="suspendForm">
+        <input type="hidden" id="suspendPrestamistaId">
+        <div class="form-field">
+          <label for="suspendMode">Acción</label>
+          <div class="input-icon-group">
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            <select id="suspendMode">
+              <option value="total" selected>Inhabilitar Acceso Inmediato</option>
+              <option value="quitar">Descontar Tiempo Específico</option>
+            </select>
+          </div>
+        </div>
+        <div id="quitarCamposGroup" style="display: none;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div class="form-field">
+              <label for="quitarCantidad">Cantidad</label>
+              <div class="input-icon-group">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <input type="number" id="quitarCantidad" value="1" min="1">
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="quitarUnidad">Unidad</label>
+              <div class="input-icon-group">
+                <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                <select id="quitarUnidad">
+                  <option value="dias" selected>Días</option>
+                  <option value="horas">Horas</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="closeSuspendModal">Cancelar</button>
+          <button type="submit" class="btn-submit">Aplicar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Editar Prestamista -->
+  <div class="modal-backdrop" id="editModalOverlay">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3>Editar Ficha de Prestamista</h3>
+      </div>
+      <form id="editForm">
+        <input type="hidden" id="editPrestamistaId">
+        <div class="form-field">
+          <label for="editNombre">Nombre Completo</label>
+          <div class="input-icon-group">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <input type="text" id="editNombre" required>
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="editDni">DNI</label>
+          <div class="input-icon-group">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><line x1="7" y1="8" x2="17" y2="8"></line></svg>
+            <input type="text" id="editDni" required>
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="editWhatsapp">WhatsApp</label>
+          <div class="input-icon-group">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            <input type="text" id="editWhatsapp" required>
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="editEdad">Edad</label>
+          <div class="input-icon-group">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <input type="number" id="editEdad" required>
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="editUsuario">Usuario</label>
+          <div class="input-icon-group">
+            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg>
+            <input type="text" id="editUsuario" required>
+          </div>
+        </div>
+        <div class="form-field">
+          <label for="editClave">Contraseña</label>
+          <div class="input-icon-group">
+            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <input type="text" id="editClave" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="closeEditModal">Cancelar</button>
+          <button type="submit" class="btn-submit">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    if (sessionStorage.getItem('cout_auth') !== 'true') {
+      window.location.replace('loginjefes.html');
+    }
+
+    import { db } from './app.js';
+    import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const openRegisterModal = document.getElementById('openRegisterModal');
+    const registerModalOverlay = document.getElementById('registerModalOverlay');
+    const closeRegisterModal = document.getElementById('closeRegisterModal');
+    const createPrestamistaForm = document.getElementById('createPrestamistaForm');
+    
+    const moneyModalOverlay = document.getElementById('moneyModalOverlay');
+    const closeMoneyModal = document.getElementById('closeMoneyModal');
+    const moneyForm = document.getElementById('moneyForm');
+    const moneyPrestamistaId = document.getElementById('moneyPrestamistaId');
+
+    const contractModalOverlay = document.getElementById('contractModalOverlay');
+    const closeContractModal = document.getElementById('closeContractModal');
+    const pagosListContainer = document.getElementById('pagosListContainer');
+
+    const suspendModalOverlay = document.getElementById('suspendModalOverlay');
+    const closeSuspendModal = document.getElementById('closeSuspendModal');
+    const suspendForm = document.getElementById('suspendForm');
+    const suspendPrestamistaId = document.getElementById('suspendPrestamistaId');
+    const suspendMode = document.getElementById('suspendMode');
+    const quitarCamposGroup = document.getElementById('quitarCamposGroup');
+
+    const editModalOverlay = document.getElementById('editModalOverlay');
+    const closeEditModal = document.getElementById('closeEditModal');
+    const editForm = document.getElementById('editForm');
+    const editPrestamistaId = document.getElementById('editPrestamistaId');
+
+    const prestamistasGrid = document.getElementById('prestamistasGrid');
+    const searchInput = document.getElementById('searchInput');
+    const totalUsersCount = document.getElementById('totalUsersCount');
+    const activeUsersCount = document.getElementById('activeUsersCount');
+
+    const prestamistasRef = collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas");
+    let cachedPrestamistas = [];
+
+    const localData = localStorage.getItem('cout_cached_prestamistas');
+    if (localData) {
+      try {
+        cachedPrestamistas = JSON.parse(localData);
+        renderPrestamistas();
+      } catch (e) {
+        console.error("Error caché", e);
+      }
+    }
+
+    openRegisterModal.addEventListener('click', () => registerModalOverlay.classList.add('is-open'));
+    closeRegisterModal.addEventListener('click', () => registerModalOverlay.classList.remove('is-open'));
+    closeMoneyModal.addEventListener('click', () => moneyModalOverlay.classList.remove('is-open'));
+    closeContractModal.addEventListener('click', () => contractModalOverlay.classList.remove('is-open'));
+    closeSuspendModal.addEventListener('click', () => suspendModalOverlay.classList.remove('is-open'));
+    closeEditModal.addEventListener('click', () => editModalOverlay.classList.remove('is-open'));
+
+    suspendMode.addEventListener('change', (e) => {
+      quitarCamposGroup.style.display = (e.target.value === 'quitar') ? 'block' : 'none';
+    });
+
+    searchInput.addEventListener('input', () => renderPrestamistas());
+
+    function formatearFechaLegible(isoString) {
+      if (!isoString) return "N/D";
+      const f = new Date(isoString);
+      return `${f.toLocaleDateString('es-AR', { day: '2-digit', month: 'short' })} &bull; ${f.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}`;
+    }
+
+    // Helper inteligente: si el dato no existe o está vacío, genera el triángulo rojo parpadeante
+    function renderCampo(valor, etiquetaFaltante) {
+      if (!valor || String(valor).trim() === '') {
+        return `<span class="missing-data-warning" title="Dato faltante: ${etiquetaFaltante}">
+                  <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                </span>`;
+      }
+      return `<strong>${valor}</strong>`;
+    }
+
+    async function cargarHistorialPagos(prestamistaId) {
+      pagosListContainer.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); padding: 16px;">Cargando registros...</div>';
+      contractModalOverlay.classList.add('is-open');
+
+      try {
+        const querySnapshot = await getDocs(collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "pagos"));
+        pagosListContainer.innerHTML = '';
+
+        if (querySnapshot.empty) {
+          pagosListContainer.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); padding: 16px;">Sin abonos registrados.</div>';
+          return;
+        }
+
+        querySnapshot.forEach((docPago) => {
+          const p = docPago.data();
+          const pId = docPago.id;
+          const card = document.createElement('div');
+          card.className = 'payment-record-card';
+          card.innerHTML = `
+            <div>
+              <div class="amount">$ ${Number(p.monto).toLocaleString('es-AR', { minimumFractionDigits: 2 })}</div>
+              <div class="time-stamp">${formatearFechaLegible(p.fechaPago)} &bull; (${p.extensionOtorgada})</div>
+            </div>
+            <button class="btn-del-record" title="Eliminar registro">
+              <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+          `;
+
+          card.querySelector('.btn-del-record').addEventListener('click', async () => {
+            if (confirm("¿Eliminar este registro de abono?")) {
+              await deleteDoc(doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "pagos", pId));
+              cargarHistorialPagos(prestamistaId);
+            }
+          });
+
+          pagosListContainer.appendChild(card);
+        });
+      } catch (err) {
+        pagosListContainer.innerHTML = '<div style="text-align: center; color: var(--status-suspended); padding: 16px;">Error de carga.</div>';
+      }
+    }
+
+    createPrestamistaForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const cantidad = parseInt(document.getElementById('tiempoCantidad').value) || 30;
+      const unidad = document.getElementById('tiempoUnidad').value;
+      const fVence = new Date();
+      
+      if (unidad === 'horas') fVence.setHours(fVence.getHours() + cantidad);
+      else fVence.setDate(fVence.getDate() + cantidad);
+
+      try {
+        await addDoc(prestamistasRef, {
+          nombre: document.getElementById('nombre').value.trim(),
+          dni: document.getElementById('dni').value.trim(),
+          whatsapp: document.getElementById('whatsapp').value.trim(),
+          edad: document.getElementById('edad').value.trim(),
+          usuario: document.getElementById('usuario').value.trim(),
+          clave: document.getElementById('clave').value.trim(),
+          venceEn: fVence.toISOString(),
+          fechaCreacion: new Date().toISOString()
+        });
+        createPrestamistaForm.reset();
+        registerModalOverlay.classList.remove('is-open');
+      } catch (err) {
+        alert("Error al guardar: " + err.message);
+      }
+    });
+
+    moneyForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = moneyPrestamistaId.value;
+      const monto = parseFloat(document.getElementById('montoPago').value) || 0;
+      const cantidad = parseInt(document.getElementById('extCantidad').value) || 30;
+      const unidad = document.getElementById('extUnidad').value;
+
+      const usr = cachedPrestamistas.find(p => p.id === id);
+      if (!usr) return;
+
+      const ahora = new Date();
+      let base = (usr.data.venceEn && new Date(usr.data.venceEn) > ahora) ? new Date(usr.data.venceEn) : ahora;
+
+      if (unidad === 'horas') base.setHours(base.getHours() + cantidad);
+      else base.setDate(base.getDate() + cantidad);
+
+      try {
+        await addDoc(collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", id, "pagos"), {
+          monto, fechaPago: new Date().toISOString(), extensionOtorgada: `${cantidad} ${unidad}`
+        });
+
+        await updateDoc(doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", id), {
+          venceEn: base.toISOString()
+        });
+
+        moneyModalOverlay.classList.remove('is-open');
+      } catch (err) {
+        alert("Error en transacción: " + err.message);
+      }
+    });
+
+    suspendForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = suspendPrestamistaId.value;
+      const mode = suspendMode.value;
+      const usr = cachedPrestamistas.find(p => p.id === id);
+      if (!usr) return;
+
+      const ahora = new Date();
+      let nFecha = new Date();
+
+      if (mode === 'total') {
+        nFecha = new Date(ahora.getTime() - 1000);
+      } else {
+        const cantidad = parseInt(document.getElementById('quitarCantidad').value) || 1;
+        const unidad = document.getElementById('quitarUnidad').value;
+        let base = (usr.data.venceEn && new Date(usr.data.venceEn) > ahora) ? new Date(usr.data.venceEn) : ahora;
+
+        if (unidad === 'horas') base.setHours(base.getHours() - cantidad);
+        else base.setDate(base.getDate() - cantidad);
+        nFecha = base;
+      }
+
+      try {
+        await updateDoc(doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", id), {
+          venceEn: nFecha.toISOString()
+        });
+        suspendModalOverlay.classList.remove('is-open');
+      } catch (err) {
+        alert("Error al suspender: " + err.message);
+      }
+    });
+
+    editForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = editPrestamistaId.value;
+      try {
+        await updateDoc(doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", id), {
+          nombre: document.getElementById('editNombre').value.trim(),
+          dni: document.getElementById('editDni').value.trim(),
+          whatsapp: document.getElementById('editWhatsapp').value.trim(),
+          edad: document.getElementById('editEdad').value.trim(),
+          usuario: document.getElementById('editUsuario').value.trim(),
+          clave: document.getElementById('editClave').value.trim()
+        });
+        editModalOverlay.classList.remove('is-open');
+      } catch (err) {
+        alert("Error al actualizar: " + err.message);
+      }
+    });
+
+    function renderPrestamistas() {
+      prestamistasGrid.innerHTML = '';
+      const filter = searchInput.value.toLowerCase().trim();
+      const ahora = new Date();
+      let countActive = 0;
+
+      const filtered = cachedPrestamistas.filter(({ data }) => {
+        const fullTxt = `${data.nombre} ${data.dni} ${data.whatsapp} ${data.usuario}`.toLowerCase();
+        return fullTxt.includes(filter);
+      });
+
+      totalUsersCount.textContent = cachedPrestamistas.length;
+
+      if (filtered.length === 0) {
+        prestamistasGrid.innerHTML = `<div style="text-align: center; color: var(--text-tertiary); padding: 40px; font-size: 13px;">No se encontraron registros.</div>`;
+        return;
+      }
+
+      filtered.forEach(({ id, data }) => {
+        const isSusp = !data.venceEn || new Date(data.venceEn) <= ahora;
+        if (!isSusp) countActive++;
+
+        const card = document.createElement('div');
+        card.className = `prestamista-card ${isSusp ? 'is-suspended' : ''}`;
+        card.setAttribute('data-id', id);
+
+        const initial = data.nombre ? data.nombre.charAt(0).toUpperCase() : 'P';
+
+        card.innerHTML = `
+          <div class="card-user-meta">
+            <div class="avatar-initial-box">${initial}</div>
+            <div class="user-info">
+              <div class="user-name">${data.nombre || 'Sin Nombre'}</div>
+              <div class="user-details-table">
+                <div class="detail-item">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><line x1="7" y1="8" x2="17" y2="8"></line></svg>
+                  <span>DNI:</span> ${renderCampo(data.dni, 'DNI faltante')}
+                </div>
+                <div class="detail-item">
+                  <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                  <span>WA:</span> ${renderCampo(data.whatsapp, 'WhatsApp faltante')}
+                </div>
+                <div class="detail-item">
+                  <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                  <span>User:</span> <code>${data.usuario || ''}</code> ${!data.usuario ? renderCampo('', 'Usuario faltante') : ''}
+                </div>
+                <div class="detail-item">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                  <span>Clave:</span> <code>${data.clave || ''}</code> ${!data.clave ? renderCampo('', 'Contraseña faltante') : ''}
+                </div>
+              </div>
+              <div class="timer-badge ${isSusp ? 'suspended' : 'active'}" id="timer-${id}">
+                <span class="dot-indicator"></span>
+                <span class="time-txt">Calculando...</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-actions-bar">
+            <button class="action-icon-btn btn-pay" data-id="${id}" title="Registrar Abono ($)">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            </button>
+            <button class="action-icon-btn btn-history" data-id="${id}" title="Auditoría de Pagos">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+            </button>
+            <button class="action-icon-btn btn-pause" data-id="${id}" title="Suspender / Descontar">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
+            </button>
+            <button class="action-icon-btn btn-edit-usr" data-id="${id}" title="Editar Ficha">
+              <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            </button>
+            <button class="action-icon-btn btn-remove-usr" data-id="${id}" title="Eliminar Registro">
+              <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+          </div>
+        `;
+
+        card.querySelector('.btn-pay').addEventListener('click', () => {
+          moneyPrestamistaId.value = id;
+          document.getElementById('montoPago').value = '';
+          moneyModalOverlay.classList.add('is-open');
+        });
+
+        card.querySelector('.btn-history').addEventListener('click', () => cargarHistorialPagos(id));
+
+        card.querySelector('.btn-pause').addEventListener('click', () => {
+          suspendPrestamistaId.value = id;
+          suspendMode.value = 'total';
+          quitarCamposGroup.style.display = 'none';
+          suspendModalOverlay.classList.add('is-open');
+        });
+
+        card.querySelector('.btn-edit-usr').addEventListener('click', () => {
+          editPrestamistaId.value = id;
+          document.getElementById('editNombre').value = data.nombre || '';
+          document.getElementById('editDni').value = data.dni || '';
+          document.getElementById('editWhatsapp').value = data.whatsapp || '';
+          document.getElementById('editEdad').value = data.edad || '';
+          document.getElementById('editUsuario').value = data.usuario || '';
+          document.getElementById('editClave').value = data.clave || '';
+          editModalOverlay.classList.add('is-open');
+        });
+
+        card.querySelector('.btn-remove-usr').addEventListener('click', async () => {
+          if (confirm(`¿Eliminar la cuenta del prestamista "${data.nombre || 'Sin Nombre'}"?`)) {
+            await deleteDoc(doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", id));
+          }
+        });
+
+        prestamistasGrid.appendChild(card);
+      });
+
+      activeUsersCount.textContent = countActive;
+      actualizarTimers();
+    }
+
+    function actualizarTimers() {
+      const ahora = new Date();
+      cachedPrestamistas.forEach(({ id, data }) => {
+        const badgeEl = document.getElementById(`timer-${id}`);
+        const cardEl = document.querySelector(`.prestamista-card[data-id="${id}"]`);
+        if (!badgeEl || !cardEl) return;
+
+        const timeTxt = badgeEl.querySelector('.time-txt');
+
+        if (!data.venceEn) {
+          timeTxt.textContent = "Sin plazo definido";
+          badgeEl.className = "timer-badge suspended";
+          cardEl.classList.add('is-suspended');
+          return;
+        }
+
+        const fVence = new Date(data.venceEn);
+        const diffMs = fVence - ahora;
+
+        if (diffMs <= 0) {
+          timeTxt.textContent = "Suscripción Vencida";
+          badgeEl.className, badgeEl.className = "timer-badge suspended";
+          cardEl.classList.add('is-suspended');
+        } else {
+          cardEl.classList.remove('is-suspended');
+          const totSeg = Math.floor(diffMs / 1000);
+          const d = Math.floor(totSeg / (3600 * 24));
+          const h = Math.floor((totSeg % (3600 * 24)) / 3600);
+          const m = Math.floor((totSeg % 3600) / 60);
+          const s = totSeg % 60;
+
+          timeTxt.textContent = `${d}d ${h}h ${m}m ${s}s restantes`;
+          badgeEl.className = "timer-badge active";
+        }
+      });
+    }
+
+    setInterval(actualizarTimers, 1000);
+
+    onSnapshot(prestamistasRef, (snapshot) => {
+      cachedPrestamistas = [];
+      snapshot.forEach((docSnap) => {
+        cachedPrestamistas.push({ id: docSnap.id, data: docSnap.data() });
+      });
+      localStorage.setItem('cout_cached_prestamistas', JSON.stringify(cachedPrestamistas));
+      renderPrestamistas();
+    }, (error) => {
+      console.error("Error Firebase:", error);
+    });
+  </script>
+</body>
+</html>
