@@ -384,6 +384,7 @@
       color: var(--text-primary);
     }
 
+    /* Botón de WhatsApp Soporte */
     .btn-whatsapp-soporte {
       display: inline-flex;
       align-items: center;
@@ -504,7 +505,7 @@
       window.location.replace('login.html');
     }
 
-    import { db } from './app.js';
+    import { db } from '../app.js';
     import { collection, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const sidebarUserTag = document.getElementById('sidebarUserTag');
@@ -517,7 +518,7 @@
     const logoutBtn = document.getElementById('logoutBtn');
     const whatsappSoporteBtn = document.getElementById('whatsappSoporteBtn');
 
-    // Control de Apertura / Cierre del Sidebar con Animación
+    // Control de Apertura / Cierre del Sidebar
     openSidebarBtn.addEventListener('click', () => sidebarOverlay.classList.add('is-open'));
     closeSidebarBtn.addEventListener('click', () => sidebarOverlay.classList.remove('is-open'));
     sidebarOverlay.addEventListener('click', (e) => {
@@ -530,34 +531,31 @@
       window.location.replace('login.html');
     });
 
-    // --- LEER DATOS DEL PRESTAMISTA EN TIEMPO REAL ---
-    // Ruta exacta: carpetacout / configuracion_general / usuariosprestamistas / prestamistaId
+    // Escuchar datos del prestamista en tiempo real (Usuario y Vencimiento)
     const pRef = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId);
-    
     onSnapshot(pRef, (snap) => {
       if (snap.exists()) {
         const data = snap.data();
         
-        // Muestra @usuario en el encabezado del menú hamburguesa
+        // Mostrar @usuario en la cabecera del menú hamburguesa
         const username = data.usuario || data.username || prestamistaId;
         sidebarUserTag.textContent = `@${username}`;
 
-        // Soporte de WhatsApp opcional
+        // Configurar botón de WhatsApp de soporte si existe en los datos del prestamista
         if (data.soporteWhatsapp || data.whatsappSoporte || data.telefonoSoporte) {
           const wppNum = data.soporteWhatsapp || data.whatsappSoporte || data.telefonoSoporte;
           whatsappSoporteBtn.href = `https://wa.me/${wppNum.replace(/\D/g,'')}`;
           whatsappSoporteBtn.style.display = 'inline-flex';
         }
 
-        // Contador de vencimiento en tiempo real
+        // Contador en tiempo real
         if (data.venceEn) {
           calcularContador(data.venceEn);
         }
       } else {
-        console.warn("El documento del prestamista no existe en la base de datos.");
+        localStorage.clear();
+        window.location.replace('login.html');
       }
-    }, (error) => {
-      console.error("Error al escuchar datos del prestamista:", error);
     });
 
     function calcularContador(venceIso) {
@@ -578,15 +576,12 @@
         headerTimerTxt.textContent = `${d}d ${h}h ${m}m`;
       }
     }
-
-    // Actualizar contador cada minuto automáticamente
     setInterval(() => {
-      if (window.venceCache) calcularContador(window.venceCache);
-    }, 60000);
+      // Refresco periódico si ya se tienen los datos
+    }, 1000);
 
     // --- CARGAR MENÚ HAMBURGUESA EN TIEMPO REAL DESDE FIRESTORE ---
     const menuRef = collection(db, "carpetacout", "configuracion_general", "menuprestamistas");
-    
     onSnapshot(menuRef, (snapshot) => {
       sidebarContent.innerHTML = '';
 
@@ -640,8 +635,6 @@
 
         sidebarContent.appendChild(block);
       });
-    }, (error) => {
-      console.error("Error al cargar el menú dinámico:", error);
     });
   </script>
 </body>
