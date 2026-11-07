@@ -578,11 +578,11 @@
 
   <script type="module">
     import { db } from './app.js';
-    import { collection, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // Detección directa del usuario a través de la URL (ej: dashprestamistas.html?user=nombre)
+    // Tomamos el parámetro enviado por el login (ej: dashprestamistas.html?user=nombre)
     const urlParams = new URLSearchParams(window.location.search);
-    const prestamistaId = urlParams.get('user') || urlParams.get('id') || urlParams.get('prestamista');
+    const busquedaUsuario = urlParams.get('user') || urlParams.get('id') || urlParams.get('prestamista') || localStorage.getItem('cout_prestamista_id');
 
     const sidebarUserTag = document.getElementById('sidebarUserTag');
     const headerTimerTxt = document.getElementById('headerTimerTxt');
@@ -600,69 +600,84 @@
     sidebarOverlay.addEventListener('click', (e) => { if (e.target === sidebarOverlay) sidebarOverlay.classList.remove('is-open'); });
 
     logoutBtn.addEventListener('click', () => {
+      localStorage.clear();
       window.location.replace('login.html');
     });
 
-    if (!prestamistaId) {
-      sidebarUserTag.textContent = "@invitado";
-      headerTimerTxt.textContent = "Sin usuario";
-      blockedModalBackdrop.classList.add('is-open');
-    } else {
-      // Consulta en tiempo real en la ruta exacta de Firebase
-      const pRef = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId);
-      
-      onSnapshot(pRef, (snap) => {
-        if (snap.exists()) {
-          const data = snap.data();
-          const username = data.usuario || data.username || prestamistaId;
-          sidebarUserTag.textContent = `@${username}`;
+    // --- LECTURA DIRECTA DE LA COLECCIÓN USUARIOSPRESTAMISTAS EN TIEMPO REAL ---
+    const usuariosRef = collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas");
 
-          if (data.soporteWhatsapp || data.whatsappSoporte || data.telefonoSoporte) {
-            const wppNum = data.soporteWhatsapp || data.whatsappSoporte || data.telefonoSoporte;
-            whatsappSoporteBtn.href = `https://wa.me/${wppNum.replace(/\D/g,'')}`;
-            whatsappSoporteBtn.style.display = 'inline-flex';
-          }
+    onSnapshot(usuariosRef, (snapshot) => {
+      let usuarioEncontrado = null;
 
-          // Validación robusta de fecha: si no hay fecha cargada o es futura, se permite acceso total
-          if (!data.venceEn) {
-            headerTimerTxt.textContent = "Activo";
-            blockedModalBackdrop.classList.remove('is-open');
-          } else {
-            const ahora = new Date();
-            const fVence = new Date(data.venceEn);
-            
-            // Verificamos si la fecha es válida
-            if (isNaN(fVence.getTime())) {
-              headerTimerTxt.textContent = "Activo";
-              blockedModalBackdrop.classList.remove('is-open');
-            } else {
-              const diffMs = fVence - ahora;
-              if (diffMs <= 0) {
-                // Solo si verdaderamente expiró muestra el bloqueo
-                headerTimerTxt.textContent = "Suscripción Vencida";
-                headerTimerBadge.classList.add('suspended');
-                blockedModalBackdrop.classList.add('is-open');
-              } else {
-                // Si está vigente, quita cualquier bloqueo y muestra el contador con calma
-                headerTimerBadge.classList.remove('suspended');
-                blockedModalBackdrop.classList.remove('is-open');
-                const d = Math.floor(diffMs / (1000 * 3600 * 24));
-                const h = Math.floor((diffMs / (1000 * 3600)) % 24);
-                headerTimerTxt.textContent = `${d}d ${h}h restantes`;
-              }
-            }
-          }
-        } else {
-          // Solo si el documento fue eliminado de Firebase muestra el bloqueo de contrato
-          sidebarUserTag.textContent = "@eliminado";
-          headerTimerTxt.textContent = "Acceso Revocado";
-          headerTimerBadge.classList.add('suspended');
-          blockedModalBackdrop.classList.add('is-open');
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const docId = docSnap.id;
+
+        // Comparamos si coincide con el ID del doc o el campo 'usuario' / 'username'
+        if (
+          docId === busquedaUsuario ||
+          data.usuario === busquedaUsuario ||
+          data.username === busquedaUsuario
+        ) {
+          usuarioEncontrado = { id: docId, ...data };
         }
       });
-    }
 
-    // Cargar menú hamburguesa dinámico en tiempo real
+      if (usuarioEncontrado) {
+        // PERMITIR ACCESO
+        blockedModalBackdrop.classList.remove('is-open');
+        const username = usuarioEncontrado.usuario || usuarioEncontrado.username || usuarioEncontrado.id;
+        sidebarUserTag.textContent = `@${username}`;
+
+        if (usuarioEncontrado.soporteWhatsapp || usuarioEncontrado.whatsappSoporte || usuarioEncontrado.telefonoSoporte) {
+          const wppNum = usuarioEncontrado.soporteWhatsapp || usuarioEncontrado.whatsappSoporte || usuarioEncontrado.telefonoSoporte;
+          whatsappSoporteBtn.href = `https://wa.me/${wppNum.replace(/\D/g,'')}`;
+          whatsappSoporteBtn.style.display = 'inline-flex';
+        }
+
+        // EVALUACIÓN DE VENCIMIENTO FIABLE (SIN BLOQUEOS FALSOS)
+        if (!usuarioEncontrado.venceEn) {
+          headerTimerTxt.textContent = "Activo";
+          headerTimerBadge.classList.remove('suspended');
+        } else {
+          const hoy = new Date();
+          hoy.setHours(0, 0, 0, 0);
+
+          const fVence = new Date(usuarioEncontrado.venceEn);
+          fVence.setHours(0, 0, 0, 0);
+
+          if (isNaN(fVence.getTime())) {
+            headerTimerTxt.textContent = "Activo";
+            headerTimerBadge.classList.remove('suspended');
+          } else {
+            const diffMs = fVence.getTime() - hoy.getTime();
+            const diasRestantes = Math.ceil(diffMs / (1000 * 3600 * 24));
+
+            if (diasRestantes < 0) {
+              // Vencido de verdad
+              headerTimerTxt.textContent = "Suscripción Vencida";
+              headerTimerBadge.classList.add('suspended');
+              blockedModalBackdrop.classList.add('is-open');
+            } else {
+              // Activo con días restantes (ej: 22 días restantes)
+              headerTimerBadge.classList.remove('suspended');
+              headerTimerTxt.textContent = diasRestantes === 0 ? "Vence hoy" : `${diasRestantes} días restantes`;
+            }
+          }
+        }
+      } else {
+        // SI EL USUARIO NO EXISTE O FUE BORRADO DE LA LISTA
+        sidebarUserTag.textContent = "@eliminado";
+        headerTimerTxt.textContent = "Acceso Revocado";
+        headerTimerBadge.classList.add('suspended');
+        blockedModalBackdrop.classList.add('is-open');
+      }
+    }, (error) => {
+      console.error("Error al escuchar usuariosprestamistas:", error);
+    });
+
+    // Cargar menú hamburguesa dinámico en tiempo real desde Firebase
     const menuRef = collection(db, "carpetacout", "configuracion_general", "menuprestamistas");
     onSnapshot(menuRef, (snapshot) => {
       sidebarContent.innerHTML = '';
