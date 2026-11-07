@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -65,7 +64,6 @@
       box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
     }
 
-    /* Botón Menú Hamburguesa Estilo 3D */
     .btn-hamburger {
       width: 42px;
       height: 42px;
@@ -94,7 +92,6 @@
       stroke-linecap: round;
     }
 
-    /* Brand Centrado */
     .brand-section {
       display: flex;
       align-items: center;
@@ -112,7 +109,6 @@
       color: var(--accent-flame);
     }
 
-    /* Badge Contador en Tiempo Real (Header) */
     .header-timer-badge {
       display: flex;
       align-items: center;
@@ -160,7 +156,7 @@
       color: #fca5a5;
     }
 
-    /* --- SIDEBAR MENU HAMBURGUESA CON ANIMACIÓN FLUIDA --- */
+    /* --- SIDEBAR MENU HAMBURGUESA --- */
     .sidebar-overlay {
       position: fixed;
       inset: 0;
@@ -198,7 +194,6 @@
       transform: translateX(0);
     }
 
-    /* Cabecera del Menú Hamburguesa (Usuario Logueado) */
     .sidebar-user-header {
       padding: 20px;
       border-bottom: 1px solid var(--border-subtle);
@@ -345,7 +340,7 @@
       stroke-width: 2;
     }
 
-    /* --- CUERPO PRINCIPAL (DASHBOARD) --- */
+    /* --- CUERPO PRINCIPAL --- */
     .dashboard-card {
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
@@ -379,10 +374,6 @@
       font-size: 14px;
       color: var(--text-secondary);
       line-height: 1.7;
-    }
-
-    .info-paragraph strong {
-      color: var(--text-primary);
     }
 
     .btn-whatsapp-soporte {
@@ -456,7 +447,6 @@
   </div>
 
   <div class="container">
-    <!-- Navbar Principal -->
     <header>
       <button class="btn-hamburger" id="openSidebarBtn" title="Abrir Menú">
         <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
@@ -472,7 +462,6 @@
       </a>
     </header>
 
-    <!-- Cuerpo Principal -->
     <main class="dashboard-card">
       <h2 class="dash-hero-title">
         Empezá a usar el sistema de gestión de tu negocio de préstamos, en el menú que está <span>arriba a la izquierda</span>.
@@ -496,11 +485,12 @@
   </div>
 
   <script type="module">
-    import { db } from './app.js';
+    // Nota: Usamos la ruta correcta '../app.js' apuntando a tu archivo en la raíz del repositorio
+    import { db } from '../app.js';
     import { collection, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // Obtenemos el ID almacenado (si no existe, usa un valor por defecto para no bloquear la página)
-    const prestamistaId = localStorage.getItem('cout_prestamista_id') || 'default_prestamista';
+    // Obtenemos el ID del prestamista logueado
+    const prestamistaId = localStorage.getItem('cout_prestamista_id');
 
     const sidebarUserTag = document.getElementById('sidebarUserTag');
     const headerTimerTxt = document.getElementById('headerTimerTxt');
@@ -512,53 +502,50 @@
     const logoutBtn = document.getElementById('logoutBtn');
     const whatsappSoporteBtn = document.getElementById('whatsappSoporteBtn');
 
-    // Control de Apertura / Cierre del Sidebar
     openSidebarBtn.addEventListener('click', () => sidebarOverlay.classList.add('is-open'));
     closeSidebarBtn.addEventListener('click', () => sidebarOverlay.classList.remove('is-open'));
     sidebarOverlay.addEventListener('click', (e) => {
       if (e.target === sidebarOverlay) sidebarOverlay.classList.remove('is-open');
     });
 
-    // Botón de Salir (limpia y vuelve al login solo si el usuario hace clic)
     logoutBtn.addEventListener('click', () => {
       localStorage.clear();
       window.location.replace('login.html');
     });
 
-    // --- ESPERAR A FIREBASE Y LEER DATOS CON RUTA EXACTA ---
-    // Ruta: carpetacout / configuracion_general / usuariosprestamistas / prestamistaId
-    const pRef = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId);
-    
-    onSnapshot(pRef, (snap) => {
-      if (snap.exists()) {
-        const data = snap.data();
-        
-        // Muestra @usuario en la cabecera del menú hamburguesa
-        const username = data.usuario || data.username || prestamistaId;
-        sidebarUserTag.textContent = `@${username}`;
+    if (prestamistaId) {
+      // Ruta exacta en Firestore: carpetacout / configuracion_general / usuariosprestamistas / prestamistaId
+      const pRef = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId);
+      
+      onSnapshot(pRef, (snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
+          const username = data.usuario || data.username || prestamistaId;
+          sidebarUserTag.textContent = `@${username}`;
 
-        // Configuración opcional de WhatsApp
-        if (data.soporteWhatsapp || data.whatsappSoporte || data.telefonoSoporte) {
-          const wppNum = data.soporteWhatsapp || data.whatsappSoporte || data.telefonoSoporte;
-          whatsappSoporteBtn.href = `https://wa.me/${wppNum.replace(/\D/g,'')}`;
-          whatsappSoporteBtn.style.display = 'inline-flex';
-        }
+          if (data.soporteWhatsapp || data.whatsappSoporte || data.telefonoSoporte) {
+            const wppNum = data.soporteWhatsapp || data.whatsappSoporte || data.telefonoSoporte;
+            whatsappSoporteBtn.href = `https://wa.me/${wppNum.replace(/\D/g,'')}`;
+            whatsappSoporteBtn.style.display = 'inline-flex';
+          }
 
-        // Calcula el contador en tiempo real con el campo venceEn de Firebase
-        if (data.venceEn) {
-          calcularContador(data.venceEn);
+          if (data.venceEn) {
+            calcularContador(data.venceEn);
+          } else {
+            headerTimerTxt.textContent = "Sin fecha límite";
+          }
         } else {
-          headerTimerTxt.textContent = "Sin fecha límite";
+          sidebarUserTag.textContent = `@${prestamistaId}`;
+          headerTimerTxt.textContent = "ID no encontrado en DB";
         }
-      } else {
-        sidebarUserTag.textContent = `@${prestamistaId}`;
-        headerTimerTxt.textContent = "Datos no sincronizados";
-      }
-    }, (error) => {
-      console.error("Error al sincronizar con Firebase:", error);
+      }, (error) => {
+        console.error("Error leyendo Firebase:", error);
+        sidebarUserTag.textContent = "@error_conexion";
+      });
+    } else {
       sidebarUserTag.textContent = "@invitado";
-      headerTimerTxt.textContent = "Modo sin conexión";
-    });
+      headerTimerTxt.textContent = "Sin sesión activa";
+    }
 
     function calcularContador(venceIso) {
       const ahora = new Date();
@@ -579,7 +566,7 @@
       }
     }
 
-    // --- CARGAR MENÚ HAMBURGUESA EN TIEMPO REAL DESDE FIRESTORE ---
+    // Cargar Menú Hamburguesa desde Firebase
     const menuRef = collection(db, "carpetacout", "configuracion_general", "menuprestamistas");
     
     onSnapshot(menuRef, (snapshot) => {
@@ -636,7 +623,7 @@
         sidebarContent.appendChild(block);
       });
     }, (error) => {
-      console.error("Error al cargar el menú:", error);
+      console.error("Error al cargar menú:", error);
     });
   </script>
 </body>
