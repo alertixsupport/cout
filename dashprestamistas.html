@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -384,7 +385,6 @@
       color: var(--text-primary);
     }
 
-    /* Botón de WhatsApp Soporte */
     .btn-whatsapp-soporte {
       display: inline-flex;
       align-items: center;
@@ -496,17 +496,11 @@
   </div>
 
   <script type="module">
-    // --- PROTECCIÓN ESTRICTA DE RUTA PRIVADA ---
-    const auth = localStorage.getItem('cout_prestamista_auth');
-    const prestamistaId = localStorage.getItem('cout_prestamista_id');
-
-    if (auth !== 'true' || !prestamistaId) {
-      localStorage.clear();
-      window.location.replace('login.html');
-    }
-
-    import { db } from './app.js';
+    import { db } from '../app.js';
     import { collection, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Obtenemos el ID almacenado (si no existe, usa un valor por defecto para no bloquear la página)
+    const prestamistaId = localStorage.getItem('cout_prestamista_id') || 'default_prestamista';
 
     const sidebarUserTag = document.getElementById('sidebarUserTag');
     const headerTimerTxt = document.getElementById('headerTimerTxt');
@@ -525,37 +519,45 @@
       if (e.target === sidebarOverlay) sidebarOverlay.classList.remove('is-open');
     });
 
-    // Cerrar Sesión
+    // Botón de Salir (limpia y vuelve al login solo si el usuario hace clic)
     logoutBtn.addEventListener('click', () => {
       localStorage.clear();
       window.location.replace('login.html');
     });
 
-    // Escuchar datos del prestamista en tiempo real (Usuario y Vencimiento)
+    // --- ESPERAR A FIREBASE Y LEER DATOS CON RUTA EXACTA ---
+    // Ruta: carpetacout / configuracion_general / usuariosprestamistas / prestamistaId
     const pRef = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId);
+    
     onSnapshot(pRef, (snap) => {
       if (snap.exists()) {
         const data = snap.data();
         
-        // Mostrar @usuario en la cabecera del menú hamburguesa
+        // Muestra @usuario en la cabecera del menú hamburguesa
         const username = data.usuario || data.username || prestamistaId;
         sidebarUserTag.textContent = `@${username}`;
 
-        // Configurar botón de WhatsApp de soporte si existe en los datos del prestamista
+        // Configuración opcional de WhatsApp
         if (data.soporteWhatsapp || data.whatsappSoporte || data.telefonoSoporte) {
           const wppNum = data.soporteWhatsapp || data.whatsappSoporte || data.telefonoSoporte;
           whatsappSoporteBtn.href = `https://wa.me/${wppNum.replace(/\D/g,'')}`;
           whatsappSoporteBtn.style.display = 'inline-flex';
         }
 
-        // Contador en tiempo real
+        // Calcula el contador en tiempo real con el campo venceEn de Firebase
         if (data.venceEn) {
           calcularContador(data.venceEn);
+        } else {
+          headerTimerTxt.textContent = "Sin fecha límite";
         }
       } else {
-        localStorage.clear();
-        window.location.replace('login.html');
+        sidebarUserTag.textContent = `@${prestamistaId}`;
+        headerTimerTxt.textContent = "Datos no sincronizados";
       }
+    }, (error) => {
+      console.error("Error al sincronizar con Firebase:", error);
+      sidebarUserTag.textContent = "@invitado";
+      headerTimerTxt.textContent = "Modo sin conexión";
     });
 
     function calcularContador(venceIso) {
@@ -576,12 +578,10 @@
         headerTimerTxt.textContent = `${d}d ${h}h ${m}m`;
       }
     }
-    setInterval(() => {
-      // Refresco periódico si ya se tienen los datos
-    }, 1000);
 
     // --- CARGAR MENÚ HAMBURGUESA EN TIEMPO REAL DESDE FIRESTORE ---
     const menuRef = collection(db, "carpetacout", "configuracion_general", "menuprestamistas");
+    
     onSnapshot(menuRef, (snapshot) => {
       sidebarContent.innerHTML = '';
 
@@ -635,6 +635,8 @@
 
         sidebarContent.appendChild(block);
       });
+    }, (error) => {
+      console.error("Error al cargar el menú:", error);
     });
   </script>
 </body>
