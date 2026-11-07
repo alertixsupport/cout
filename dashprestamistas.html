@@ -613,7 +613,6 @@
       
       onSnapshot(pRef, (snap) => {
         if (snap.exists()) {
-          blockedModalBackdrop.classList.remove('is-open');
           const data = snap.data();
           const username = data.usuario || data.username || prestamistaId;
           sidebarUserTag.textContent = `@${username}`;
@@ -624,22 +623,37 @@
             whatsappSoporteBtn.style.display = 'inline-flex';
           }
 
-          if (data.venceEn) {
+          // Validación robusta de fecha: si no hay fecha cargada o es futura, se permite acceso total
+          if (!data.venceEn) {
+            headerTimerTxt.textContent = "Activo";
+            blockedModalBackdrop.classList.remove('is-open');
+          } else {
             const ahora = new Date();
             const fVence = new Date(data.venceEn);
-            const diffMs = fVence - ahora;
-            if (diffMs <= 0) {
-              headerTimerTxt.textContent = "Suscripción Vencida";
-              headerTimerBadge.classList.add('suspended');
+            
+            // Verificamos si la fecha es válida
+            if (isNaN(fVence.getTime())) {
+              headerTimerTxt.textContent = "Activo";
+              blockedModalBackdrop.classList.remove('is-open');
             } else {
-              headerTimerBadge.classList.remove('suspended');
-              const d = Math.floor(diffMs / (1000 * 3600 * 24));
-              const h = Math.floor((diffMs / (1000 * 3600)) % 24);
-              headerTimerTxt.textContent = `${d}d ${h}h restantes`;
+              const diffMs = fVence - ahora;
+              if (diffMs <= 0) {
+                // Solo si verdaderamente expiró muestra el bloqueo
+                headerTimerTxt.textContent = "Suscripción Vencida";
+                headerTimerBadge.classList.add('suspended');
+                blockedModalBackdrop.classList.add('is-open');
+              } else {
+                // Si está vigente, quita cualquier bloqueo y muestra el contador con calma
+                headerTimerBadge.classList.remove('suspended');
+                blockedModalBackdrop.classList.remove('is-open');
+                const d = Math.floor(diffMs / (1000 * 3600 * 24));
+                const h = Math.floor((diffMs / (1000 * 3600)) % 24);
+                headerTimerTxt.textContent = `${d}d ${h}h restantes`;
+              }
             }
           }
         } else {
-          // Si el usuario es borrado o no existe en Firebase, muestra inmediatamente el bloqueo
+          // Solo si el documento fue eliminado de Firebase muestra el bloqueo de contrato
           sidebarUserTag.textContent = "@eliminado";
           headerTimerTxt.textContent = "Acceso Revocado";
           headerTimerBadge.classList.add('suspended');
