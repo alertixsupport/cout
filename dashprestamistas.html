@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>COUT.APP | Dashboard de Prestamistas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-base: #090a0f;
+      --bg-surface: #12151f;
+      --bg-surface-hover: #181c2b;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: #2563eb;
+      --accent-primary: #2563eb;
+      --accent-flame: #f97316;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-tertiary: #64748b;
+      
+      --status-active: #059669;
+      --status-active-bg: rgba(5, 150, 105, 0.12);
+      --status-suspended: #dc2626;
+      --status-suspended-bg: rgba(220, 38, 38, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      width: 100%;
+      min-height: 100vh;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      padding-bottom: 40px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px 16px;
+      width: 100%;
+    }
+
+    /* Navbar Principal */
+    header {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 12px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Botón Menú Hamburguesa Estilo 3D */
+    .btn-hamburger {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: linear-gradient(145deg, #181c2b, #10121b);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-hamburger:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .btn-hamburger svg {
+      width: 22px;
+      height: 22px;
+      stroke: var(--text-primary);
+      fill: none;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+    }
+
+    /* Brand Centrado */
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-text {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+    }
+
+    .logo-text span {
+      color: var(--accent-flame);
+    }
+
+    /* Badge Contador en Tiempo Real (Header) */
+    .header-timer-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(37, 99, 235, 0.1);
+      border: 1px solid rgba(37, 99, 235, 0.3);
+      padding: 8px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .header-timer-badge:hover {
+      background: rgba(37, 99, 235, 0.2);
+      border-color: rgba(37, 99, 235, 0.5);
+    }
+
+    .header-timer-badge.suspended {
+      background: var(--status-suspended-bg);
+      border-color: rgba(220, 38, 38, 0.3);
+    }
+
+    .dot-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 8px #34d399;
+    }
+
+    .header-timer-badge.suspended .dot-indicator {
+      background: #f87171;
+      box-shadow: 0 0 8px #f87171;
+    }
+
+    .header-timer-txt {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: #93c5fd;
+    }
+
+    .header-timer-badge.suspended .header-timer-txt {
+      color: #fca5a5;
+    }
+
+    /* --- SIDEBAR MENU HAMBURGUESA CON ANIMACIÓN FLUIDA --- */
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 7, 11, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .sidebar-overlay.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sidebar-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 320px;
+      max-width: 85vw;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-subtle);
+      z-index: 2001;
+      transform: translateX(-100%);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 15px 0 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .sidebar-overlay.is-open .sidebar-menu {
+      transform: translateX(0);
+    }
+
+    /* Cabecera del Menú Hamburguesa (Usuario Logueado) */
+    .sidebar-user-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.02);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .user-info-box h3 {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+    }
+
+    .user-info-box h3 span {
+      color: var(--accent-flame);
+    }
+
+    .user-info-box p {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--accent-primary);
+      margin-top: 2px;
+    }
+
+    .btn-close-sidebar {
+      background: transparent;
+      border: none;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+    }
+
+    .btn-close-sidebar:hover {
+      color: var(--text-primary);
+    }
+
+    .btn-close-sidebar svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .sidebar-content {
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .menu-category-block {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .category-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-tertiary);
+      padding: 0 8px;
+      margin-bottom: 4px;
+    }
+
+    .menu-item-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .menu-item-link:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-primary);
+    }
+
+    .menu-item-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .menu-item-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--accent-primary);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .btn-logout {
+      width: 100%;
+      height: 38px;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 8px;
+      color: #fca5a5;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+
+    .btn-logout:hover {
+      background: rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-logout svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    /* --- CUERPO PRINCIPAL (DASHBOARD) --- */
+    .dashboard-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 32px 24px;
+      box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .dash-hero-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.4px;
+      line-height: 1.4;
+    }
+
+    .dash-hero-title span {
+      color: var(--accent-primary);
+    }
+
+    .section-divider {
+      height: 1px;
+      background: var(--border-subtle);
+      width: 100%;
+    }
+
+    .info-paragraph {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .info-paragraph strong {
+      color: var(--text-primary);
+    }
+
+    /* Botón de WhatsApp Soporte */
+    .btn-whatsapp-soporte {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(5, 150, 105, 0.3);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      margin-top: 4px;
+      align-self: flex-start;
+    }
+
+    .btn-whatsapp-soporte:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+
+    .btn-whatsapp-soporte svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .filler-text-box {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px dashed var(--border-subtle);
+      border-radius: 12px;
+      padding: 18px;
+      font-size: 13px;
+      color: var(--text-tertiary);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Overlay Menú Hamburguesa -->
+  <div class="sidebar-overlay" id="sidebarOverlay">
+    <div class="sidebar-menu">
+      <div class="sidebar-user-header">
+        <div class="user-info-box">
+          <h3>cout<span>.app</span></h3>
+          <p id="sidebarUserTag">@cargando...</p>
+        </div>
+        <button class="btn-close-sidebar" id="closeSidebarBtn" title="Cerrar Menú">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="sidebar-content" id="sidebarContent">
+        <div style="text-align: center; color: var(--text-tertiary); padding: 20px; font-size: 12px;">
+          Sincronizando herramientas...
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="btn-logout" id="logoutBtn">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Navbar Principal -->
+    <header>
+      <button class="btn-hamburger" id="openSidebarBtn" title="Abrir Menú">
+        <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+
+      <div class="brand-section">
+        <h1 class="logo-text">cout<span>.app</span></h1>
+      </div>
+
+      <a href="pagosonline.html" class="header-timer-badge" id="headerTimerBadge" title="Ver estado de suscripción">
+        <span class="dot-indicator"></span>
+        <span class="header-timer-txt" id="headerTimerTxt">Calculando...</span>
+      </a>
+    </header>
+
+    <!-- Cuerpo Principal -->
+    <main class="dashboard-card">
+      <h2 class="dash-hero-title">
+        Empezá a usar el sistema de gestión de tu negocio de préstamos, en el menú que está <span>arriba a la izquierda</span>.
+      </h2>
+
+      <div class="section-divider"></div>
+
+      <p class="info-paragraph">
+        Cualquier duda que tengas, podés contactar al soporte mediante WhatsApp a la persona que te dio acceso al servicio de <strong>COUT.APP</strong>.
+      </p>
+
+      <a href="#" id="whatsappSoporteBtn" class="btn-whatsapp-soporte" target="_blank" style="display: none;">
+        <svg viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.124-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+        Contactar Soporte por WhatsApp
+      </a>
+
+      <div class="filler-text-box">
+        <strong>Panel de Control Profesional:</strong> Este espacio está diseñado para optimizar el flujo operativo diario de tu cartera de créditos. Desde aquí podrás coordinar cobros, registrar nuevos prestatarios, emitir comprobantes digitales y llevar un seguimiento detallado de los vencimientos de capital e intereses en tiempo real.
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    // --- PROTECCIÓN ESTRICTA DE RUTA PRIVADA ---
+    const auth = localStorage.getItem('cout_prestamista_auth');
+    const prestamistaId = localStorage.getItem('cout_prestamista_id');
+
+    if (auth !== 'true' || !prestamistaId) {
+      localStorage.clear();
+      window.location.replace('login.html');
+    }
+
+    import { db } from '../app.js';
+    import { collection, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const sidebarUserTag = document.getElementById('sidebarUserTag');
+    const headerTimerTxt = document.getElementById('headerTimerTxt');
+    const headerTimerBadge = document.getElementById('headerTimerBadge');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const openSidebarBtn = document.getElementById('openSidebarBtn');
+    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+    const sidebarContent = document.getElementById('sidebarContent');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const whatsappSoporteBtn = document.getElementById('whatsappSoporteBtn');
+
+    // Control de Apertura / Cierre del Sidebar
+    openSidebarBtn.addEventListener('click', () => sidebarOverlay.classList.add('is-open'));
+    closeSidebarBtn.addEventListener('click', () => sidebarOverlay.classList.remove('is-open'));
+    sidebarOverlay.addEventListener('click', (e) => {
+      if (e.target === sidebarOverlay) sidebarOverlay.classList.remove('is-open');
+    });
+
+    // Cerrar Sesión
+    logoutBtn.addEventListener('click', () => {
+      localStorage.clear();
+      window.location.replace('login.html');
+    });
+
+    // Escuchar datos del prestamista en tiempo real (Usuario y Vencimiento)
+    const pRef = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId);
+    onSnapshot(pRef, (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        
+        // Mostrar @usuario en la cabecera del menú hamburguesa
+        const username = data.usuario || data.username || prestamistaId;
+        sidebarUserTag.textContent = `@${username}`;
+
+        // Configurar botón de WhatsApp de soporte si existe en los datos del prestamista
+        if (data.soporteWhatsapp || data.whatsappSoporte || data.telefonoSoporte) {
+          const wppNum = data.soporteWhatsapp || data.whatsappSoporte || data.telefonoSoporte;
+          whatsappSoporteBtn.href = `https://wa.me/${wppNum.replace(/\D/g,'')}`;
+          whatsappSoporteBtn.style.display = 'inline-flex';
+        }
+
+        // Contador en tiempo real
+        if (data.venceEn) {
+          calcularContador(data.venceEn);
+        }
+      } else {
+        localStorage.clear();
+        window.location.replace('login.html');
+      }
+    });
+
+    function calcularContador(venceIso) {
+      const ahora = new Date();
+      const fVence = new Date(venceIso);
+      const diffMs = fVence - ahora;
+
+      if (diffMs <= 0) {
+        headerTimerTxt.textContent = "Suscripción Vencida";
+        headerTimerBadge.classList.add('suspended');
+      } else {
+        headerTimerBadge.classList.remove('suspended');
+        const totSeg = Math.floor(diffMs / 1000);
+        const d = Math.floor(totSeg / (3600 * 24));
+        const h = Math.floor((totSeg % (3600 * 24)) / 3600);
+        const m = Math.floor((totSeg % 3600) / 60);
+
+        headerTimerTxt.textContent = `${d}d ${h}h ${m}m`;
+      }
+    }
+    setInterval(() => {
+      // Refresco periódico si ya se tienen los datos
+    }, 1000);
+
+    // --- CARGAR MENÚ HAMBURGUESA EN TIEMPO REAL DESDE FIRESTORE ---
+    const menuRef = collection(db, "carpetacout", "configuracion_general", "menuprestamistas");
+    onSnapshot(menuRef, (snapshot) => {
+      sidebarContent.innerHTML = '';
+
+      if (snapshot.empty) {
+        sidebarContent.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); padding: 20px; font-size: 12px;">No hay herramientas configuradas.</div>';
+        return;
+      }
+
+      const categoriasMap = {};
+
+      snapshot.forEach((docSnap) => {
+        const item = docSnap.data();
+        const cat = item.Categoria || item.categoria || 'General';
+        
+        if (!categoriasMap[cat]) {
+          categoriasMap[cat] = [];
+        }
+        categoriasMap[cat].push(item);
+      });
+
+      Object.keys(categoriasMap).forEach((categoria) => {
+        const block = document.createElement('div');
+        block.className = 'menu-category-block';
+
+        const title = document.createElement('div');
+        title.className = 'category-title';
+        title.textContent = categoria;
+        block.appendChild(title);
+
+        categoriasMap[categoria].forEach((navItem) => {
+          const link = document.createElement('a');
+          link.className = 'menu-item-link';
+          link.href = navItem.Redireccion || navItem.redireccion || '#';
+
+          const iconContainer = document.createElement('div');
+          iconContainer.className = 'menu-item-icon';
+          
+          if (navItem.LOGOTIPO || navItem.logotipo) {
+            iconContainer.innerHTML = navItem.LOGOTIPO || navItem.logotipo;
+          } else {
+            iconContainer.innerHTML = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle></svg>`;
+          }
+
+          const span = document.createElement('span');
+          span.textContent = navItem.Nombre || navItem.nombre || 'Herramienta';
+
+          link.appendChild(iconContainer);
+          link.appendChild(span);
+          block.appendChild(link);
+        });
+
+        sidebarContent.appendChild(block);
+      });
+    });
+  </script>
+</body>
+</html>
