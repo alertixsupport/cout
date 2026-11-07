@@ -384,7 +384,6 @@
       color: var(--text-primary);
     }
 
-    /* Botón de WhatsApp Soporte */
     .btn-whatsapp-soporte {
       display: inline-flex;
       align-items: center;
@@ -518,7 +517,7 @@
     const logoutBtn = document.getElementById('logoutBtn');
     const whatsappSoporteBtn = document.getElementById('whatsappSoporteBtn');
 
-    // Control de Apertura / Cierre del Sidebar
+    // Control de Apertura / Cierre del Sidebar con Animación
     openSidebarBtn.addEventListener('click', () => sidebarOverlay.classList.add('is-open'));
     closeSidebarBtn.addEventListener('click', () => sidebarOverlay.classList.remove('is-open'));
     sidebarOverlay.addEventListener('click', (e) => {
@@ -531,31 +530,34 @@
       window.location.replace('login.html');
     });
 
-    // Escuchar datos del prestamista en tiempo real (Usuario y Vencimiento)
+    // --- LEER DATOS DEL PRESTAMISTA EN TIEMPO REAL ---
+    // Ruta exacta: carpetacout / configuracion_general / usuariosprestamistas / prestamistaId
     const pRef = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId);
+    
     onSnapshot(pRef, (snap) => {
       if (snap.exists()) {
         const data = snap.data();
         
-        // Mostrar @usuario en la cabecera del menú hamburguesa
+        // Muestra @usuario en el encabezado del menú hamburguesa
         const username = data.usuario || data.username || prestamistaId;
         sidebarUserTag.textContent = `@${username}`;
 
-        // Configurar botón de WhatsApp de soporte si existe en los datos del prestamista
+        // Soporte de WhatsApp opcional
         if (data.soporteWhatsapp || data.whatsappSoporte || data.telefonoSoporte) {
           const wppNum = data.soporteWhatsapp || data.whatsappSoporte || data.telefonoSoporte;
           whatsappSoporteBtn.href = `https://wa.me/${wppNum.replace(/\D/g,'')}`;
           whatsappSoporteBtn.style.display = 'inline-flex';
         }
 
-        // Contador en tiempo real
+        // Contador de vencimiento en tiempo real
         if (data.venceEn) {
           calcularContador(data.venceEn);
         }
       } else {
-        localStorage.clear();
-        window.location.replace('login.html');
+        console.warn("El documento del prestamista no existe en la base de datos.");
       }
+    }, (error) => {
+      console.error("Error al escuchar datos del prestamista:", error);
     });
 
     function calcularContador(venceIso) {
@@ -576,12 +578,15 @@
         headerTimerTxt.textContent = `${d}d ${h}h ${m}m`;
       }
     }
+
+    // Actualizar contador cada minuto automáticamente
     setInterval(() => {
-      // Refresco periódico si ya se tienen los datos
-    }, 1000);
+      if (window.venceCache) calcularContador(window.venceCache);
+    }, 60000);
 
     // --- CARGAR MENÚ HAMBURGUESA EN TIEMPO REAL DESDE FIRESTORE ---
     const menuRef = collection(db, "carpetacout", "configuracion_general", "menuprestamistas");
+    
     onSnapshot(menuRef, (snapshot) => {
       sidebarContent.innerHTML = '';
 
@@ -635,6 +640,8 @@
 
         sidebarContent.appendChild(block);
       });
+    }, (error) => {
+      console.error("Error al cargar el menú dinámico:", error);
     });
   </script>
 </body>
