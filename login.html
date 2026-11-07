@@ -600,7 +600,7 @@
           sessionStorage.setItem('cout_prestamista_id', prestamistaValido.id);
           sessionStorage.setItem('cout_prestamista_nombre', prestamistaValido.nombre || 'Prestamista');
 
-          window.location.replace('dashprestamistas.html?user=${nombreDeUsuario}');
+          window.location.replace('dashprestamistas.html?user=${usuario}');
         }, 3000);
 
       } catch (err) {
