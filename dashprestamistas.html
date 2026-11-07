@@ -14,15 +14,11 @@
       --bg-surface: #12151f;
       --bg-surface-hover: #181c2b;
       --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-focus: #2563eb;
       --accent-primary: #2563eb;
       --accent-flame: #f97316;
       --text-primary: #f1f5f9;
       --text-secondary: #94a3b8;
       --text-tertiary: #64748b;
-      
-      --status-active: #059669;
-      --status-active-bg: rgba(5, 150, 105, 0.12);
       --status-suspended: #dc2626;
       --status-suspended-bg: rgba(220, 38, 38, 0.12);
     }
@@ -340,7 +336,7 @@
       stroke-width: 2;
     }
 
-    /* --- MODAL DE BLOQUEO EN TIEMPO REAL (KILLSWITCH) --- */
+    /* --- MODAL DE BLOQUEO KILLSWITCH --- */
     .modal-backdrop-blocked {
       position: fixed;
       inset: 0;
@@ -497,7 +493,7 @@
 </head>
 <body>
 
-  <!-- Modal de Bloqueo Inmediato en Tiempo Real (Si se borra el usuario) -->
+  <!-- Modal KillSwitch de Bloqueo Inmediato -->
   <div class="modal-backdrop-blocked" id="blockedModalBackdrop">
     <div class="modal-window-blocked">
       <div class="modal-icon-alert">
@@ -581,11 +577,12 @@
   </div>
 
   <script type="module">
-    import { db } from './app.js';
+    import { db } from '../app.js';
     import { collection, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // Detectamos exactamente el usuario logueado guardado por el login.html
-    const prestamistaId = localStorage.getItem('cout_prestamista_id') || localStorage.getItem('cout_prestamista_user');
+    // Detección directa del usuario a través de la URL (ej: dashprestamistas.html?user=nombre)
+    const urlParams = new URLSearchParams(window.location.search);
+    const prestamistaId = urlParams.get('user') || urlParams.get('id') || urlParams.get('prestamista');
 
     const sidebarUserTag = document.getElementById('sidebarUserTag');
     const headerTimerTxt = document.getElementById('headerTimerTxt');
@@ -600,29 +597,23 @@
 
     openSidebarBtn.addEventListener('click', () => sidebarOverlay.classList.add('is-open'));
     closeSidebarBtn.addEventListener('click', () => sidebarOverlay.classList.remove('is-open'));
-    sidebarOverlay.addEventListener('click', (e) => {
-      if (e.target === sidebarOverlay) sidebarOverlay.classList.remove('is-open');
-    });
+    sidebarOverlay.addEventListener('click', (e) => { if (e.target === sidebarOverlay) sidebarOverlay.classList.remove('is-open'); });
 
     logoutBtn.addEventListener('click', () => {
-      localStorage.clear();
       window.location.replace('login.html');
     });
 
     if (!prestamistaId) {
-      // Si no hay sesión previa, mostramos indicador pero permitimos ver la interfaz
       sidebarUserTag.textContent = "@invitado";
-      headerTimerTxt.textContent = "Sin sesión";
+      headerTimerTxt.textContent = "Sin usuario";
+      blockedModalBackdrop.classList.add('is-open');
     } else {
-      // --- ESCUCHA EN TIEMPO REAL EN FIREBASE ---
-      // Ruta exacta: carpetacout / configuracion_general / usuariosprestamistas / prestamistaId
+      // Consulta en tiempo real en la ruta exacta de Firebase
       const pRef = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId);
       
       onSnapshot(pRef, (snap) => {
         if (snap.exists()) {
-          // El usuario existe y está activo: Quitamos cualquier bloqueo
           blockedModalBackdrop.classList.remove('is-open');
-
           const data = snap.data();
           const username = data.usuario || data.username || prestamistaId;
           sidebarUserTag.textContent = `@${username}`;
@@ -634,47 +625,33 @@
           }
 
           if (data.venceEn) {
-            calcularContador(data.venceEn);
-          } else {
-            headerTimerTxt.textContent = "Sin fecha límite";
+            const ahora = new Date();
+            const fVence = new Date(data.venceEn);
+            const diffMs = fVence - ahora;
+            if (diffMs <= 0) {
+              headerTimerTxt.textContent = "Suscripción Vencida";
+              headerTimerBadge.classList.add('suspended');
+            } else {
+              headerTimerBadge.classList.remove('suspended');
+              const d = Math.floor(diffMs / (1000 * 3600 * 24));
+              const h = Math.floor((diffMs / (1000 * 3600)) % 24);
+              headerTimerTxt.textContent = `${d}d ${h}h restantes`;
+            }
           }
         } else {
-          // 🔴 SI EL USUARIO FUE ELIMINADO EN TIEMPO REAL EN FIREBASE: Muestra el cartel de inmediato
+          // Si el usuario es borrado o no existe en Firebase, muestra inmediatamente el bloqueo
           sidebarUserTag.textContent = "@eliminado";
           headerTimerTxt.textContent = "Acceso Revocado";
           headerTimerBadge.classList.add('suspended');
           blockedModalBackdrop.classList.add('is-open');
         }
-      }, (error) => {
-        console.error("Error al sincronizar con Firebase:", error);
       });
     }
 
-    function calcularContador(venceIso) {
-      const ahora = new Date();
-      const fVence = new Date(venceIso);
-      const diffMs = fVence - ahora;
-
-      if (diffMs <= 0) {
-        headerTimerTxt.textContent = "Suscripción Vencida";
-        headerTimerBadge.classList.add('suspended');
-      } else {
-        headerTimerBadge.classList.remove('suspended');
-        const totSeg = Math.floor(diffMs / 1000);
-        const d = Math.floor(totSeg / (3600 * 24));
-        const h = Math.floor((totSeg % (3600 * 24)) / 3600);
-        const m = Math.floor((totSeg % 3600) / 60);
-
-        headerTimerTxt.textContent = `${d}d ${h}h ${m}m`;
-      }
-    }
-
-    // --- CARGAR MENÚ HAMBURGUESA EN TIEMPO REAL DESDE FIREBASE ---
+    // Cargar menú hamburguesa dinámico en tiempo real
     const menuRef = collection(db, "carpetacout", "configuracion_general", "menuprestamistas");
-    
     onSnapshot(menuRef, (snapshot) => {
       sidebarContent.innerHTML = '';
-
       if (snapshot.empty) {
         sidebarContent.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); padding: 20px; font-size: 12px;">No hay herramientas configuradas.</div>';
         return;
