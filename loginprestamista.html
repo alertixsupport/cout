@@ -3,20 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>COUT.APP | Acceso Prestamistas</title>
+  <title>COUT.APP | Acceso Empresarial Prestamistas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
   
   <style>
     :root {
-      --bg-base: #090a0f;
-      --bg-surface: #12151f;
+      --bg-base: #07090e;
+      --bg-surface: #0e111a;
+      --bg-surface-card: #131722;
       --border-subtle: rgba(255, 255, 255, 0.08);
-      --border-focus: #2563eb;
-      --accent-primary: #2563eb;
+      --border-focus: #f97316;
+      --accent-primary: #f97316;
       --accent-flame: #f97316;
-      --text-primary: #f1f5f9;
+      --text-primary: #f8fafc;
       --text-secondary: #94a3b8;
       --text-tertiary: #64748b;
       --status-error: #ef4444;
@@ -34,62 +35,138 @@
       width: 100%;
       min-height: 100vh;
       background-color: var(--bg-base);
-      background-image: 
-        radial-gradient(at 50% 0%, rgba(37, 99, 235, 0.12) 0px, transparent 50%),
-        radial-gradient(at 50% 100%, rgba(249, 115, 22, 0.05) 0px, transparent 50%);
       display: flex;
-      align-items: center;
+      align-items: stretch;
       justify-content: center;
-      padding: 16px;
       color: var(--text-primary);
+      overflow-x: hidden;
     }
 
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(12px); }
+    @keyframes fadeInSlide {
+      from { opacity: 0; transform: translateY(16px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    @keyframes flameFlicker {
-      0%, 100% { transform: scale(1) rotate(0deg); filter: drop-shadow(0 0 4px rgba(249, 115, 22, 0.4)); }
-      50% { transform: scale(1.06) rotate(-2deg); filter: drop-shadow(0 0 10px rgba(249, 115, 22, 0.7)); }
+    @keyframes shakeError {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
     }
 
-    .login-container {
+    .shake {
+      animation: shakeError 0.4s ease-in-out;
+      border-color: var(--status-error) !important;
+      box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15) !important;
+    }
+
+    @keyframes permanentFlamePulse {
+      0%, 100% { 
+        transform: scale(1) rotate(0deg); 
+        filter: drop-shadow(0 0 6px rgba(249, 115, 22, 0.5));
+        border-color: rgba(249, 115, 22, 0.35);
+        background: rgba(249, 115, 22, 0.1);
+      }
+      50% { 
+        transform: scale(1.08) rotate(-2deg); 
+        filter: drop-shadow(0 0 16px rgba(249, 115, 22, 0.85));
+        border-color: rgba(249, 115, 22, 0.7);
+        background: rgba(249, 115, 22, 0.18);
+      }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
+    }
+
+    @keyframes arrowSlidePermanent {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(5px); }
+    }
+
+    /* Animación de brillo sutil en tonos naranjas/fuego para el botón */
+    @keyframes buttonAmbientOrange {
+      0%, 100% { box-shadow: 0 0 15px rgba(249, 115, 22, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+      50% { box-shadow: 0 0 25px rgba(249, 115, 22, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+    }
+
+    .enterprise-wrapper {
       width: 100%;
-      max-width: 400px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: 16px;
-      padding: 32px 28px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-      animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr;
     }
 
-    .brand-header {
-      display: flex;
+    @media (min-width: 1024px) {
+      .enterprise-wrapper {
+        grid-template-columns: 1.2fr 1fr;
+      }
+    }
+
+    .brand-sidebar {
+      display: none;
+      background: linear-gradient(135deg, #090d16 0%, #0e1424 100%);
+      border-right: 1px solid var(--border-subtle);
+      padding: 60px;
       flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (min-width: 1024px) {
+      .brand-sidebar {
+        display: flex;
+      }
+    }
+
+    .brand-sidebar::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      left: -20%;
+      width: 60%;
+      height: 60%;
+      background: radial-gradient(circle, rgba(249, 115, 22, 0.1) 0%, transparent 70%);
+      pointer-events: none;
+      animation: pulseGlow 6s ease-in-out infinite;
+    }
+
+    .brand-sidebar::after {
+      content: '';
+      position: absolute;
+      bottom: -20%;
+      right: -20%;
+      width: 60%;
+      height: 60%;
+      background: radial-gradient(circle, rgba(249, 115, 22, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .sidebar-top {
+      position: relative;
+      z-index: 2;
+    }
+
+    .sidebar-logo {
+      display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       margin-bottom: 24px;
-      text-align: center;
     }
 
-    .brand-logo-icon {
-      width: 48px;
-      height: 48px;
+    .sidebar-logo-icon {
+      width: 46px;
+      height: 46px;
       border-radius: 12px;
-      background: rgba(249, 115, 22, 0.1);
-      border: 1px solid rgba(249, 115, 22, 0.3);
+      border: 1px solid rgba(249, 115, 22, 0.35);
       display: flex;
       align-items: center;
       justify-content: center;
-      animation: flameFlicker 3s ease-in-out infinite;
+      animation: permanentFlamePulse 3.5s ease-in-out infinite;
     }
 
-    .brand-logo-icon svg {
+    .sidebar-logo-icon svg {
       width: 24px;
       height: 24px;
       stroke: var(--accent-flame);
@@ -97,42 +174,143 @@
       stroke-width: 2;
     }
 
-    .logo-text {
+    .sidebar-logo h2 {
       font-size: 24px;
       font-weight: 800;
       letter-spacing: -0.5px;
-      color: var(--text-primary);
     }
 
-    .logo-text span {
+    .sidebar-logo h2 span {
       color: var(--accent-flame);
     }
 
-    .brand-subtitle {
-      font-size: 12px;
+    .sidebar-hero-text h1 {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+      color: #ffffff;
+    }
+
+    .sidebar-hero-text h1 span {
+      background: linear-gradient(135deg, #ffedd5 0%, #f97316 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .sidebar-hero-text p {
+      font-size: 15px;
       color: var(--text-secondary);
-      font-weight: 500;
-      line-height: 1.4;
+      line-height: 1.6;
+      max-width: 440px;
+    }
+
+    .sidebar-footer-info {
+      position: relative;
+      z-index: 2;
+      font-size: 13px;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .secure-dot {
+      width: 8px;
+      height: 8px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #10b981;
+    }
+
+    .login-main-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: var(--bg-base);
+      position: relative;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--bg-surface-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 40px 32px;
+      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+      animation: fadeInSlide 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      position: relative;
+    }
+
+    .mobile-brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+
+    @media (min-width: 1024px) {
+      .mobile-brand {
+        display: none;
+      }
+    }
+
+    .mobile-logo-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      border: 1px solid rgba(249, 115, 22, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: permanentFlamePulse 3.5s ease-in-out infinite;
+    }
+
+    .mobile-logo-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--accent-flame);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .form-header-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      letter-spacing: -0.4px;
+    }
+
+    .form-header-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
     }
 
     .login-form {
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 18px;
     }
 
     .form-field {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 7px;
     }
 
     .form-field label {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.6px;
       color: var(--text-secondary);
     }
 
@@ -143,73 +321,127 @@
 
     .input-icon-group svg {
       position: absolute;
-      left: 14px;
+      left: 15px;
       top: 50%;
       transform: translateY(-50%);
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       stroke: var(--text-tertiary);
       fill: none;
       stroke-width: 2;
+      transition: stroke 0.2s;
     }
 
     .input-icon-group input {
       width: 100%;
-      height: 44px;
-      padding: 0 16px 0 42px;
-      background: var(--bg-base);
+      height: 48px;
+      padding: 0 16px 0 46px;
+      background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
-      border-radius: 10px;
+      border-radius: 12px;
       color: var(--text-primary);
-      font-size: 13px;
+      font-size: 14px;
       outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
+      transition: all 0.25s ease;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
     .input-icon-group input:focus {
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      border-color: var(--border-focus);
+      background: #090e18;
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
+    .input-icon-group input:focus + svg,
+    .input-icon-group input:not(:placeholder-shown) + svg {
+      stroke: var(--accent-flame);
+    }
+
+    /* --- BOTÓN DE ALTA GAMA CON TONOS NARANJAS / FUEGO EXCLUSIVOS --- */
     .btn-submit {
       width: 100%;
-      height: 44px;
-      margin-top: 6px;
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-      border: none;
-      border-radius: 10px;
+      height: 52px;
+      margin-top: 8px;
+      background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+      border: 1px solid rgba(249, 115, 22, 0.6);
+      border-radius: 12px;
       color: white;
-      font-weight: 600;
-      font-size: 13px;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.3px;
       cursor: pointer;
-      transition: transform 0.15s ease, opacity 0.2s ease;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: buttonAmbientOrange 3.5s ease-in-out infinite;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-submit::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+      transition: 0.5s;
+    }
+
+    .btn-submit:hover::after {
+      left: 100%;
     }
 
     .btn-submit:hover {
-      opacity: 0.95;
-      transform: translateY(-1px);
+      background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(249, 115, 22, 0.45);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
     }
 
     .btn-submit:disabled {
-      opacity: 0.7;
+      opacity: 0.75;
       cursor: not-allowed;
       transform: none;
+      animation: none;
+      background: #1e293b;
+      box-shadow: none;
+      border-color: var(--border-subtle);
     }
 
-    /* Animación de carga profesional (Spinner) */
+    .btn-submit svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.5;
+      animation: arrowSlidePermanent 1.8s ease-in-out infinite;
+      position: relative;
+      z-index: 2;
+    }
+
+    .btn-submit span {
+      position: relative;
+      z-index: 2;
+    }
+
     .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
+      width: 18px;
+      height: 18px;
+      border: 2.5px solid rgba(255, 255, 255, 0.3);
       border-top-color: white;
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      animation: spin 0.7s linear infinite;
       display: none;
+      position: relative;
+      z-index: 2;
     }
 
     @keyframes spin {
@@ -218,30 +450,39 @@
 
     .error-banner {
       width: 100%;
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      border-radius: 8px;
-      padding: 10px 14px;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      border-radius: 10px;
+      padding: 12px 16px;
       color: #fca5a5;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 500;
       text-align: center;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
       display: none;
+      animation: fadeInSlide 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
-    /* Enlace de Renovación */
     .renovar-container {
-      margin-top: 20px;
+      margin-top: 24px;
       text-align: center;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 20px;
     }
 
     .renovar-link {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--accent-flame);
       text-decoration: none;
       font-weight: 600;
       transition: opacity 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .renovar-link:hover {
@@ -250,78 +491,136 @@
     }
 
     .login-footer {
-      margin-top: 20px;
+      margin-top: 16px;
       text-align: center;
       font-size: 11px;
       color: var(--text-tertiary);
+      letter-spacing: 0.3px;
     }
   </style>
 </head>
 <body>
 
-  <div class="login-container">
-    <div class="brand-header">
-      <div class="brand-logo-icon" title="Cout.app">
-        <svg viewBox="0 0 24 24">
-          <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.542 2-6 .5 2 2 3.5 3.5 5.5A5.5 5.5 0 0 1 17 15a5 5 0 0 1-10 0c0-.3.033-.6.097-.892A5.474 5.474 0 0 0 8.5 14.5z"/>
-          <path d="M12 22a4 4 0 0 0 4-4c0-1.5-1-2.5-2-3.5-.5 1-1 1.5-2 2s-1.5-.5-2-1.5c-1 1-2 2-2 3a4 4 0 0 0 4 4z"/>
-        </svg>
-      </div>
-      <div>
-        <h1 class="logo-text">cout<span>.app</span></h1>
-        <p class="brand-subtitle">Software para gestión empresarial de prestamistas</p>
-      </div>
-    </div>
-
-    <div class="error-banner" id="errorBanner"></div>
-
-    <form class="login-form" id="loginForm">
-      <div class="form-field">
-        <label for="usuario">Usuario</label>
-        <div class="input-icon-group">
-          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-          <input type="text" id="usuario" required autocomplete="username" placeholder="Ingrese su usuario">
+  <div class="enterprise-wrapper">
+    
+    <!-- LADO IZQUIERDO: Panel Empresarial para PC -->
+    <div class="brand-sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-logo">
+          <div class="sidebar-logo-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.542 2-6 .5 2 2 3.5 3.5 5.5A5.5 5.5 0 0 1 17 15a5 5 0 0 1-10 0c0-.3.033-.6.097-.892A5.474 5.474 0 0 0 8.5 14.5z"/>
+              <path d="M12 22a4 4 0 0 0 4-4c0-1.5-1-2.5-2-3.5-.5 1-1 1.5-2 2s-1.5-.5-2-1.5c-1 1-2 2-2 3a4 4 0 0 0 4 4z"/>
+            </svg>
+          </div>
+          <h2>cout<span style="color: var(--accent-flame);">.app</span></h2>
+        </div>
+        
+        <div class="sidebar-hero-text" style="margin-top: 80px;">
+          <h1>Gestión financiera <span>inteligente y segura</span> para prestamistas.</h1>
+          <p>Control total de cartera, seguimiento de vencimientos en tiempo real y automatización operativa centralizada bajo estándares de alta gama.</p>
         </div>
       </div>
 
-      <div class="form-field">
-        <label for="clave">Contraseña de acceso</label>
-        <div class="input-icon-group">
-          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-          <input type="password" id="clave" required autocomplete="current-password" placeholder="••••••••">
-        </div>
+      <div class="sidebar-footer-info">
+        <div class="secure-dot"></div>
+        <span>Infraestructura cifrada &bull; Conexión en vivo con Firebase</span>
       </div>
-
-      <button type="submit" class="btn-submit" id="btnSubmit">
-        <span id="btnText">Iniciar sesión</span>
-        <div class="spinner" id="btnSpinner"></div>
-      </button>
-    </form>
-
-    <div class="renovar-container">
-      <a href="pagosonline.html" class="renovar-link">¿Necesitas renovar usuario? Click aquí</a>
     </div>
 
-    <div class="login-footer">
-      COUT.APP &bull; Seguridad Financiera
+    <!-- LADO DERECHO: Tarjeta de Acceso -->
+    <div class="login-main-section">
+      <div class="login-card">
+        
+        <div class="mobile-brand">
+          <div class="mobile-logo-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.542 2-6 .5 2 2 3.5 3.5 5.5A5.5 5.5 0 0 1 17 15a5 5 0 0 1-10 0c0-.3.033-.6.097-.892A5.474 5.474 0 0 0 8.5 14.5z"/>
+              <path d="M12 22a4 4 0 0 0 4-4c0-1.5-1-2.5-2-3.5-.5 1-1 1.5-2 2s-1.5-.5-2-1.5c-1 1-2 2-2 3a4 4 0 0 0 4 4z"/>
+            </svg>
+          </div>
+          <div>
+            <h1 style="font-size: 24px; font-weight: 800;">cout<span style="color: var(--accent-flame);">.app</span></h1>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 24px;">
+          <h2 class="form-header-title">Portal de Acceso</h2>
+          <p class="form-header-subtitle">Ingrese sus credenciales autorizadas</p>
+        </div>
+
+        <!-- Banner de advertencia inteligente -->
+        <div class="error-banner" id="errorBanner" style="display: none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          <span id="errorText">Por favor, complete todos los campos.</span>
+        </div>
+
+        <form class="login-form" id="loginForm" novalidate>
+          <div class="form-field">
+            <label for="usuario">Usuario</label>
+            <div class="input-icon-group">
+              <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+              <input type="text" id="usuario" autocomplete="username" placeholder="Ingrese su usuario">
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="clave">Contraseña de acceso</label>
+            <div class="input-icon-group">
+              <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <input type="password" id="clave" autocomplete="current-password" placeholder="••••••••">
+            </div>
+          </div>
+
+          <!-- Botón de acceso naranja fuego limpio y sin azul -->
+          <button type="submit" class="btn-submit" id="btnSubmit">
+            <span id="btnText">Acceder al sistema</span>
+            <svg id="btnIcon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            <div class="spinner" id="btnSpinner"></div>
+          </button>
+        </form>
+
+        <div class="renovar-container">
+          <a href="pagosonline.html" class="renovar-link">
+            <span>¿Necesitas renovar usuario?</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </a>
+        </div>
+
+        <div class="login-footer">
+          COUT.APP &bull; Enterprise Financial Suite
+        </div>
+
+      </div>
     </div>
+
   </div>
 
   <script type="module">
-    import { db } from './app.js';
+    import { db } from '../app.js';
     import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const loginForm = document.getElementById('loginForm');
     const usuarioInput = document.getElementById('usuario');
     const claveInput = document.getElementById('clave');
     const errorBanner = document.getElementById('errorBanner');
+    const errorText = document.getElementById('errorText');
     const btnSubmit = document.getElementById('btnSubmit');
     const btnText = document.getElementById('btnText');
+    const btnIcon = document.getElementById('btnIcon');
     const btnSpinner = document.getElementById('btnSpinner');
 
-    function mostrarError(mensaje) {
-      errorBanner.textContent = mensaje;
-      errorBanner.style.display = 'block';
+    function mostrarAlerta(mensaje, elementoInput = null) {
+      errorText.textContent = mensaje;
+      errorBanner.style.display = 'flex';
+
+      if (elementoInput) {
+        elementoInput.classList.add('shake');
+        elementoInput.focus();
+        setTimeout(() => {
+          elementoInput.classList.remove('shake');
+        }, 400);
+      }
     }
 
     loginForm.addEventListener('submit', async (e) => {
@@ -331,18 +630,23 @@
       const usuarioVal = usuarioInput.value.trim();
       const claveVal = claveInput.value.trim();
 
-      if (!usuarioVal || !claveVal) {
-        mostrarError("Por favor, complete todos los campos.");
+      if (!usuarioVal) {
+        mostrarAlerta("Por favor, ingrese su usuario.", usuarioInput);
         return;
       }
 
-      // Activar animación de carga profesional
-      btnText.textContent = "Verificando acceso...";
+      if (!claveVal) {
+        mostrarAlerta("Por favor, ingrese su contraseña.", claveInput);
+        return;
+      }
+
+      // Animación de carga profesional
+      btnText.textContent = "Verificando credenciales...";
+      btnIcon.style.display = "none";
       btnSpinner.style.display = "block";
       btnSubmit.disabled = true;
 
       try {
-        // Consulta directa a la ruta exacta en Firestore
         const usuariosRef = collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas");
         const snapshot = await getDocs(usuariosRef);
 
@@ -350,7 +654,6 @@
 
         snapshot.forEach((docSnap) => {
           const data = docSnap.data();
-          // Compara si el documento coincide o si los campos de usuario y clave son correctos
           if (
             (docSnap.id === usuarioVal || data.usuario === usuarioVal || data.username === usuarioVal) &&
             (data.clave === claveVal || data.password === claveVal)
@@ -360,14 +663,15 @@
         });
 
         if (!prestamistaEncontrado) {
-          mostrarError("Usuario o contraseña incorrectos.");
-          btnText.textContent = "Iniciar sesión";
+          mostrarAlerta("Usuario o contraseña incorrectos.");
+          btnText.textContent = "Acceder al sistema";
+          btnIcon.style.display = "block";
           btnSpinner.style.display = "none";
           btnSubmit.disabled = false;
           return;
         }
 
-        // Validación opcional de suscripción vencida (comprobando el campo venceEn)
+        // Validación de suscripción vencida
         if (prestamistaEncontrado.venceEn) {
           const hoy = new Date();
           hoy.setHours(0, 0, 0, 0);
@@ -375,27 +679,28 @@
           fVence.setHours(0, 0, 0, 0);
 
           if (!isNaN(fVence.getTime()) && fVence < hoy) {
-            mostrarError("Su suscripción se encuentra vencida. Por favor renueve su usuario.");
-            btnText.textContent = "Iniciar sesión";
+            mostrarAlerta("Su suscripción se encuentra vencida. Por favor renueve su usuario.");
+            btnText.textContent = "Acceder al системы";
+            btnIcon.style.display = "block";
             btnSpinner.style.display = "none";
             btnSubmit.disabled = false;
             return;
           }
         }
 
-        // Guardamos la sesión en localStorage para que gestionprestamista.html lo reconozca al instante
+        // Guardado de sesión y redirección a gestionprestamista.html
         localStorage.setItem('cout_prestamista_id', prestamistaEncontrado.id);
         localStorage.setItem('cout_prestamista_user', prestamistaEncontrado.usuario || prestamistaEncontrado.username || usuarioVal);
 
-        // Redirección exitosa a gestionprestamista.html (con parámetro opcional en URL por seguridad)
         setTimeout(() => {
           window.location.replace(`gestionprestamista.html?user=${encodeURIComponent(prestamistaEncontrado.id)}`);
-        }, 400);
+        }, 500);
 
       } catch (err) {
         console.error("Error al conectar con Firebase:", err);
-        mostrarError("Error de conexión con el servidor. Intente nuevamente.");
-        btnText.textContent = "Iniciar sesión";
+        mostrarAlerta("Error de conexión con el servidor. Intente nuevamente.");
+        btnText.textContent = "Acceder al sistema";
+        btnIcon.style.display = "block";
         btnSpinner.style.display = "none";
         btnSubmit.disabled = false;
       }
