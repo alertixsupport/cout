@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>COUT.APP | Panel de Gestión de Prestamistas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-base: #06080d;
+      --bg-surface: #0e121d;
+      --bg-surface-hover: #161d2e;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --accent-primary: #2563eb;
+      --accent-flame: #f97316;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-tertiary: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      scrollbar-width: none;
+    }
+
+    html::-webkit-scrollbar, body::-webkit-scrollbar {
+      display: none;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 24px 20px;
+      width: 100%;
+    }
+
+    /* Navbar Principal */
+    header {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 16px 24px;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
+    }
+
+    .btn-hamburger {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(145deg, #161d2e, #0e121d);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .btn-hamburger:hover {
+      border-color: rgba(249, 115, 22, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-hamburger svg {
+      width: 22px;
+      height: 22px;
+      stroke: var(--text-primary);
+      fill: none;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-text {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+    }
+
+    .logo-text span {
+      color: var(--accent-flame);
+    }
+
+    .user-badge-header {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: #93c5fd;
+      background: rgba(37, 99, 235, 0.1);
+      border: 1px solid rgba(37, 99, 235, 0.3);
+      padding: 8px 14px;
+      border-radius: 10px;
+    }
+
+    /* --- SIDEBAR MENÚ HAMBURGUESA (ANIMACIÓN FLUIDA) --- */
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 7, 11, 0.8);
+      backdrop-filter: blur(10px);
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .sidebar-overlay.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .sidebar-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 320px;
+      max-width: 85vw;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-subtle);
+      z-index: 2001;
+      transform: translateX(-100%);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 20px 0 50px rgba(0, 0, 0, 0.8);
+    }
+
+    .sidebar-overlay.is-open .sidebar-menu {
+      transform: translateX(0);
+    }
+
+    .sidebar-user-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(255, 255, 255, 0.01);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .user-info-box h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+    }
+
+    .user-info-box h3 span {
+      color: var(--accent-flame);
+    }
+
+    .user-info-box p {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #93c5fd;
+      margin-top: 4px;
+    }
+
+    .btn-close-sidebar {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .btn-close-sidebar:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-close-sidebar svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+    }
+
+    .sidebar-content {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .menu-category-block {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .category-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-tertiary);
+      padding: 0 8px;
+      margin-bottom: 4px;
+    }
+
+    .menu-item-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .menu-item-link:hover {
+      background: var(--bg-surface-hover);
+      color: var(--text-primary);
+      transform: translateX(4px);
+    }
+
+    .menu-item-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .menu-item-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--accent-flame);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .sidebar-footer {
+      padding: 20px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .btn-logout {
+      width: 100%;
+      height: 44px;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      border-radius: 12px;
+      color: #fca5a5;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-logout:hover {
+      background: rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-logout svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+    }
+
+    /* --- CUERPO PRINCIPAL CON CARDS INTERACTIVAS --- */
+    .dashboard-hero {
+      margin-bottom: 32px;
+    }
+
+    .dashboard-hero h1 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .dashboard-hero h1 span {
+      color: var(--accent-flame);
+    }
+
+    .dashboard-hero p {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    @media (min-width: 768px) {
+      .cards-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .feature-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-decoration: none;
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--accent-flame), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(249, 115, 22, 0.4);
+      background: var(--bg-surface-hover);
+      box-shadow: 0 20px 40px -12px rgba(249, 115, 22, 0.15);
+    }
+
+    .feature-card:hover::before {
+      opacity: 1;
+    }
+
+    .card-icon-box {
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      background: rgba(249, 115, 22, 0.1);
+      border: 1px solid rgba(249, 115, 22, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-icon-box svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--accent-flame);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .card-content h3 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      letter-spacing: -0.3px;
+    }
+
+    .card-content p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Overlay Menú Hamburguesa -->
+  <div class="sidebar-overlay" id="sidebarOverlay">
+    <div class="sidebar-menu">
+      <div class="sidebar-user-header">
+        <div class="user-info-box">
+          <h3>cout<span>.app</span></h3>
+          <p id="sidebarUserTag">@cargando...</p>
+        </div>
+        <button class="btn-close-sidebar" id="closeSidebarBtn" title="Cerrar Menú">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="sidebar-content" id="sidebarContent">
+        <div style="text-align: center; color: var(--text-tertiary); padding: 20px; font-size: 12px;">
+          Cargando herramientas...
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="btn-logout" id="logoutBtn">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          Cerrar Sesión
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <header>
+      <button class="btn-hamburger" id="openSidebarBtn" title="Abrir Menú">
+        <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+
+      <div class="brand-section">
+        <h1 class="logo-text">cout<span>.app</span></h1>
+      </div>
+
+      <div class="user-badge-header" id="headerUserBadge">@...</div>
+    </header>
+
+    <main>
+      <div class="dashboard-hero">
+        <h1>Panel de Gestión, <span>Prestamista</span></h1>
+        <p>Seleccione una herramienta operativa para administrar su cartera de créditos.</p>
+      </div>
+
+      <div class="cards-grid">
+        <!-- Card 1: Notas rápidas -->
+        <a href="notas.html" class="feature-card">
+          <div class="card-icon-box">
+            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          </div>
+          <div class="card-content">
+            <h3>Agregar nota rápida</h3>
+            <p>Registre recordatorios operativos, observaciones de clientes y apuntes diarios al instante.</p>
+          </div>
+        </a>
+
+        <!-- Card 2: Configura tu negocio -->
+        <a href="configuracion.html" class="feature-card">
+          <div class="card-icon-box">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          </div>
+          <div class="card-content">
+            <h3>Configura tu negocio</h3>
+            <p>Personalice parámetros de cartera, tasas de interés, plazos y datos generales de su empresa.</p>
+          </div>
+        </a>
+
+        <!-- Card 3: Ver estadísticas -->
+        <a href="estadisticas.html" class="feature-card">
+          <div class="card-icon-box">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          </div>
+          <div class="card-content">
+            <h3>Ver estadísticas de tu negocio</h3>
+            <p>Analice el flujo de caja, el capital colocado, los intereses devengados y el rendimiento general en vivo.</p>
+          </div>
+        </a>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { db } from './app.js';
+    import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    // Recuperamos el usuario logueado almacenado por loginprestamista.html
+    const usuarioLogueado = localStorage.getItem('cout_prestamista_user') || 'prestamista';
+    
+    const sidebarUserTag = document.getElementById('sidebarUserTag');
+    const headerUserBadge = document.getElementById('headerUserBadge');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const openSidebarBtn = document.getElementById('openSidebarBtn');
+    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+    const sidebarContent = document.getElementById('sidebarContent');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    sidebarUserTag.textContent = `@${usuarioLogueado}`;
+    headerUserBadge.textContent = `@${usuarioLogueado}`;
+
+    // Control de apertura y cierre del menú hamburguesa
+    openSidebarBtn.addEventListener('click', () => sidebarOverlay.classList.add('is-open'));
+    closeSidebarBtn.addEventListener('click', () => sidebarOverlay.classList.remove('is-open'));
+    sidebarOverlay.addEventListener('click', (e) => {
+      if (e.target === sidebarOverlay) sidebarOverlay.classList.remove('is-open');
+    });
+
+    // Cierre de sesión limpio
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('cout_prestamista_id');
+      localStorage.removeItem('cout_prestamista_user');
+      window.location.replace('loginprestamista.html');
+    });
+
+    // --- LECTURA DINÁMICA DEL MENÚ DESDE FIREBASE ---
+    const menuRef = collection(db, "carpetacout", "configuracion_general", "menuprestamistas");
+    
+    onSnapshot(menuRef, (snapshot) => {
+      sidebarContent.innerHTML = '';
+      if (snapshot.empty) {
+        sidebarContent.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); padding: 20px; font-size: 12px;">No hay herramientas configuradas.</div>';
+        return;
+      }
+
+      const categoriasMap = {};
+      snapshot.forEach((docSnap) => {
+        const item = docSnap.data();
+        const cat = item.Categoria || item.categoria || 'General';
+        if (!categoriasMap[cat]) categoriasMap[cat] = [];
+        categoriasMap[cat].push(item);
+      });
+
+      Object.keys(categoriasMap).forEach((categoria) => {
+        const block = document.createElement('div');
+        block.className = 'menu-category-block';
+
+        const title = document.createElement('div');
+        title.className = 'category-title';
+        title.textContent = categoria;
+        block.appendChild(title);
+
+        categoriasMap[categoria].forEach((navItem) => {
+          const link = document.createElement('a');
+          link.className = 'menu-item-link';
+          link.href = navItem.Redireccion || navItem.redireccion || '#';
+
+          const iconContainer = document.createElement('div');
+          iconContainer.className = 'menu-item-icon';
+          iconContainer.innerHTML = navItem.LOGOTIPO || navItem.logotipo || `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle></svg>`;
+
+          const span = document.createElement('span');
+          span.textContent = navItem.Nombre || navItem.nombre || 'Herramienta';
+
+          link.appendChild(iconContainer);
+          link.appendChild(span);
+          block.appendChild(link);
+        });
+
+        sidebarContent.appendChild(block);
+      });
+    });
+  </script>
+</body>
+</html>
