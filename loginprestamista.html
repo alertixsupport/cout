@@ -10,9 +10,9 @@
   
   <style>
     :root {
-      --bg-base: #07090e;
-      --bg-surface: #0e111a;
-      --bg-surface-card: #131722;
+      --bg-base: #06080d;
+      --bg-surface: #0e121d;
+      --bg-surface-card: #121824;
       --border-subtle: rgba(255, 255, 255, 0.08);
       --border-focus: #f97316;
       --accent-primary: #f97316;
@@ -31,15 +31,30 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    body {
+    /* Ocultar barras de desplazamiento manteniendo el scroll funcional */
+    html, body {
       width: 100%;
-      min-height: 100vh;
+      height: 100%;
       background-color: var(--bg-base);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      scrollbar-width: none; /* Firefox */
+      -ms-overflow-style: none; /* IE/Edge */
+    }
+
+    html::-webkit-scrollbar, body::-webkit-scrollbar {
+      display: none; /* Chrome/Safari/Opera */
+    }
+
+    body {
       display: flex;
       align-items: stretch;
       justify-content: center;
-      color: var(--text-primary);
-      overflow-x: hidden;
+      /* Fondo difuminado y degradado profesional de alta gama */
+      background-image: 
+        radial-gradient(circle at 15% 20%, rgba(249, 115, 22, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+        linear-gradient(135deg, #07090f 0%, #0c101b 50%, #06080d 100%);
     }
 
     @keyframes fadeInSlide {
@@ -84,7 +99,6 @@
       50% { transform: translateX(5px); }
     }
 
-    /* Animación de brillo sutil en tonos naranjas/fuego para el botón */
     @keyframes buttonAmbientOrange {
       0%, 100% { box-shadow: 0 0 15px rgba(249, 115, 22, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
       50% { box-shadow: 0 0 25px rgba(249, 115, 22, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35); }
@@ -103,9 +117,10 @@
       }
     }
 
+    /* LADO IZQUIERDO: Panel Empresarial para PC con fondo enriquecido */
     .brand-sidebar {
       display: none;
-      background: linear-gradient(135deg, #090d16 0%, #0e1424 100%);
+      background: linear-gradient(145deg, #070a12 0%, #0d1322 50%, #080b14 100%);
       border-right: 1px solid var(--border-subtle);
       padding: 60px;
       flex-direction: column;
@@ -123,11 +138,11 @@
     .brand-sidebar::before {
       content: '';
       position: absolute;
-      top: -20%;
-      left: -20%;
-      width: 60%;
-      height: 60%;
-      background: radial-gradient(circle, rgba(249, 115, 22, 0.1) 0%, transparent 70%);
+      top: -10%;
+      left: -10%;
+      width: 70%;
+      height: 70%;
+      background: radial-gradient(circle, rgba(249, 115, 22, 0.12) 0%, transparent 65%);
       pointer-events: none;
       animation: pulseGlow 6s ease-in-out infinite;
     }
@@ -135,11 +150,11 @@
     .brand-sidebar::after {
       content: '';
       position: absolute;
-      bottom: -20%;
-      right: -20%;
-      width: 60%;
-      height: 60%;
-      background: radial-gradient(circle, rgba(249, 115, 22, 0.08) 0%, transparent 70%);
+      bottom: -10%;
+      right: -10%;
+      width: 70%;
+      height: 70%;
+      background: radial-gradient(circle, rgba(37, 99, 235, 0.1) 0%, transparent 65%);
       pointer-events: none;
     }
 
@@ -224,12 +239,12 @@
       box-shadow: 0 0 10px #10b981;
     }
 
+    /* LADO DERECHO: Formulario centrado y estético */
     .login-main-section {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
-      background: var(--bg-base);
+      padding: 20px;
       position: relative;
     }
 
@@ -238,9 +253,9 @@
       max-width: 420px;
       background: var(--bg-surface-card);
       border: 1px solid var(--border-subtle);
-      border-radius: 20px;
-      padding: 40px 32px;
-      box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+      border-radius: 22px;
+      padding: 36px 28px;
+      box-shadow: 0 25px 50px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
       animation: fadeInSlide 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       position: relative;
     }
@@ -250,7 +265,7 @@
       flex-direction: column;
       align-items: center;
       gap: 10px;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
       text-align: center;
     }
 
@@ -261,8 +276,8 @@
     }
 
     .mobile-logo-icon {
-      width: 46px;
-      height: 46px;
+      width: 44px;
+      height: 44px;
       border-radius: 12px;
       border: 1px solid rgba(249, 115, 22, 0.35);
       display: flex;
@@ -272,8 +287,8 @@
     }
 
     .mobile-logo-icon svg {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       stroke: var(--accent-flame);
       fill: none;
       stroke-width: 2;
@@ -283,27 +298,27 @@
       font-size: 20px;
       font-weight: 700;
       color: var(--text-primary);
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       letter-spacing: -0.4px;
     }
 
     .form-header-subtitle {
       font-size: 13px;
       color: var(--text-secondary);
-      margin-bottom: 24px;
+      margin-bottom: 22px;
     }
 
     .login-form {
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 18px;
+      gap: 16px;
     }
 
     .form-field {
       display: flex;
       flex-direction: column;
-      gap: 7px;
+      gap: 6px;
     }
 
     .form-field label {
@@ -332,6 +347,7 @@
       transition: stroke 0.2s;
     }
 
+    /* font-size: 16px evita que los dispositivos móviles hagan zoom automático al enfocar */
     .input-icon-group input {
       width: 100%;
       height: 48px;
@@ -340,10 +356,16 @@
       border: 1px solid var(--border-subtle);
       border-radius: 12px;
       color: var(--text-primary);
-      font-size: 14px;
+      font-size: 16px; 
       outline: none;
       transition: all 0.25s ease;
       box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    @media (min-width: 1024px) {
+      .input-icon-group input {
+        font-size: 14px; /* Tamaño normal en PC */
+      }
     }
 
     .input-icon-group input:focus {
@@ -357,11 +379,11 @@
       stroke: var(--accent-flame);
     }
 
-    /* --- BOTÓN DE ALTA GAMA CON TONOS NARANJAS / FUEGO EXCLUSIVOS --- */
+    /* --- BOTÓN DE ALTA GAMA --- */
     .btn-submit {
       width: 100%;
-      height: 52px;
-      margin-top: 8px;
+      height: 50px;
+      margin-top: 6px;
       background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
       border: 1px solid rgba(249, 115, 22, 0.6);
       border-radius: 12px;
@@ -458,20 +480,19 @@
       font-size: 13px;
       font-weight: 500;
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       display: none;
       animation: fadeInSlide 0.3s ease;
-      display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
     }
 
     .renovar-container {
-      margin-top: 24px;
+      margin-top: 20px;
       text-align: center;
       border-top: 1px solid var(--border-subtle);
-      padding-top: 20px;
+      padding-top: 18px;
     }
 
     .renovar-link {
@@ -491,7 +512,7 @@
     }
 
     .login-footer {
-      margin-top: 16px;
+      margin-top: 14px;
       text-align: center;
       font-size: 11px;
       color: var(--text-tertiary);
@@ -544,13 +565,13 @@
           </div>
         </div>
 
-        <div style="margin-bottom: 24px;">
+        <div style="margin-bottom: 22px;">
           <h2 class="form-header-title">Portal de Acceso</h2>
           <p class="form-header-subtitle">Ingrese sus credenciales autorizadas</p>
         </div>
 
         <!-- Banner de advertencia inteligente -->
-        <div class="error-banner" id="errorBanner" style="display: none;">
+        <div class="error-banner" id="errorBanner">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
           <span id="errorText">Por favor, complete todos los campos.</span>
         </div>
@@ -572,7 +593,7 @@
             </div>
           </div>
 
-          <!-- Botón de acceso naranja fuego limpio y sin azul -->
+          <!-- Botón de acceso -->
           <button type="submit" class="btn-submit" id="btnSubmit">
             <span id="btnText">Acceder al sistema</span>
             <svg id="btnIcon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
@@ -680,7 +701,7 @@
 
           if (!isNaN(fVence.getTime()) && fVence < hoy) {
             mostrarAlerta("Su suscripción se encuentra vencida. Por favor renueve su usuario.");
-            btnText.textContent = "Acceder al системы";
+            btnText.textContent = "Acceder al sistema";
             btnIcon.style.display = "block";
             btnSpinner.style.display = "none";
             btnSubmit.disabled = false;
