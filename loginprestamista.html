@@ -38,19 +38,18 @@
       background-color: var(--bg-base);
       color: var(--text-primary);
       overflow-x: hidden;
-      scrollbar-width: none; /* Firefox */
-      -ms-overflow-style: none; /* IE/Edge */
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
 
     html::-webkit-scrollbar, body::-webkit-scrollbar {
-      display: none; /* Chrome/Safari/Opera */
+      display: none;
     }
 
     body {
       display: flex;
       align-items: stretch;
       justify-content: center;
-      /* Fondo difuminado y degradado profesional de alta gama */
       background-image: 
         radial-gradient(circle at 15% 20%, rgba(249, 115, 22, 0.08) 0%, transparent 45%),
         radial-gradient(circle at 85% 80%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
@@ -117,7 +116,7 @@
       }
     }
 
-    /* LADO IZQUIERDO: Panel Empresarial para PC con fondo enriquecido */
+    /* LADO IZQUIERDO: Panel Empresarial para PC */
     .brand-sidebar {
       display: none;
       background: linear-gradient(145deg, #070a12 0%, #0d1322 50%, #080b14 100%);
@@ -239,13 +238,21 @@
       box-shadow: 0 0 10px #10b981;
     }
 
-    /* LADO DERECHO: Formulario centrado y estético */
+    /* LADO DERECHO: Centrado perfecto en móviles y PC */
     .login-main-section {
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 16px;
+      min-height: 100vh;
       position: relative;
+    }
+
+    @media (min-width: 1024px) {
+      .login-main-section {
+        min-height: auto;
+        padding: 24px;
+      }
     }
 
     .login-card {
@@ -254,10 +261,11 @@
       background: var(--bg-surface-card);
       border: 1px solid var(--border-subtle);
       border-radius: 22px;
-      padding: 36px 28px;
+      padding: 32px 24px;
       box-shadow: 0 25px 50px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
       animation: fadeInSlide 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       position: relative;
+      margin: auto; /* Centrado absoluto vertical y horizontal en mobile */
     }
 
     .mobile-brand {
@@ -265,7 +273,7 @@
       flex-direction: column;
       align-items: center;
       gap: 10px;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       text-align: center;
     }
 
@@ -305,14 +313,14 @@
     .form-header-subtitle {
       font-size: 13px;
       color: var(--text-secondary);
-      margin-bottom: 22px;
+      margin-bottom: 18px;
     }
 
     .login-form {
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
 
     .form-field {
@@ -347,7 +355,6 @@
       transition: stroke 0.2s;
     }
 
-    /* font-size: 16px evita que los dispositivos móviles hagan zoom automático al enfocar */
     .input-icon-group input {
       width: 100%;
       height: 48px;
@@ -364,7 +371,7 @@
 
     @media (min-width: 1024px) {
       .input-icon-group input {
-        font-size: 14px; /* Tamaño normal en PC */
+        font-size: 14px;
       }
     }
 
@@ -475,12 +482,12 @@
       background: rgba(239, 68, 68, 0.12);
       border: 1px solid rgba(239, 68, 68, 0.35);
       border-radius: 10px;
-      padding: 12px 16px;
+      padding: 10px 14px;
       color: #fca5a5;
       font-size: 13px;
       font-weight: 500;
       text-align: center;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       display: none;
       animation: fadeInSlide 0.3s ease;
       align-items: center;
@@ -489,10 +496,10 @@
     }
 
     .renovar-container {
-      margin-top: 20px;
+      margin-top: 18px;
       text-align: center;
       border-top: 1px solid var(--border-subtle);
-      padding-top: 18px;
+      padding-top: 16px;
     }
 
     .renovar-link {
@@ -512,7 +519,7 @@
     }
 
     .login-footer {
-      margin-top: 14px;
+      margin-top: 12px;
       text-align: center;
       font-size: 11px;
       color: var(--text-tertiary);
@@ -565,7 +572,7 @@
           </div>
         </div>
 
-        <div style="margin-bottom: 22px;">
+        <div style="margin-bottom: 20px;">
           <h2 class="form-header-title">Portal de Acceso</h2>
           <p class="form-header-subtitle">Ingrese sus credenciales autorizadas</p>
         </div>
