@@ -617,12 +617,11 @@
       window.location.replace('loginprestamista.html');
     });
 
-    // --- 2. KILLSWITCH EN TIEMPO REAL (Vigila si el usuario es eliminado o suspendido) ---
+    // --- 2. KILLSWITCH EN TIEMPO REAL (Vigila eliminación o suspensión por venceEn) ---
     const userDocRef = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId);
     
     onSnapshot(userDocRef, (docSnap) => {
       if (!docSnap.exists()) {
-        // El usuario fue ELIMINADO de Firebase en tiempo real
         console.warn("Acceso revocado: El usuario fue eliminado.");
         localStorage.clear();
         window.location.replace('loginprestamista.html');
@@ -631,7 +630,7 @@
 
       const userData = docSnap.data();
 
-      // Validación opcional si agregas un campo de estado o si vence la suscripción en vivo
+      // Verificación en tiempo real del campo venceEn (suspensión o expiración)
       if (userData.venceEn) {
         const hoy = new Date();
         hoy.setHours(0, 0, 0, 0);
@@ -639,7 +638,7 @@
         fVence.setHours(0, 0, 0, 0);
 
         if (!isNaN(fVence.getTime()) && fVence < hoy) {
-          console.warn("Acceso revocado: Suscripción vencida.");
+          console.warn("Acceso revocado: Suscripción vencida o usuario suspendido.");
           localStorage.clear();
           window.location.replace('loginprestamista.html');
         }
