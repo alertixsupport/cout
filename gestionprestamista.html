@@ -107,7 +107,7 @@
       color: var(--accent-flame);
     }
 
-    /* --- INSIGNIA DE USUARIO CON TIPOGRAFÍA PLUS JAKARTA SANS --- */
+    /* Insignia de usuario */
     @keyframes pulseGreen {
       0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
       50% { transform: scale(1.1); opacity: 0.8; box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
@@ -139,7 +139,7 @@
       letter-spacing: -0.2px;
     }
 
-    /* --- SIDEBAR MENÚ HAMBURGUESA --- */
+    /* Sidebar Menú Hamburguesa */
     .sidebar-overlay {
       position: fixed;
       inset: 0;
@@ -332,7 +332,7 @@
       stroke-width: 2.2;
     }
 
-    /* --- CUERPO PRINCIPAL CON CARDS Y FLECHAS ANIMADAS --- */
+    /* Cuerpo principal y cards */
     .dashboard-hero {
       margin-bottom: 32px;
     }
@@ -517,7 +517,6 @@
         <h1 class="logo-text">cout<span>.app</span></h1>
       </div>
 
-      <!-- Insignia superior con Plus Jakarta Sans y punto verde titilante -->
       <div class="user-badge-header">
         <div class="live-dot"></div>
         <span class="user-badge-txt" id="headerUserBadge">@...</span>
@@ -586,7 +585,13 @@
     import { db } from './app.js';
     import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const usuarioLogueado = localStorage.getItem('cout_prestamista_user') || 'prestamista';
+    // --- GUARDIÁN DE AUTENTICACIÓN (Verifica si hay sesión activa) ---
+    const prestamistaId = localStorage.getItem('cout_prestamista_id');
+    const usuarioLogueado = localStorage.getItem('cout_prestamista_user');
+
+    if (!prestamistaId || !usuarioLogueado) {
+      window.location.replace('loginprestamista.html');
+    }
     
     const sidebarUserTag = document.getElementById('sidebarUserTag');
     const headerUserBadge = document.getElementById('headerUserBadge');
@@ -608,21 +613,20 @@
     logoutBtn.addEventListener('click', () => {
       localStorage.removeItem('cout_prestamista_id');
       localStorage.removeItem('cout_prestamista_user');
+      localStorage.removeItem('cout_menu_cache');
       window.location.replace('loginprestamista.html');
     });
 
-    const menuRef = collection(db, "carpetacout", "configuracion_general", "menuprestamistas");
-    
-    onSnapshot(menuRef, (snapshot) => {
+    // --- RENDERIZADO INSTANTÁNEO DESDE CACHÉ LOCAL ---
+    function renderizarMenu(itemsArray) {
       sidebarContent.innerHTML = '';
-      if (snapshot.empty) {
+      if (!itemsArray || itemsArray.length === 0) {
         sidebarContent.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); padding: 20px; font-size: 12px;">No hay herramientas configuradas.</div>';
         return;
       }
 
       const categoriasMap = {};
-      snapshot.forEach((docSnap) => {
-        const item = docSnap.data();
+      itemsArray.forEach((item) => {
         const cat = item.Categoria || item.categoria || 'General';
         if (!categoriasMap[cat]) categoriasMap[cat] = [];
         categoriasMap[cat].push(item);
@@ -656,6 +660,29 @@
 
         sidebarContent.appendChild(block);
       });
+    }
+
+    // 1. Cargamos de inmediato si hay datos previos en caché (Cero demoras)
+    const menuCacheGuardado = localStorage.getItem('cout_menu_cache');
+    if (menuCacheGuardado) {
+      try {
+        renderizarMenu(JSON.parse(menuCacheGuardado));
+      } catch (e) {
+        console.error("Error leyendo caché del menú", e);
+      }
+    }
+
+    // 2. Sincronización en tiempo real en segundo plano con Firebase
+    const menuRef = collection(db, "carpetacout", "configuracion_general", "menuprestamistas");
+    
+    onSnapshot(menuRef, (snapshot) => {
+      const items = [];
+      snapshot.forEach((docSnap) => {
+        items.push(docSnap.data());
+      });
+
+      localStorage.setItem('cout_menu_cache', JSON.stringify(items));
+      renderizarMenu(items);
     });
   </script>
 </body>
