@@ -6,7 +6,7 @@
   <title>COUT.APP | Panel de Gestión de Prestamistas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <style>
     :root {
@@ -107,7 +107,7 @@
       color: var(--accent-flame);
     }
 
-    /* --- INSIGNIA DE USUARIO PROFESIONAL CON TITILEO VERDE --- */
+    /* --- INSIGNIA DE USUARIO CON TIPOGRAFÍA PLUS JAKARTA SANS --- */
     @keyframes pulseGreen {
       0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
       50% { transform: scale(1.1); opacity: 0.8; box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
@@ -133,8 +133,7 @@
     }
 
     .user-badge-txt {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 700;
       color: #fed7aa;
       letter-spacing: -0.2px;
@@ -206,8 +205,7 @@
     }
 
     .sidebar-user-tag-wrapper span {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 700;
       color: #fed7aa;
     }
@@ -431,7 +429,6 @@
       stroke-width: 2;
     }
 
-    /* Flecha profesional animada en la card */
     .card-arrow-icon {
       width: 36px;
       height: 36px;
@@ -520,7 +517,7 @@
         <h1 class="logo-text">cout<span>.app</span></h1>
       </div>
 
-      <!-- Insignia superior con tipografía técnica y punto verde titilante -->
+      <!-- Insignia superior con Plus Jakarta Sans y punto verde titilante -->
       <div class="user-badge-header">
         <div class="live-dot"></div>
         <span class="user-badge-txt" id="headerUserBadge">@...</span>
@@ -589,7 +586,6 @@
     import { db } from './app.js';
     import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // Recuperamos el usuario logueado almacenado por loginprestamista.html
     const usuarioLogueado = localStorage.getItem('cout_prestamista_user') || 'prestamista';
     
     const sidebarUserTag = document.getElementById('sidebarUserTag');
@@ -603,21 +599,18 @@
     sidebarUserTag.textContent = `@${usuarioLogueado}`;
     headerUserBadge.textContent = `@${usuarioLogueado}`;
 
-    // Control de apertura y cierre del menú hamburguesa
     openSidebarBtn.addEventListener('click', () => sidebarOverlay.classList.add('is-open'));
     closeSidebarBtn.addEventListener('click', () => sidebarOverlay.classList.remove('is-open'));
     sidebarOverlay.addEventListener('click', (e) => {
       if (e.target === sidebarOverlay) sidebarOverlay.classList.remove('is-open');
     });
 
-    // Cierre de sesión limpio
     logoutBtn.addEventListener('click', () => {
       localStorage.removeItem('cout_prestamista_id');
       localStorage.removeItem('cout_prestamista_user');
       window.location.replace('loginprestamista.html');
     });
 
-    // --- LECTURA DINÁMICA DEL MENÚ DESDE FIREBASE ---
     const menuRef = collection(db, "carpetacout", "configuracion_general", "menuprestamistas");
     
     onSnapshot(menuRef, (snapshot) => {
