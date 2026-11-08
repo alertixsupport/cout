@@ -583,9 +583,9 @@
 
   <script type="module">
     import { db } from './app.js';
-    import { collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { collection, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // --- GUARDIÁN DE AUTENTICACIÓN (Verifica si hay sesión activa) ---
+    // 1. Guardián de autenticación inicial
     const prestamistaId = localStorage.getItem('cout_prestamista_id');
     const usuarioLogueado = localStorage.getItem('cout_prestamista_user');
 
@@ -617,7 +617,36 @@
       window.location.replace('loginprestamista.html');
     });
 
-    // --- RENDERIZADO INSTANTÁNEO DESDE CACHÉ LOCAL ---
+    // --- 2. KILLSWITCH EN TIEMPO REAL (Vigila si el usuario es eliminado o suspendido) ---
+    const userDocRef = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId);
+    
+    onSnapshot(userDocRef, (docSnap) => {
+      if (!docSnap.exists()) {
+        // El usuario fue ELIMINADO de Firebase en tiempo real
+        console.warn("Acceso revocado: El usuario fue eliminado.");
+        localStorage.clear();
+        window.location.replace('loginprestamista.html');
+        return;
+      }
+
+      const userData = docSnap.data();
+
+      // Validación opcional si agregas un campo de estado o si vence la suscripción en vivo
+      if (userData.venceEn) {
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        const fVence = new Date(userData.venceEn);
+        fVence.setHours(0, 0, 0, 0);
+
+        if (!isNaN(fVence.getTime()) && fVence < hoy) {
+          console.warn("Acceso revocado: Suscripción vencida.");
+          localStorage.clear();
+          window.location.replace('loginprestamista.html');
+        }
+      }
+    });
+
+    // --- 3. RENDERIZADO INSTANTÁNEO Y TIEMPO REAL DEL MENÚ ---
     function renderizarMenu(itemsArray) {
       sidebarContent.innerHTML = '';
       if (!itemsArray || itemsArray.length === 0) {
@@ -662,7 +691,6 @@
       });
     }
 
-    // 1. Cargamos de inmediato si hay datos previos en caché (Cero demoras)
     const menuCacheGuardado = localStorage.getItem('cout_menu_cache');
     if (menuCacheGuardado) {
       try {
@@ -672,7 +700,6 @@
       }
     }
 
-    // 2. Sincronización en tiempo real en segundo plano con Firebase
     const menuRef = collection(db, "carpetacout", "configuracion_general", "menuprestamistas");
     
     onSnapshot(menuRef, (snapshot) => {
