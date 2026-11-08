@@ -20,7 +20,6 @@
       --text-primary: #f8fafc;
       --text-secondary: #94a3b8;
       --text-tertiary: #64748b;
-      --status-error: #ef4444;
       --status-success: #10b981;
     }
 
@@ -46,7 +45,7 @@
     }
 
     .container {
-      max-width: 960px;
+      max-width: 900px;
       margin: 0 auto;
       padding: 24px 20px;
       width: 100%;
@@ -114,53 +113,142 @@
     /* Panel Hero */
     .dashboard-hero {
       margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
     }
 
-    .dashboard-hero h1 {
+    .hero-text h1 {
       font-size: 24px;
       font-weight: 800;
       letter-spacing: -0.5px;
       margin-bottom: 6px;
     }
 
-    .dashboard-hero h1 span {
+    .hero-text h1 span {
       color: var(--accent-flame);
     }
 
-    .dashboard-hero p {
+    .hero-text p {
       font-size: 13px;
       color: var(--text-secondary);
     }
 
-    /* Layout en Grid */
-    .admin-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 24px;
+    @keyframes buttonAmbientOrange {
+      0%, 100% { box-shadow: 0 0 15px rgba(249, 115, 22, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+      50% { box-shadow: 0 0 25px rgba(249, 115, 22, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35); }
     }
 
-    @media (min-width: 768px) {
-      .admin-grid {
-        grid-template-columns: 1fr 1.3fr;
-      }
+    .btn-open-modal {
+      background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+      border: 1px solid rgba(249, 115, 22, 0.6);
+      border-radius: 12px;
+      color: white;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 12px 20px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      animation: buttonAmbientOrange 3.5s ease-in-out infinite;
     }
 
-    .card-panel {
+    .btn-open-modal:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(249, 115, 22, 0.45);
+    }
+
+    .btn-open-modal svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.5;
+    }
+
+    /* --- VENTANA EMERGENTE (MODAL FLOTANTE) --- */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 7, 11, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-overlay.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-container {
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       border-radius: 20px;
-      padding: 24px;
-      box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.5);
+      width: 100%;
+      max-width: 500px;
+      padding: 28px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+      transform: scale(0.95) translateY(10px);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
     }
 
-    .card-panel h2 {
-      font-size: 16px;
+    .modal-overlay.is-open .modal-container {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h3 {
+      font-size: 18px;
       font-weight: 700;
-      margin-bottom: 18px;
       letter-spacing: -0.3px;
       display: flex;
       align-items: center;
       gap: 8px;
+    }
+
+    .btn-close-modal {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .btn-close-modal:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-primary);
+    }
+
+    .btn-close-modal svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
     }
 
     /* Formulario */
@@ -210,20 +298,10 @@
       box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
     }
 
-    .form-actions-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 6px;
-    }
-
-    @keyframes buttonAmbientOrange {
-      0%, 100% { box-shadow: 0 0 15px rgba(249, 115, 22, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
-      50% { box-shadow: 0 0 25px rgba(249, 115, 22, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35); }
-    }
-
-    .btn-submit {
-      flex: 1;
+    .btn-submit-modal {
+      width: 100%;
       height: 48px;
+      margin-top: 6px;
       background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
       border: 1px solid rgba(249, 115, 22, 0.6);
       border-radius: 12px;
@@ -232,54 +310,65 @@
       font-size: 14px;
       cursor: pointer;
       transition: all 0.3s ease;
-      animation: buttonAmbientOrange 3.5s ease-in-out infinite;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
     }
 
-    .btn-submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 30px rgba(249, 115, 22, 0.45);
+    .btn-submit-modal:hover {
+      box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
     }
 
-    .btn-cancel-edit {
-      display: none;
-      background: rgba(255, 255, 255, 0.05);
+    /* Panel Principal de Listado */
+    .card-panel {
+      background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-      border-radius: 12px;
-      padding: 0 16px;
-      font-weight: 600;
-      font-size: 13px;
-      cursor: pointer;
-      transition: all 0.2s;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.5);
     }
 
-    .btn-cancel-edit:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text-primary);
+    .card-panel h2 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    /* Lista agrupada por categorías */
+    /* Contenedor Agrupado */
     .menu-grouped-container {
       display: flex;
       flex-direction: column;
-      gap: 20px;
-      max-height: 520px;
+      gap: 16px;
+      max-height: 560px;
       overflow-y: auto;
       padding-right: 4px;
     }
 
     .category-group-block {
-      background: rgba(255, 255, 255, 0.01);
+      background: rgba(255, 255, 255, 0.015);
       border: 1px solid var(--border-subtle);
       border-radius: 14px;
       padding: 14px;
       display: flex;
       flex-direction: column;
       gap: 10px;
+      transition: border-color 0.2s;
+    }
+
+    .category-group-block:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .category-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px;
     }
 
     .category-group-title {
@@ -288,7 +377,15 @@
       text-transform: uppercase;
       letter-spacing: 0.8px;
       color: var(--accent-flame);
-      padding-left: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .category-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .menu-item-row {
@@ -369,8 +466,8 @@
       border: 1px solid var(--border-subtle);
       color: var(--text-secondary);
       cursor: pointer;
-      width: 32px;
-      height: 32px;
+      width: 30px;
+      height: 30px;
       border-radius: 8px;
       display: flex;
       align-items: center;
@@ -391,27 +488,11 @@
     }
 
     .btn-action svg {
-      width: 14px;
-      height: 14px;
+      width: 13px;
+      height: 13px;
       stroke: currentColor;
       fill: none;
       stroke-width: 2.2;
-    }
-
-    .status-msg {
-      padding: 10px;
-      border-radius: 8px;
-      font-size: 12px;
-      text-align: center;
-      margin-bottom: 12px;
-      display: none;
-    }
-
-    .status-msg.success {
-      background: rgba(16, 185, 129, 0.15);
-      border: 1px solid rgba(16, 185, 129, 0.35);
-      color: #6ee7b7;
-      display: block;
     }
   </style>
 </head>
@@ -431,70 +512,73 @@
 
     <main>
       <div class="dashboard-hero">
-        <h1>Gestión de Menú <span>Dinámico</span></h1>
-        <p>Organice por categorías, reubique el orden vertical y edite las páginas del menú lateral.</p>
+        <div class="hero-text">
+          <h1>Gestión de Menú <span>Dinámico</span></h1>
+          <p>Administre páginas, ordene categorías completas o reubique ítems verticalmente.</p>
+        </div>
+        <button class="btn-open-modal" id="openModalBtn">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Nueva Página / Menú
+        </button>
       </div>
 
-      <div class="admin-grid">
-        
-        <!-- FORMULARIO DE CREACIÓN / EDICIÓN -->
-        <div class="card-panel">
-          <h2 id="formTitle">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-flame)" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            Nuevo Ítem de Menú
-          </h2>
+      <!-- LISTA PRINCIPAL AGRUPADA Y REUBICABLE -->
+      <div class="card-panel">
+        <h2>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-flame)" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          Estructura de Categorías y Páginas Activas
+        </h2>
 
-          <div class="status-msg success" id="successMsg" style="display: none;">¡Cambios guardados con éxito!</div>
-
-          <form class="menu-form" id="menuForm">
-            <input type="hidden" id="editDocId" value="">
-
-            <div class="form-field">
-              <label for="nombre">Título del Menú</label>
-              <input type="text" id="nombre" required placeholder="Ej. Clientes o Testimonios">
-            </div>
-
-            <div class="form-field">
-              <label for="redireccion">Redirección (Link / Archivo)</label>
-              <input type="text" id="redireccion" required placeholder="Ej. testimonio.html">
-            </div>
-
-            <div class="form-field">
-              <label for="categoria">Categoría</label>
-              <input type="text" id="categoria" required placeholder="Ej. Operativo, Finanzas">
-            </div>
-
-            <div class="form-field">
-              <label for="logotipo">Código Ícono SVG (completo)</label>
-              <textarea id="logotipo" required placeholder='<svg viewBox="0 0 24 24"><path d="..."/></svg>'></textarea>
-            </div>
-
-            <div class="form-actions-row">
-              <button type="button" class="btn-cancel-edit" id="cancelEditBtn">Cancelar</button>
-              <button type="submit" class="btn-submit" id="submitBtn">
-                <span id="submitBtnTxt">Guardar Ítem</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <!-- LISTA AGRUPADA Y REUBICABLE -->
-        <div class="card-panel">
-          <h2>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-flame)" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-            Ítems por Categoría y Orden
-          </h2>
-
-          <div class="menu-grouped-container" id="menuGroupedContainer">
-            <div style="text-align: center; color: var(--text-tertiary); padding: 30px; font-size: 13px;">
-              Cargando estructura desde Firebase...
-            </div>
+        <div class="menu-grouped-container" id="menuGroupedContainer">
+          <div style="text-align: center; color: var(--text-tertiary); padding: 40px; font-size: 13px;">
+            Cargando estructura en tiempo real...
           </div>
         </div>
-
       </div>
     </main>
+  </div>
+
+  <!-- VENTANA EMERGENTE (MODAL) PARA CREAR / EDITAR -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="modalTitle">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-flame)" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Nueva Página de Menú
+        </h3>
+        <button class="btn-close-modal" id="closeModalBtn" title="Cerrar ventana">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <form class="menu-form" id="menuForm">
+        <input type="hidden" id="editDocId" value="">
+
+        <div class="form-field">
+          <label for="nombre">Título del Menú</label>
+          <input type="text" id="nombre" required placeholder="Ej. Clientes o Testimonios">
+        </div>
+
+        <div class="form-field">
+          <label for="redireccion">Redirección (Link / Archivo)</label>
+          <input type="text" id="redireccion" required placeholder="Ej. testimonio.html">
+        </div>
+
+        <div class="form-field">
+          <label for="categoria">Categoría</label>
+          <input type="text" id="categoria" required placeholder="Ej. Operativo, Finanzas">
+        </div>
+
+        <div class="form-field">
+          <label for="logotipo">Código Ícono SVG (completo)</label>
+          <textarea id="logotipo" required placeholder='<svg viewBox="0 0 24 24"><path d="..."/></svg>'></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit-modal" id="submitBtnTxt">
+          Guardar Página en Menú
+        </button>
+      </form>
+    </div>
   </div>
 
   <script type="module">
@@ -506,24 +590,42 @@
       window.location.replace('loginprestamista.html');
     }
 
+    const modalOverlay = document.getElementById('modalOverlay');
+    const openModalBtn = document.getElementById('openModalBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
     const menuForm = document.getElementById('menuForm');
     const editDocIdInput = document.getElementById('editDocId');
     const nombreInput = document.getElementById('nombre');
     const redireccionInput = document.getElementById('redireccion');
     const categoriaInput = document.getElementById('categoria');
     const logotipoInput = document.getElementById('logotipo');
-    const successMsg = document.getElementById('successMsg');
-    const menuGroupedContainer = document.getElementById('menuGroupedContainer');
-    const formTitle = document.getElementById('formTitle');
+    const modalTitle = document.getElementById('modalTitle');
     const submitBtnTxt = document.getElementById('submitBtnTxt');
-    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const menuGroupedContainer = document.getElementById('menuGroupedContainer');
 
     let menuCacheGlobal = [];
 
-    // 1. Guardar o Actualizar Ítem
+    // Control de Apertura y Cierre de Modal
+    openModalBtn.addEventListener('click', () => {
+      resetearFormulario();
+      modalOverlay.classList.add('is-open');
+    });
+
+    closeModalBtn.addEventListener('click', () => modalOverlay.classList.remove('is-open'));
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) modalOverlay.classList.remove('is-open');
+    });
+
+    function resetearFormulario() {
+      menuForm.reset();
+      editDocIdInput.value = '';
+      modalTitle.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-flame)" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Nueva Página de Menú`;
+      submitBtnTxt.textContent = "Guardar Página en Menú";
+    }
+
+    // 1. Guardar o Actualizar desde el Modal
     menuForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-
       const docId = editDocIdInput.value;
       const dataItem = {
         Nombre: nombreInput.value.trim(),
@@ -536,28 +638,23 @@
         const menuRef = collection(db, "carpetacout", "configuracion_general", "menuprestamistas");
 
         if (docId) {
-          // Actualizar existente
           const docRef = doc(db, "carpetacout", "configuracion_general", "menuprestamistas", docId);
           await updateDoc(docRef, dataItem);
         } else {
-          // Crear nuevo con orden al final
           dataItem.orden = menuCacheGlobal.length;
           await addDoc(menuRef, dataItem);
         }
 
         localStorage.removeItem('cout_menu_cache');
+        modalOverlay.classList.remove('is-open');
         resetearFormulario();
-
-        successMsg.style.display = 'block';
-        setTimeout(() => { successMsg.style.display = 'none'; }, 3000);
-
       } catch (err) {
         console.error("Error al guardar:", err);
-        alert("Ocurrió un error al guardar el menú.");
+        alert("Ocurrió un error al guardar.");
       }
     });
 
-    // 2. Cargar datos en formulario para Editar
+    // 2. Abrir Modal para Editar
     window.cargarParaEditar = (id) => {
       const item = menuCacheGlobal.find(m => m.id === id);
       if (!item) return;
@@ -568,25 +665,14 @@
       categoriaInput.value = item.Categoria || '';
       logotipoInput.value = item.LOGOTIPO || '';
 
-      formTitle.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-flame)" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Editar: ${item.Nombre}`;
-      submitBtnTxt.textContent = "Actualizar Ítem";
-      cancelEditBtn.style.display = 'block';
-      nombreInput.focus();
+      modalTitle.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-flame)" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Editar: ${item.Nombre}`;
+      submitBtnTxt.textContent = "Actualizar Cambios";
+      modalOverlay.classList.add('is-open');
     };
 
-    function resetearFormulario() {
-      menuForm.reset();
-      editDocIdInput.value = '';
-      formTitle.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-flame)" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Nuevo Ítem de Menú`;
-      submitBtnTxt.textContent = "Guardar Ítem";
-      cancelEditBtn.style.display = 'none';
-    }
-
-    cancelEditBtn.addEventListener('click', resetearFormulario);
-
-    // 3. Eliminar ítem
+    // 3. Eliminar Ítem
     window.eliminarItemMenu = async (id) => {
-      if (confirm("¿Está seguro de eliminar este ítem del menú?")) {
+      if (confirm("¿Está seguro de eliminar esta página del menú?")) {
         try {
           const docRef = doc(db, "carpetacout", "configuracion_general", "menuprestamistas", id);
           await deleteDoc(docRef);
@@ -597,32 +683,68 @@
       }
     };
 
-    // 4. Reubicar posición (Subir o Bajar)
-    window.cambiarPosicion = async (id, direccion) => {
+    // 4. Reubicar Posición de Página Individual
+    window.cambiarPosicionItem = async (id, direccion) => {
       const index = menuCacheGlobal.findIndex(m => m.id === id);
       if (index === -1) return;
 
       const nuevoIndex = index + direccion;
       if (nuevoIndex < 0 || nuevoIndex >= menuCacheGlobal.length) return;
 
-      // Intercambiar órdenes en memoria
       const temp = menuCacheGlobal[index];
       menuCacheGlobal[index] = menuCacheGlobal[nuevoIndex];
       menuCacheGlobal[nuevoIndex] = temp;
 
       try {
-        // Actualizar el campo 'orden' en Firestore para todos los afectados
         for (let i = 0; i < menuCacheGlobal.length; i++) {
           const docRef = doc(db, "carpetacout", "configuracion_general", "menuprestamistas", menuCacheGlobal[i].id);
           await updateDoc(docRef, { orden: i });
         }
         localStorage.removeItem('cout_menu_cache');
       } catch (err) {
-        console.error("Error al reordenar:", err);
+        console.error("Error al reordenar ítem:", err);
       }
     };
 
-    // 5. Escucha en tiempo real y renderizado agrupado
+    // 5. Reubicar Categoría Completa (Mueve todos los ítems de esa categoría arriba o abajo en bloque)
+    window.cambiarPosicionCategoria = async (catName, direccion) => {
+      // Agrupar categorías actuales en orden
+      const catsOrdenadas = [];
+      menuCacheGlobal.forEach(item => {
+        const cat = item.Categoria || item.categoria || 'General';
+        if (!catsOrdenadas.includes(cat)) catsOrdenadas.push(cat);
+      });
+
+      const catIndex = catsOrdenadas.indexOf(catName);
+      if (catIndex === -1) return;
+
+      const nuevoCatIndex = catIndex + direccion;
+      if (nuevoCatIndex < 0 || nuevoCatIndex >= catsOrdenadas.length) return;
+
+      // Intercambiar orden de las categorías en el array global
+      const tempCat = catsOrdenadas[catIndex];
+      catsOrdenadas[catIndex] = catsOrdenadas[nuevoCatIndex];
+      catsOrdenadas[nuevoCatIndex] = tempCat;
+
+      // Reconstruir el array completo agrupado por la nueva estructura de categorías
+      let nuevoOrdenGlobal = [];
+      catsOrdenadas.forEach(c => {
+        const itemsDeCat = menuCacheGlobal.filter(item => (item.Categoria || item.categoria || 'General') === c);
+        nuevoOrdenGlobal = nuevoOrdenGlobal.concat(itemsDeCat);
+      });
+
+      try {
+        for (let i = 0; i < nuevoOrdenGlobal.length; i++) {
+          const docRef = doc(db, "carpetacout", "configuracion_general", "menuprestamistas", nuevoOrdenGlobal[i].id);
+          await updateDoc(docRef, { orden: i });
+        }
+        localStorage.removeItem('cout_menu_cache');
+      } catch (err) {
+        console.error("Error al reordenar categoría:", err);
+      }
+    };
+
+    // 6. Listener en tiempo real de Firestore
     const menuRef = collection(db, "carpetacout", "configuracion_general", "menuprestamistas");
 
     onSnapshot(menuRef, (snapshot) => {
@@ -633,16 +755,15 @@
         items.push({ id: docSnap.id, ...docSnap.data() });
       });
 
-      // Ordenar por campo 'orden' si existe
       items.sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
       menuCacheGlobal = items;
 
       if (items.length === 0) {
-        menuGroupedContainer.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); padding: 30px; font-size: 13px;">No hay ítems registrados.</div>';
+        menuGroupedContainer.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); padding: 40px; font-size: 13px;">No hay páginas configuradas. Utilice el botón superior para agregar una.</div>';
         return;
       }
 
-      // Agrupar por Categoría
+      // Agrupar por Categoría manteniendo el orden
       const categoriasMap = {};
       items.forEach((item) => {
         const cat = item.Categoria || item.categoria || 'General';
@@ -654,10 +775,27 @@
         const groupBlock = document.createElement('div');
         groupBlock.className = 'category-group-block';
 
+        const groupHeader = document.createElement('div');
+        groupHeader.className = 'category-group-header';
+
         const groupTitle = document.createElement('div');
         groupTitle.className = 'category-group-title';
-        groupTitle.textContent = catName;
-        groupBlock.appendChild(groupTitle);
+        groupTitle.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 9h16M4 15h16"/></svg> ${catName}`;
+        
+        const catActions = document.createElement('div');
+        catActions.className = 'category-actions';
+        catActions.innerHTML = `
+          <button class="btn-action" onclick="window.cambiarPosicionCategoria('${catName}', -1)" title="Mover categoría arriba">
+            <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"></polyline></svg>
+          </button>
+          <button class="btn-action" onclick="window.cambiarPosicionCategoria('${catName}', 1)" title="Mover categoría abajo">
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+        `;
+
+        groupHeader.appendChild(groupTitle);
+        groupHeader.appendChild(catActions);
+        groupBlock.appendChild(groupHeader);
 
         categoriasMap[catName].forEach((navItem) => {
           const row = document.createElement('div');
@@ -676,16 +814,16 @@
               </div>
             </div>
             <div class="item-actions">
-              <button class="btn-action" onclick="window.cambiarPosicion('${navItem.id}', -1)" title="Mover arriba">
+              <button class="btn-action" onclick="window.cambiarPosicionItem('${navItem.id}', -1)" title="Mover página arriba">
                 <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"></polyline></svg>
               </button>
-              <button class="btn-action" onclick="window.cambiarPosicion('${navItem.id}', 1)" title="Mover abajo">
+              <button class="btn-action" onclick="window.cambiarPosicionItem('${navItem.id}', 1)" title="Mover página abajo">
                 <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
               </button>
-              <button class="btn-action" onclick="window.cargarParaEditar('${navItem.id}')" title="Editar ítem">
+              <button class="btn-action" onclick="window.cargarParaEditar('${navItem.id}')" title="Editar página">
                 <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
               </button>
-              <button class="btn-action delete" onclick="window.eliminarItemMenu('${navItem.id}')" title="Eliminar ítem">
+              <button class="btn-action delete" onclick="window.eliminarItemMenu('${navItem.id}')" title="Eliminar página">
                 <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
               </button>
             </div>
