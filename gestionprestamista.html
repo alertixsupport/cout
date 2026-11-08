@@ -6,7 +6,7 @@
   <title>COUT.APP | Panel de Gestión de Prestamistas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
   
   <style>
     :root {
@@ -107,18 +107,40 @@
       color: var(--accent-flame);
     }
 
-    .user-badge-header {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      font-weight: 600;
-      color: #93c5fd;
-      background: rgba(37, 99, 235, 0.1);
-      border: 1px solid rgba(37, 99, 235, 0.3);
-      padding: 8px 14px;
-      border-radius: 10px;
+    /* --- INSIGNIA DE USUARIO PROFESIONAL CON TITILEO VERDE --- */
+    @keyframes pulseGreen {
+      0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+      50% { transform: scale(1.1); opacity: 0.8; box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
     }
 
-    /* --- SIDEBAR MENÚ HAMBURGUESA (ANIMACIÓN FLUIDA) --- */
+    .user-badge-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(249, 115, 22, 0.25);
+      padding: 8px 14px;
+      border-radius: 12px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #10b981;
+      border-radius: 50%;
+      animation: pulseGreen 2s infinite ease-in-out;
+    }
+
+    .user-badge-txt {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fed7aa;
+      letter-spacing: -0.2px;
+    }
+
+    /* --- SIDEBAR MENÚ HAMBURGUESA --- */
     .sidebar-overlay {
       position: fixed;
       inset: 0;
@@ -176,11 +198,18 @@
       color: var(--accent-flame);
     }
 
-    .user-info-box p {
+    .sidebar-user-tag-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .sidebar-user-tag-wrapper span {
       font-family: 'JetBrains Mono', monospace;
       font-size: 12px;
-      color: #93c5fd;
-      margin-top: 4px;
+      font-weight: 700;
+      color: #fed7aa;
     }
 
     .btn-close-sidebar {
@@ -305,7 +334,7 @@
       stroke-width: 2.2;
     }
 
-    /* --- CUERPO PRINCIPAL CON CARDS INTERACTIVAS --- */
+    /* --- CUERPO PRINCIPAL CON CARDS Y FLECHAS ANIMADAS --- */
     .dashboard-hero {
       margin-bottom: 32px;
     }
@@ -377,6 +406,12 @@
       opacity: 1;
     }
 
+    .card-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
     .card-icon-box {
       width: 50px;
       height: 50px;
@@ -394,6 +429,38 @@
       stroke: var(--accent-flame);
       fill: none;
       stroke-width: 2;
+    }
+
+    /* Flecha profesional animada en la card */
+    .card-arrow-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .card-arrow-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--text-tertiary);
+      fill: none;
+      stroke-width: 2.2;
+      transition: transform 0.3s ease, stroke 0.3s ease;
+    }
+
+    .feature-card:hover .card-arrow-icon {
+      background: rgba(249, 115, 22, 0.15);
+      border-color: rgba(249, 115, 22, 0.4);
+    }
+
+    .feature-card:hover .card-arrow-icon svg {
+      stroke: var(--accent-flame);
+      transform: translateX(4px);
     }
 
     .card-content h3 {
@@ -418,7 +485,10 @@
       <div class="sidebar-user-header">
         <div class="user-info-box">
           <h3>cout<span>.app</span></h3>
-          <p id="sidebarUserTag">@cargando...</p>
+          <div class="sidebar-user-tag-wrapper">
+            <div class="live-dot"></div>
+            <span id="sidebarUserTag">@cargando...</span>
+          </div>
         </div>
         <button class="btn-close-sidebar" id="closeSidebarBtn" title="Cerrar Menú">
           <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -450,7 +520,11 @@
         <h1 class="logo-text">cout<span>.app</span></h1>
       </div>
 
-      <div class="user-badge-header" id="headerUserBadge">@...</div>
+      <!-- Insignia superior con tipografía técnica y punto verde titilante -->
+      <div class="user-badge-header">
+        <div class="live-dot"></div>
+        <span class="user-badge-txt" id="headerUserBadge">@...</span>
+      </div>
     </header>
 
     <main>
@@ -462,8 +536,13 @@
       <div class="cards-grid">
         <!-- Card 1: Notas rápidas -->
         <a href="notas.html" class="feature-card">
-          <div class="card-icon-box">
-            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          <div class="card-header-row">
+            <div class="card-icon-box">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            </div>
+            <div class="card-arrow-icon">
+              <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </div>
           </div>
           <div class="card-content">
             <h3>Agregar nota rápida</h3>
@@ -473,8 +552,13 @@
 
         <!-- Card 2: Configura tu negocio -->
         <a href="configuracion.html" class="feature-card">
-          <div class="card-icon-box">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          <div class="card-header-row">
+            <div class="card-icon-box">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </div>
+            <div class="card-arrow-icon">
+              <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </div>
           </div>
           <div class="card-content">
             <h3>Configura tu negocio</h3>
@@ -484,8 +568,13 @@
 
         <!-- Card 3: Ver estadísticas -->
         <a href="estadisticas.html" class="feature-card">
-          <div class="card-icon-box">
-            <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          <div class="card-header-row">
+            <div class="card-icon-box">
+              <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            </div>
+            <div class="card-arrow-icon">
+              <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </div>
           </div>
           <div class="card-content">
             <h3>Ver estadísticas de tu negocio</h3>
