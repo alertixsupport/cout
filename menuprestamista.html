@@ -620,7 +620,6 @@
 
     let menuCacheGlobal = [];
 
-    // Actualizar selector de categorías disponibles
     function actualizarSelectorCategorias(categoriaSeleccionada = '') {
       categoriaSelect.innerHTML = '';
       
@@ -668,7 +667,6 @@
 
     categoriaSelect.addEventListener('change', manejarCambioSelector);
 
-    // Control de Apertura y Cierre de Modal
     openModalBtn.addEventListener('click', () => {
       resetearFormulario();
       actualizarSelectorCategorias();
@@ -688,7 +686,7 @@
       submitBtnTxt.textContent = "Guardar Página en Menú";
     }
 
-    // 1. Guardar o Actualizar desde el Modal
+    // Guardar o Actualizar
     menuForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const docId = editDocIdInput.value;
@@ -725,7 +723,6 @@
       }
     });
 
-    // 2. Abrir Modal para Editar
     window.cargarParaEditar = (id) => {
       const item = menuCacheGlobal.find(m => m.id === id);
       if (!item) return;
@@ -743,20 +740,30 @@
       modalOverlay.classList.add('is-open');
     };
 
-    // 3. Eliminar Ítem
     window.eliminarItemMenu = async (id) => {
       if (confirm("¿Está seguro de eliminar esta página del menú?")) {
         try {
           const docRef = doc(db, "carpetacout", "configuracion_general", "menuprestamistas", id);
           await deleteDoc(docRef);
           localStorage.removeItem('cout_menu_cache');
+          
+          // Re-indexar los restantes para mantener secuencia limpia
+          setTimeout(async () => {
+            if (menuCacheGlobal.length > 0) {
+              const promesas = menuCacheGlobal.filter(m => m.id !== id).map((item, idx) => {
+                const ref = doc(db, "carpetacout", "configuracion_general", "menuprestamistas", item.id);
+                return updateDoc(ref, { orden: idx });
+              });
+              await Promise.all(promesas);
+            }
+          }, 300);
         } catch (err) {
           console.error("Error al eliminar:", err);
         }
       }
     };
 
-    // 4. Reubicar Posición de Página Individual (Con persistencia garantizada)
+    // Reubicar posición de página individual
     window.cambiarPosicionItem = async (id, direccion) => {
       const index = menuCacheGlobal.findIndex(m => m.id === id);
       if (index === -1) return;
@@ -764,14 +771,12 @@
       const nuevoIndex = index + direccion;
       if (nuevoIndex < 0 || nuevoIndex >= menuCacheGlobal.length) return;
 
-      // Intercambiar en copia local
       const nuevoArray = [...menuCacheGlobal];
       const temp = nuevoArray[index];
       nuevoArray[index] = nuevoArray[nuevoIndex];
       nuevoArray[nuevoIndex] = temp;
 
       try {
-        // Guardar todos los nuevos índices de orden en Firestore
         const promesas = nuevoArray.map((item, idx) => {
           const docRef = doc(db, "carpetacout", "configuracion_general", "menuprestamistas", item.id);
           return updateDoc(docRef, { orden: idx });
@@ -783,7 +788,7 @@
       }
     };
 
-    // 5. Reubicar Categoría Completa (Reorganiza y persiste el bloque completo)
+    // Reubicar categoría completa y reescribir orden completo
     window.cambiarPosicionCategoria = async (catName, direccion) => {
       const catsOrdenadas = [];
       menuCacheGlobal.forEach(item => {
@@ -797,12 +802,10 @@
       const nuevoCatIndex = catIndex + direccion;
       if (nuevoCatIndex < 0 || nuevoCatIndex >= catsOrdenadas.length) return;
 
-      // Intercambiar categorías en la lista
       const tempCat = catsOrdenadas[catIndex];
       catsOrdenadas[catIndex] = catsOrdenadas[nuevoCatIndex];
       catsOrdenadas[nuevoCatIndex] = tempCat;
 
-      // Reconstruir el nuevo orden global de todos los ítems
       let nuevoOrdenGlobal = [];
       catsOrdenadas.forEach(c => {
         const itemsDeCat = menuCacheGlobal.filter(item => (item.Categoria || item.categoria || 'General') === c);
@@ -821,7 +824,7 @@
       }
     };
 
-    // 6. Listener en tiempo real de Firestore
+    // Listener en tiempo real con ordenamiento robusto
     const menuRef = collection(db, "carpetacout", "configuracion_general", "menuprestamistas");
 
     onSnapshot(menuRef, (snapshot) => {
@@ -832,7 +835,8 @@
         items.push({ id: docSnap.id, ...docSnap.data() });
       });
 
-      items.sort((a, b) => (a.orden ?? 0) - (b.orden ?? 0));
+      // Ordenar estrictamente por el campo 'orden' asegurando valor por defecto numérico
+      items.sort((a, b) => (Number(a.orden) || 0) - (Number(b.orden) || 0));
       menuCacheGlobal = items;
 
       if (items.length === 0) {
