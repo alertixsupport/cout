@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>COUT.APP | Crear Crédito</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-base: #06080d;
+      --bg-surface: #0e121d;
+      --bg-surface-hover: #161d2e;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: #f97316;
+      --accent-flame: #f97316;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-tertiary: #64748b;
+      --status-success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      scrollbar-width: none;
+    }
+
+    html::-webkit-scrollbar, body::-webkit-scrollbar {
+      display: none;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      width: 100%;
+    }
+
+    /* Navbar Principal */
+    header {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 14px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 10px;
+      transition: all 0.2s;
+    }
+
+    .btn-back:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+      border-color: rgba(249, 115, 22, 0.3);
+    }
+
+    .btn-back svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-text {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+    }
+
+    .logo-text span {
+      color: var(--accent-flame);
+    }
+
+    /* Tarjeta del Formulario */
+    .credit-card-form {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    }
+
+    .form-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-title svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--accent-flame);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .form-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 22px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 640px) {
+      .form-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-field.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-field label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-secondary);
+    }
+
+    .form-field select,
+    .form-field input {
+      width: 100%;
+      padding: 11px 14px;
+      background: #090e18;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    .form-field select:focus,
+    .form-field input:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+    }
+
+    /* Caja de Resumen Financiero en Tiempo Real */
+    .financial-summary-box {
+      grid-column: 1 / -1;
+      background: #090e18;
+      border: 1px solid rgba(249, 115, 22, 0.3);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .summary-header {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--accent-flame);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    @media (min-width: 640px) {
+      .summary-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .summary-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .summary-item .lbl {
+      font-size: 10px;
+      color: var(--text-tertiary);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .summary-item .val {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-primary);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .btn-submit-credit {
+      grid-column: 1 / -1;
+      height: 48px;
+      background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+      border: 1px solid rgba(249, 115, 22, 0.6);
+      border-radius: 12px;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-submit-credit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(249, 115, 22, 0.4);
+    }
+
+    /* Modal de Alertas Profesional */
+    .custom-alert-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 7, 11, 0.88);
+      backdrop-filter: blur(12px);
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .custom-alert-overlay.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .custom-alert-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 380px;
+      padding: 22px;
+      text-align: center;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+    }
+
+    .custom-alert-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: rgba(249, 115, 22, 0.1);
+      border: 1px solid rgba(249, 115, 22, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px auto;
+    }
+
+    .custom-alert-icon svg {
+      width: 22px;
+      height: 22px;
+      stroke: var(--accent-flame);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .custom-alert-box h4 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .custom-alert-box p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+      margin-bottom: 18px;
+    }
+
+    .btn-alert-primary {
+      width: 100%;
+      height: 40px;
+      background: var(--accent-flame);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MODAL DE ALERTA -->
+  <div class="custom-alert-overlay" id="customAlertOverlay">
+    <div class="custom-alert-box">
+      <div class="custom-alert-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      </div>
+      <h4 id="alertTitle">Atención</h4>
+      <p id="alertMessage">Mensaje del sistema...</p>
+      <button class="btn-alert-primary" id="alertOkBtn">Aceptar</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <header>
+      <a href="gestionprestamista.html" class="btn-back">
+        <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Volver al Panel
+      </a>
+
+      <div class="brand-section">
+        <h1 class="logo-text">cout<span>.app</span></h1>
+      </div>
+    </header>
+
+    <main>
+      <div class="credit-card-form">
+        <div class="form-title">
+          <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+          Otorgar Nuevo Crédito o Préstamo
+        </div>
+        <p class="form-subtitle">Selecciona el cliente y define los parámetros financieros del crédito.</p>
+
+        <form class="form-grid" id="creditForm">
+          
+          <!-- Seleccionar Cliente -->
+          <div class="form-field full-width">
+            <label for="clienteSelect">Cliente</label>
+            <select id="clienteSelect" required>
+              <option value="">Seleccione un cliente...</option>
+            </select>
+          </div>
+
+          <!-- Tipo de Crédito -->
+          <div class="form-field">
+            <label for="tipoCredito">Tipo de Crédito</label>
+            <select id="tipoCredito" required>
+              <option value="prestamo">Préstamo en Efectivo</option>
+              <option value="producto">Producto Financiado</option>
+            </select>
+          </div>
+
+          <!-- Frecuencia de Pago -->
+          <div class="form-field">
+            <label for="frecuencia">Modalidad / Frecuencia</label>
+            <select id="frecuencia" required>
+              <option value="semanal">Semanal</option>
+              <option value="quincenal">Quincenal</option>
+              <option value="mensual">Mensual</option>
+            </select>
+          </div>
+
+          <!-- Monto del Préstamo -->
+          <div class="form-field">
+            <label for="monto">Monto Principal ($)</label>
+            <input type="number" id="monto" required min="1" step="any" placeholder="Ej. 50000">
+          </div>
+
+          <!-- Interés (%) -->
+          <div class="form-field">
+            <label for="interes" id="lblInteres">Interés Total (%)</label>
+            <input type="number" id="interes" required min="0" step="any" placeholder="Ej. 20">
+          </div>
+
+          <!-- Cantidad de Cuotas -->
+          <div class="form-field">
+            <label for="cuotas">Cantidad de Cuotas</label>
+            <input type="number" id="cuotas" required min="1" value="1" placeholder="Ej. 4">
+          </div>
+
+          <!-- Fecha de Inicio -->
+          <div class="form-field">
+            <label for="fechaInicio">Fecha de Inicio</label>
+            <input type="date" id="fechaInicio" required>
+          </div>
+
+          <!-- RESUMEN FINANCIERO EN TIEMPO REAL -->
+          <div class="financial-summary-box">
+            <div class="summary-header">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+              Simulación Financiera del Crédito
+            </div>
+            <div class="summary-grid">
+              <div class="summary-item">
+                <span class="lbl">Total con Interés</span>
+                <span class="val" id="sumTotal">$0.00</span>
+              </div>
+              <div class="summary-item">
+                <span class="lbl">Valor por Cuota</span>
+                <span class="val" id="sumCuota">$0.00</span>
+              </div>
+              <div class="summary-item">
+                <span class="lbl">Ganancia Interés</span>
+                <span class="val" id="sumGanancia">$0.00</span>
+              </div>
+              <div class="summary-item">
+                <span class="lbl">Fecha Vencimiento</span>
+                <span class="val" id="sumFechaVence">-</span>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-submit-credit" id="submitBtn">
+            Registrar y Emitir Crédito
+          </button>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { db } from './app.js';
+    import { collection, addDoc, doc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const prestamistaId = localStorage.getItem('cout_prestamista_id');
+    const usuarioLogueado = localStorage.getItem('cout_prestamista_user');
+
+    if (!prestamistaId || !usuarioLogueado) {
+      window.location.replace('loginprestamista.html');
+    }
+
+    // Establecer fecha de hoy por defecto en el input
+    const todayStr = new Date().toISOString().split('T')[0];
+    document.getElementById('fechaInicio').value = todayStr;
+
+    // Alertas profesionales
+    window.mostrarAlerta = (titulo, mensaje, callback = null) => {
+      const overlay = document.getElementById('customAlertOverlay');
+      document.getElementById('alertTitle').textContent = titulo;
+      document.getElementById('alertMessage').textContent = mensaje;
+      overlay.classList.add('is-open');
+      document.getElementById('alertOkBtn').onclick = () => {
+        overlay.classList.remove('is-open');
+        if (callback) callback();
+      };
+    };
+
+    // Cargar clientes en el selector (usando caché local instantánea)
+    const clienteSelect = document.getElementById('clienteSelect');
+    const cacheLocalClientes = localStorage.getItem(`cout_clientes_cache_${prestamistaId}`);
+    
+    function poblarClientes(lista) {
+      clienteSelect.innerHTML = '<option value="">Seleccione un cliente...</option>';
+      lista.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = `${c.nombre} (DNI: ${c.dni || 'N/D'})`;
+        opt.dataset.nombre = c.nombre;
+        clienteSelect.appendChild(opt);
+      });
+    }
+
+    if (cacheLocalClientes) {
+      try {
+        poblarClientes(JSON.parse(cacheLocalClientes));
+      } catch(e) { console.error(e); }
+    }
+
+    // Sincronización en segundo plano con Firestore para clientes
+    const clientesRef = collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "clientes");
+    getDocs(clientesRef).then(snap => {
+      const arr = [];
+      snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
+      localStorage.setItem(`cout_clientes_cache_${prestamistaId}`, JSON.stringify(arr));
+      poblarClientes(arr);
+    });
+
+    // Referencias de cálculo en tiempo real
+    const montoInput = document.getElementById('monto');
+    const interesInput = document.getElementById('interes');
+    const cuotasInput = document.getElementById('cuotas');
+    const frecuenciaSelect = document.getElementById('frecuencia');
+    const fechaInicioInput = document.getElementById('fechaInicio');
+    const lblInteres = document.getElementById('lblInteres');
+
+    const sumTotal = document.getElementById('sumTotal');
+    const sumCuota = document.getElementById('sumCuota');
+    const sumGanancia = document.getElementById('sumGanancia');
+    const sumFechaVence = document.getElementById('sumFechaVence');
+
+    cuotasInput.addEventListener('input', () => {
+      const c = parseInt(cuotasInput.value) || 1;
+      lblInteres.textContent = c > 1 ? "Interés por Cuota (%)" : "Interés Único (%)";
+      calcularSimulacion();
+    });
+
+    montoInput.addEventListener('input', calcularSimulacion);
+    interesInput.addEventListener('input', calcularSimulacion);
+    frecuenciaSelect.addEventListener('change', calcularSimulacion);
+    fechaInicioInput.addEventListener('change', calcularSimulacion);
+
+    function calcularSimulacion() {
+      const monto = parseFloat(montoInput.value) || 0;
+      const interes = parseFloat(interesInput.value) || 0;
+      const cuotas = parseInt(cuotasInput.value) || 1;
+      const frecuencia = frecuenciaSelect.value;
+      const fechaInicioVal = fechaInicioInput.value;
+
+      // Cálculo del total con interés
+      // Si cuotas > 1, el interés se calcula por cuota o total según la regla de negocio habitual (aquí aplicamos interés total o acumulado por cuota)
+      let totalConInteres = 0;
+      let ganancia = 0;
+
+      if (cuotas === 1) {
+        ganancia = monto * (interes / 100);
+        totalConInteres = monto + ganancia;
+      } else {
+        // Interés aplicado por cuota o sobre el total
+        ganancia = monto * (interes / 100) * cuotas;
+        totalConInteres = monto + ganancia;
+      }
+
+      const valorCuota = totalConInteres / cuotas;
+
+      // Calcular fecha de vencimiento final
+      if (fechaInicioVal) {
+        let fechaVence = new Date(fechaInicioVal);
+        let diasTotales = 0;
+        if (frecuencia === 'semanal') diasTotales = 7 * cuotas;
+        else if (frecuencia === 'quincenal') diasTotales = 15 * cuotas;
+        else if (frecuencia === 'mensual') diasTotales = 30 * cuotas;
+
+        fechaVence.setDate(fechaVence.getDate() + diasTotales);
+        sumFechaVence.textContent = fechaVence.toLocaleDateString('es-AR');
+      } else {
+        sumFechaVence.textContent = '-';
+      }
+
+      sumTotal.textContent = '$' + totalConInteres.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      sumCuota.textContent = '$' + valorCuota.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      sumGanancia.textContent = '$' + ganancia.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // Guardar Crédito en Firestore
+    const creditForm = document.getElementById('creditForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    creditForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      submitBtn.textContent = "Registrando Crédito...";
+      submitBtn.disabled = true;
+
+      const clienteId = clienteSelect.value;
+      const clienteNombre = clienteSelect.options[clienteSelect.selectedIndex].dataset.nombre;
+      const tipoCredito = document.getElementById('tipoCredito').value;
+      const frecuencia = frecuenciaSelect.value;
+      const monto = parseFloat(montoInput.value) || 0;
+      const interes = parseFloat(interesInput.value) || 0;
+      const cuotas = parseInt(cuotasInput.value) || 1;
+      const fechaInicio = fechaInicioInput.value;
+
+      const ganancia = cuotas === 1 ? monto * (interes / 100) : monto * (interes / 100) * cuotas;
+      const totalConInteres = monto + ganancia;
+      const valorCuota = totalConInteres / cuotas;
+
+      try {
+        const creditoPayload = {
+          clienteId,
+          clienteNombre,
+          tipoCredito,
+          frecuencia,
+          montoPrincipal: monto,
+          interesPorcentaje: interes,
+          cantidadCuotas: cuotas,
+          totalConInteres,
+          valorCuota,
+          fechaInicio,
+          estado: 'activo',
+          creadoEn: new Date().toISOString()
+        };
+
+        const creditosRef = collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos");
+        await addDoc(creditosRef, creditoPayload);
+
+        mostrarAlerta("Éxito", "Crédito registrado y emitido correctamente.", () => {
+          window.location.href = 'gestionprestamista.html';
+        });
+      } catch (err) {
+        console.error("Error al registrar crédito:", err);
+        mostrarAlerta("Error", "No se pudo registrar el crédito. Intente nuevamente.");
+        submitBtn.textContent = "Registrar y Emitir Crédito";
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
