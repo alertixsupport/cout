@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>COUT.APP | Gestión de Clientes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-base: #06080d;
+      --bg-surface: #0e121d;
+      --bg-surface-hover: #161d2e;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-focus: #f97316;
+      --accent-primary: #2563eb;
+      --accent-flame: #f97316;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-tertiary: #64748b;
+      --status-success: #10b981;
+      --status-error: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      scrollbar-width: none;
+    }
+
+    html::-webkit-scrollbar, body::-webkit-scrollbar {
+      display: none;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 20px;
+      width: 100%;
+    }
+
+    /* Navbar Principal */
+    header {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 16px 24px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 16px;
+      border-radius: 12px;
+      transition: all 0.2s;
+    }
+
+    .btn-back:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-primary);
+      border-color: rgba(249, 115, 22, 0.3);
+    }
+
+    .btn-back svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo-text {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text-primary);
+    }
+
+    .logo-text span {
+      color: var(--accent-flame);
+    }
+
+    /* Panel Hero */
+    .dashboard-hero {
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .hero-text h1 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+
+    .hero-text h1 span {
+      color: var(--accent-flame);
+    }
+
+    .hero-text p {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    @keyframes buttonAmbientOrange {
+      0%, 100% { box-shadow: 0 0 15px rgba(249, 115, 22, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+      50% { box-shadow: 0 0 25px rgba(249, 115, 22, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+    }
+
+    .btn-open-modal {
+      background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+      border: 1px solid rgba(249, 115, 22, 0.6);
+      border-radius: 12px;
+      color: white;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 12px 20px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      animation: buttonAmbientOrange 3.5s ease-in-out infinite;
+    }
+
+    .btn-open-modal:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(249, 115, 22, 0.45);
+    }
+
+    .btn-open-modal svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.5;
+    }
+
+    /* --- GRID DE CARDS DE CLIENTES --- */
+    .clients-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    @media (min-width: 768px) {
+      .clients-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .clients-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .client-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.5);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .client-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(249, 115, 22, 0.4);
+      background: var(--bg-surface-hover);
+    }
+
+    .client-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .client-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: rgba(249, 115, 22, 0.1);
+      border: 1px solid rgba(249, 115, 22, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .client-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .client-avatar svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--accent-flame);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .client-title-info h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+      letter-spacing: -0.2px;
+    }
+
+    .client-title-info span {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .client-details-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: #090e18;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .client-detail-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+
+    .client-detail-row .label {
+      color: var(--text-tertiary);
+      font-weight: 600;
+    }
+
+    .client-detail-row .value {
+      color: var(--text-primary);
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .client-card-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-whatsapp {
+      flex: 1;
+      height: 40px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 10px;
+      color: #6ee7b7;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-whatsapp:hover {
+      background: rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-whatsapp svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+    }
+
+    .btn-delete-client {
+      width: 40px;
+      height: 40px;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      border-radius: 10px;
+      color: #fca5a5;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .btn-delete-client:hover {
+      background: rgba(239, 68, 68, 0.25);
+      color: white;
+    }
+
+    .btn-delete-client svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+    }
+
+    /* --- VENTANA EMERGENTE (MODAL FLOTANTE) --- */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 7, 11, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-overlay.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-container {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 520px;
+      padding: 28px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+      transform: scale(0.95) translateY(10px);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-overlay.is-open .modal-container {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-shrink: 0;
+    }
+
+    .modal-header h3 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-close-modal {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .btn-close-modal:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-primary);
+    }
+
+    .btn-close-modal svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
+    }
+
+    .modal-body-scroll {
+      overflow-y: auto;
+      flex: 1;
+      padding-right: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .client-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-field label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-secondary);
+    }
+
+    .form-field input {
+      width: 100%;
+      padding: 12px 14px;
+      background: #090e18;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 14px;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    .form-field input:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+    }
+
+    .btn-submit-modal {
+      width: 100%;
+      height: 48px;
+      margin-top: 6px;
+      background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+      border: 1px solid rgba(249, 115, 22, 0.6);
+      border-radius: 12px;
+      color: white;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-submit-modal:hover {
+      box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
+    }
+
+    /* Modal de Alerta Profesional */
+    .custom-alert-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 7, 11, 0.88);
+      backdrop-filter: blur(12px);
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .custom-alert-overlay.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .custom-alert-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 400px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+      transform: scale(0.9);
+      transition: transform 0.25s ease;
+    }
+
+    .custom-alert-overlay.is-open .custom-alert-box {
+      transform: scale(1);
+    }
+
+    .custom-alert-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 16px;
+      background: rgba(249, 115, 22, 0.1);
+      border: 1px solid rgba(249, 115, 22, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px auto;
+    }
+
+    .custom-alert-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--accent-flame);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .custom-alert-box h4 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .custom-alert-box p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .custom-alert-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-alert-primary {
+      flex: 1;
+      height: 42px;
+      background: var(--accent-flame);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .btn-alert-secondary {
+      flex: 1;
+      height: 42px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MODAL DE ALERTA / CONFIRMACIÓN -->
+  <div class="custom-alert-overlay" id="customAlertOverlay">
+    <div class="custom-alert-box">
+      <div class="custom-alert-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      </div>
+      <h4 id="alertTitle">Atención</h4>
+      <p id="alertMessage">Mensaje del sistema...</p>
+      <div class="custom-alert-buttons" id="alertButtonsContainer">
+        <button class="btn-alert-primary" id="alertOkBtn">Aceptar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <header>
+      <a href="gestionprestamista.html" class="btn-back">
+        <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Volver al Panel
+      </a>
+
+      <div class="brand-section">
+        <h1 class="logo-text">cout<span>.app</span></h1>
+      </div>
+    </header>
+
+    <main>
+      <div class="dashboard-hero">
+        <div class="hero-text">
+          <h1>Gestión de <span>Clientes</span></h1>
+          <p>Administre su cartera de clientes registrados con acceso directo a WhatsApp y detalles.</p>
+        </div>
+        <button class="btn-open-modal" id="openModalBtn">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Nuevo Cliente
+        </button>
+      </div>
+
+      <!-- LISTADO DE CARDS DE CLIENTES -->
+      <div class="clients-grid" id="clientsGrid">
+        <div style="text-align: center; color: var(--text-tertiary); grid-column: span 3; padding: 40px; font-size: 13px;">
+          Cargando clientes en tiempo real...
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- VENTANA EMERGENTE (MODAL) PARA AGREGAR CLIENTE -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-flame)" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+          Registrar Nuevo Cliente
+        </h3>
+        <button class="btn-close-modal" id="closeModalBtn" title="Cerrar ventana">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="modal-body-scroll">
+        <form class="client-form" id="clientForm">
+          <div class="form-field">
+            <label for="nombre">Nombre y Apellido</label>
+            <input type="text" id="nombre" required placeholder="Ej. Carlos Mendoza">
+          </div>
+
+          <div class="form-field">
+            <label for="edad">Edad</label>
+            <input type="number" id="edad" required placeholder="Ej. 35">
+          </div>
+
+          <div class="form-field">
+            <label for="whatsapp">WhatsApp</label>
+            <input type="tel" id="whatsapp" required placeholder="Ej. +5491123456789">
+          </div>
+
+          <div class="form-field">
+            <label for="domicilio">Domicilio</label>
+            <input type="text" id="domicilio" required placeholder="Ej. Av. Corrientes 1234">
+          </div>
+
+          <div class="form-field">
+            <label for="dni">DNI</label>
+            <input type="text" id="dni" required placeholder="Ej. 32456789">
+          </div>
+
+          <div class="form-field">
+            <label for="imagen">Adjuntar Imagen (Opcional)</label>
+            <input type="file" id="imagen" accept="image/*">
+          </div>
+
+          <button type="submit" class="btn-submit-modal" id="submitBtnTxt">
+            Guardar Cliente
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db } from './app.js';
+    import { collection, addDoc, deleteDoc, doc, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const prestamistaId = localStorage.getItem('cout_prestamista_id');
+    const usuarioLogueado = localStorage.getItem('cout_prestamista_user');
+
+    if (!prestamistaId || !usuarioLogueado) {
+      window.location.replace('loginprestamista.html');
+    }
+
+    // Alertas profesionales
+    window.mostrarAlerta = (titulo, mensaje, callback = null) => {
+      const overlay = document.getElementById('customAlertOverlay');
+      document.getElementById('alertTitle').textContent = titulo;
+      document.getElementById('alertMessage').textContent = mensaje;
+      document.getElementById('alertButtonsContainer').innerHTML = `<button class="btn-alert-primary" id="alertOkBtn">Aceptar</button>`;
+      overlay.classList.add('is-open');
+      document.getElementById('alertOkBtn').onclick = () => {
+        overlay.classList.remove('is-open');
+        if (callback) callback();
+      };
+    };
+
+    window.mostrarConfirmacion = (titulo, mensaje, callbackAceptar) => {
+      const overlay = document.getElementById('customAlertOverlay');
+      document.getElementById('alertTitle').textContent = titulo;
+      document.getElementById('alertMessage').textContent = mensaje;
+      document.getElementById('alertButtonsContainer').innerHTML = `
+        <button class="btn-alert-secondary" id="alertCancelBtn">Cancelar</button>
+        <button class="btn-alert-primary" id="alertOkBtn">Eliminar</button>
+      `;
+      overlay.classList.add('is-open');
+      document.getElementById('alertCancelBtn').onclick = () => overlay.classList.remove('is-open');
+      document.getElementById('alertOkBtn').onclick = () => {
+        overlay.classList.remove('is-open');
+        callbackAceptar();
+      };
+    };
+
+    // Killswitch en tiempo real
+    const userDocRef = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId);
+    onSnapshot(userDocRef, (docSnap) => {
+      if (!docSnap.exists()) {
+        localStorage.clear();
+        window.location.replace('loginprestamista.html');
+        return;
+      }
+      const userData = docSnap.data();
+      if (userData.venceEn) {
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        const fVence = new Date(userData.venceEn);
+        fVence.setHours(0, 0, 0, 0);
+        if (!isNaN(fVence.getTime()) && fVence < hoy) {
+          localStorage.clear();
+          window.location.replace('loginprestamista.html');
+        }
+      }
+    });
+
+    // Validar acceso estricto de roles por URL si esta página está restringida
+    async function validarAccesoPagina() {
+      const paginaActual = 'clientes.html';
+      const menuRef = collection(db, "carpetacout", "configuracion_general", "menuprestamistas");
+      const snap = await getDocs(menuRef);
+      
+      let encontradaConfig = null;
+      snap.forEach(d => {
+        const dat = d.data();
+        if ((dat.Redireccion || dat.redireccion) === paginaActual) {
+          encontradaConfig = dat;
+        }
+      });
+
+      if (encontradaConfig && encontradaConfig.acceso === 'personalizado') {
+        const permitidos = encontradaConfig.usuariosPermitidos || [];
+        if (!permitidos.includes(usuarioLogueado)) {
+          mostrarAlerta("Acceso Restringido", "No cuentas con autorización para visualizar este módulo.", () => {
+            window.location.replace('gestionprestamista.html');
+          });
+        }
+      }
+    }
+    validarAccesoPagina();
+
+    const modalOverlay = document.getElementById('modalOverlay');
+    const openModalBtn = document.getElementById('openModalBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const clientForm = document.getElementById('clientForm');
+    const clientsGrid = document.getElementById('clientsGrid');
+
+    openModalBtn.addEventListener('click', () => {
+      clientForm.reset();
+      modalOverlay.classList.add('is-open');
+    });
+
+    closeModalBtn.addEventListener('click', () => modalOverlay.classList.remove('is-open'));
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) modalOverlay.classList.remove('is-open');
+    });
+
+    // Guardar Cliente con imagen opcional en Base64
+    clientForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const nombre = document.getElementById('nombre').value.trim();
+      const edad = document.getElementById('edad').value.trim();
+      const whatsapp = document.getElementById('whatsapp').value.trim();
+      const domicilio = document.getElementById('domicilio').value.trim();
+      const dni = document.getElementById('dni').value.trim();
+      const imagenFile = document.getElementById('imagen').files[0];
+
+      const guardarEnFirestore = async (imageBase64 = '') => {
+        try {
+          const clientesRef = collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "clientes");
+          await addDoc(clientesRef, {
+            nombre,
+            edad,
+            whatsapp,
+            domicilio,
+            dni,
+            imagen: imageBase64,
+            creadoEn: new Date().toISOString()
+          });
+
+          modalOverlay.classList.remove('is-open');
+          clientForm.reset();
+          mostrarAlerta("Éxito", "Cliente registrado correctamente.", "success");
+        } catch (err) {
+          console.error("Error al guardar cliente:", err);
+          mostrarAlerta("Error", "No se pudo registrar el cliente.", "error");
+        }
+      };
+
+      if (imagenFile) {
+        const reader = new FileReader();
+        reader.onload = function(uploadEvent) {
+          guardarEnFirestore(uploadEvent.target.result);
+        };
+        reader.readAsDataURL(imagenFile);
+      } else {
+        guardarEnFirestore('');
+      }
+    });
+
+    // Eliminar Cliente
+    window.eliminarCliente = (id) => {
+      mostrarConfirmacion("Eliminar Cliente", "¿Está seguro de eliminar este cliente de su cartera?", async () => {
+        try {
+          const clientRef = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "clientes", id);
+          await deleteDoc(clientRef);
+          mostrarAlerta("Eliminado", "El cliente ha sido eliminado.", "success");
+        } catch (err) {
+          console.error("Error al eliminar:", err);
+          mostrarAlerta("Error", "No se pudo eliminar el cliente.", "error");
+        }
+      });
+    };
+
+    // Lectura en tiempo real de los clientes del prestamista logueado
+    const clientesRef = collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "clientes");
+    onSnapshot(clientesRef, (snapshot) => {
+      clientsGrid.innerHTML = '';
+
+      if (snapshot.empty) {
+        clientsGrid.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); grid-column: span 3; padding: 40px; font-size: 13px;">No hay clientes registrados en su cartera.</div>';
+        return;
+      }
+
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const id = docSnap.id;
+        const limpiaWp = (data.whatsapp || '').replace(/[^0-9]/g, '');
+
+        const card = document.createElement('div');
+        card.className = 'client-card';
+
+        card.innerHTML = `
+          <div class="client-header">
+            <div class="client-avatar">
+              ${data.imagen ? `<img src="${data.imagen}" alt="Avatar">` : `<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`}
+            </div>
+            <div class="client-title-info">
+              <h3>${data.nombre || 'Sin Nombre'}</h3>
+              <span>DNI: ${data.dni || 'N/D'}</span>
+            </div>
+          </div>
+
+          <div class="client-details-list">
+            <div class="client-detail-row">
+              <span class="label">Edad:</span>
+              <span class="value">${data.edad || '-'} años</span>
+            </div>
+            <div class="client-detail-row">
+              <span class="label">WhatsApp:</span>
+              <span class="value">${data.whatsapp || '-'}</span>
+            </div>
+            <div class="client-detail-row">
+              <span class="label">Domicilio:</span>
+              <span class="value">${data.domicilio || '-'}</span>
+            </div>
+          </div>
+
+          <div class="client-card-actions">
+            <a href="https://wa.me/${limpiaWp}" target="_blank" class="btn-whatsapp">
+              <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+              WhatsApp
+            </a>
+            <button class="btn-delete-client" onclick="window.eliminarCliente('${id}')" title="Eliminar cliente">
+              <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+            </button>
+          </div>
+        `;
+
+        clientsGrid.appendChild(card);
+      });
+    });
+  </script>
+</body>
+</html>
