@@ -111,7 +111,7 @@
 
     /* Panel Hero */
     .dashboard-hero {
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -119,11 +119,17 @@
       gap: 16px;
     }
 
+    .hero-text-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
     .hero-text h1 {
       font-size: 22px;
       font-weight: 800;
       letter-spacing: -0.5px;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
 
     .hero-text h1 span {
@@ -133,6 +139,29 @@
     .hero-text p {
       font-size: 13px;
       color: var(--text-secondary);
+    }
+
+    /* BADGE CONTADOR CLIENTES */
+    .client-counter-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(249, 115, 22, 0.1);
+      border: 1px solid rgba(249, 115, 22, 0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-flame);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .client-counter-badge svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.2;
     }
 
     @keyframes buttonAmbientOrange {
@@ -167,6 +196,53 @@
       stroke: currentColor;
       fill: none;
       stroke-width: 2.5;
+    }
+
+    /* BARRA DE BÚSQUEDA EN TIEMPO REAL */
+    .search-container {
+      margin-bottom: 20px;
+      position: relative;
+      width: 100%;
+    }
+
+    .search-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-input-wrapper svg.search-icon {
+      position: absolute;
+      left: 14px;
+      width: 16px;
+      height: 16px;
+      stroke: var(--text-tertiary);
+      fill: none;
+      stroke-width: 2;
+      pointer-events: none;
+      transition: stroke 0.2s;
+    }
+
+    .search-input-wrapper input {
+      width: 100%;
+      padding: 10px 14px 10px 40px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .search-input-wrapper input:focus {
+      border-color: var(--accent-flame);
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+    }
+
+    .search-input-wrapper input:focus + svg.search-icon {
+      stroke: var(--accent-flame);
     }
 
     /* GRID Y CARDS COMPACTAS */
@@ -492,7 +568,7 @@
       box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
     }
 
-    /* --- NUEVAS CAJAS PROFESIONALES DE SUBIDA DE ARCHIVOS --- */
+    /* CAJAS DE SUBIDA DE ARCHIVOS */
     .file-upload-box {
       position: relative;
       background: #090e18;
@@ -817,14 +893,30 @@
 
     <main>
       <div class="dashboard-hero">
-        <div class="hero-text">
-          <h1>Gestión de <span>Clientes</span></h1>
-          <p>Fichas técnicas, documentación y control de cartera de créditos.</p>
+        <div class="hero-text-wrapper">
+          <div class="hero-text">
+            <h1>Gestión de <span>Clientes</span></h1>
+            <p>Fichas técnicas, documentación y control de cartera de créditos.</p>
+          </div>
+          <!-- CONTADOR DE CLIENTES INTEGRADO Y COMPACTO -->
+          <div class="client-counter-badge" title="Total de clientes registrados">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            <span id="clientCounter">0</span>
+          </div>
         </div>
+
         <button class="btn-open-modal" id="openModalBtn">
           <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           Nuevo Cliente
         </button>
+      </div>
+
+      <!-- BUSCADOR EN TIEMPO REAL -->
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <input type="text" id="searchInput" placeholder="Buscar cliente por nombre, DNI, WhatsApp o domicilio...">
+          <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </div>
       </div>
 
       <!-- CARDS DE CLIENTES -->
@@ -944,7 +1036,7 @@
 
     let clientesCacheGlobal = [];
 
-    // Compresión automática de imágenes
+    // Compresión automática de imágenes para celulares
     function comprimirImagen(file, maxDimension = 600, calidad = 0.75) {
       return new Promise((resolve, reject) => {
         if (!file) return resolve('');
@@ -1070,6 +1162,8 @@
     const submitBtnTxt = document.getElementById('submitBtnTxt');
     const clientsGrid = document.getElementById('clientsGrid');
     const profileCardContent = document.getElementById('profileCardContent');
+    const clientCounter = document.getElementById('clientCounter');
+    const searchInput = document.getElementById('searchInput');
 
     const inputPerfil = document.getElementById('imagenPerfil');
     const boxPerfil = document.getElementById('boxPerfil');
@@ -1081,7 +1175,7 @@
     const txtDocTitle = document.getElementById('txtDocTitle');
     const txtDocSub = document.getElementById('txtDocSub');
 
-    // UI Feedback para las nuevas Cajas de Subida
+    // Cajas de Subida de Archivos
     inputPerfil.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (file) {
@@ -1132,12 +1226,18 @@
     modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) modalOverlay.classList.remove('is-open'); });
     viewModalOverlay.addEventListener('click', (e) => { if (e.target === viewModalOverlay) viewModalOverlay.classList.remove('is-open'); });
 
-    // Renderizar HTML dinámico de clientes
+    // Renderizar HTML dinámico de clientes y actualizar contador
     function renderizarClientes(arrayClientes) {
       clientsGrid.innerHTML = '';
+      clientCounter.textContent = clientesCacheGlobal.length;
 
       if (!arrayClientes || arrayClientes.length === 0) {
-        clientsGrid.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); grid-column: 1/-1; padding: 40px; font-size: 13px;">No hay clientes registrados en su cartera.</div>';
+        const queryTerm = searchInput.value.trim();
+        if (queryTerm) {
+          clientsGrid.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); grid-column: 1/-1; padding: 40px; font-size: 13px;">No se encontraron clientes coincidentes con la búsqueda.</div>';
+        } else {
+          clientsGrid.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); grid-column: 1/-1; padding: 40px; font-size: 13px;">No hay clientes registrados en su cartera.</div>';
+        }
         return;
       }
 
@@ -1194,7 +1294,28 @@
       });
     }
 
-    // CACHÉ LOCAL
+    // BUSCADOR EN TIEMPO REAL
+    function filtrarClientes() {
+      const query = searchInput.value.toLowerCase().trim();
+      if (!query) {
+        renderizarClientes(clientesCacheGlobal);
+        return;
+      }
+
+      const filtrados = clientesCacheGlobal.filter(c => {
+        const nom = (c.nombre || '').toLowerCase();
+        const dni = (c.dni || '').toLowerCase();
+        const wp = (c.whatsapp || '').toLowerCase();
+        const dom = (c.domicilio || '').toLowerCase();
+        return nom.includes(query) || dni.includes(query) || wp.includes(query) || dom.includes(query);
+      });
+
+      renderizarClientes(filtrados);
+    }
+
+    searchInput.addEventListener('input', filtrarClientes);
+
+    // CACHÉ LOCAL INSTANTÁNEO
     const cacheLocal = localStorage.getItem(`cout_clientes_cache_${prestamistaId}`);
     if (cacheLocal) {
       try {
@@ -1250,7 +1371,7 @@
       }
     });
 
-    // Ver Ficha
+    // Ver Ficha (Ojito)
     window.verFichaCliente = (id) => {
       const c = clientesCacheGlobal.find(item => item.id === id);
       if (!c) return;
@@ -1339,7 +1460,7 @@
       });
     };
 
-    // Listener Firestore + Sincronización Caché
+    // Firestore listener en tiempo real con sincronización de caché y filtrado dinámico
     const clientesRef = collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "clientes");
     onSnapshot(clientesRef, (snapshot) => {
       const arrayTemp = [];
@@ -1349,7 +1470,9 @@
 
       clientesCacheGlobal = arrayTemp;
       localStorage.setItem(`cout_clientes_cache_${prestamistaId}`, JSON.stringify(arrayTemp));
-      renderizarClientes(clientesCacheGlobal);
+      
+      // Aplicar filtro o renderizado actual
+      filtrarClientes();
     });
   </script>
 </body>
