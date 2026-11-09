@@ -1254,10 +1254,13 @@
     viewModalOverlay.addEventListener('click', (e) => { if (e.target === viewModalOverlay) viewModalOverlay.classList.remove('is-open'); });
 
     // Copiar Link de Firma Digital
-    window.copiarLinkFirma = (id) => {
-      const link = `${window.location.origin}/firma.html?id=${id}&p=${prestamistaId}`;
+   window.copiarLinkFirma = (id) => {
+      // Obtiene la ruta base actual (funciona perfecto en local y en GitHub Pages)
+      const basePath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+      const link = `${basePath}firma.html?id=${id}&p=${prestamistaId}`;
+      
       navigator.clipboard.writeText(link).then(() => {
-        mostrarAlerta("Enlace Copiado", "El link de firma digital fue copiado al portapapeles. Puedes enviárselo al cliente por WhatsApp.");
+        mostrarAlerta("Enlace Copiado", "El link de firma digital fue copiado al portapapeles. Envíaselo al cliente por WhatsApp.");
       }).catch(err => {
         console.error("Error al copiar enlace:", err);
       });
