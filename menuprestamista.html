@@ -520,7 +520,7 @@
       <div class="dashboard-hero">
         <div class="hero-text">
           <h1>Gestión de Menú <span>Dinámico</span></h1>
-          <p>Administre páginas, ordene categorías completas o reubique ítems verticalmente.</p>
+          <p>Administre páginas, ordene categorías completas o reubique ítems verticalmente en tiempo real.</p>
         </div>
         <button class="btn-open-modal" id="openModalBtn">
           <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -595,7 +595,7 @@
   </div>
 
   <script type="module">
-    import { db } from './app.js';
+    import { db } from '../app.js';
     import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const prestamistaId = localStorage.getItem('cout_prestamista_id');
@@ -627,7 +627,7 @@
       const categoriasUnicas = [];
       menuCacheGlobal.forEach(item => {
         const cat = item.Categoria || item.categoria || 'General';
-        if (!categoriasUnicas.includes(cat)) categoriasUnicas.includes(cat) || categoriasUnicas.push(cat);
+        if (!categoriasUnicas.includes(cat)) categoriasUnicas.push(cat);
       });
 
       categoriasUnicas.forEach(cat => {
@@ -638,20 +638,17 @@
         categoriaSelect.appendChild(opt);
       });
 
-      // Opción para agregar nueva categoría
       const optNueva = document.createElement('option');
       optNueva.value = '__NUEVA__';
       optNueva.textContent = '+ Agregar nueva categoría...';
       categoriaSelect.appendChild(optNueva);
 
-      if (categoriasUnicas.length === 0 || (categoriaSeleccionada && !categoriasUnicas.includes(categoriaSeleccionada))) {
-        if (categoriaSeleccionada) {
-          const optCustom = document.createElement('option');
-          optCustom.value = categoriaSeleccionada;
-          optCustom.textContent = categoriaSeleccionada;
-          optCustom.selected = true;
-          categoriaSelect.insertBefore(optCustom, categoriaSelect.firstChild);
-        }
+      if (categoriaSeleccionada && !categoriasUnicas.includes(categoriaSeleccionada)) {
+        const optCustom = document.createElement('option');
+        optCustom.value = categoriaSeleccionada;
+        optCustom.textContent = categoriaSeleccionada;
+        optCustom.selected = true;
+        categoriaSelect.insertBefore(optCustom, categoriaSelect.firstChild);
       }
 
       manejarCambioSelector();
@@ -759,7 +756,7 @@
       }
     };
 
-    // 4. Reubicar Posición de Página Individual
+    // 4. Reubicar Posición de Página Individual (Con persistencia garantizada)
     window.cambiarPosicionItem = async (id, direccion) => {
       const index = menuCacheGlobal.findIndex(m => m.id === id);
       if (index === -1) return;
@@ -767,22 +764,26 @@
       const nuevoIndex = index + direccion;
       if (nuevoIndex < 0 || nuevoIndex >= menuCacheGlobal.length) return;
 
-      const temp = menuCacheGlobal[index];
-      menuCacheGlobal[index] = menuCacheGlobal[nuevoIndex];
-      menuCacheGlobal[nuevoIndex] = temp;
+      // Intercambiar en copia local
+      const nuevoArray = [...menuCacheGlobal];
+      const temp = nuevoArray[index];
+      nuevoArray[index] = nuevoArray[nuevoIndex];
+      nuevoArray[nuevoIndex] = temp;
 
       try {
-        for (let i = 0; i < menuCacheGlobal.length; i++) {
-          const docRef = doc(db, "carpetacout", "configuracion_general", "menuprestamistas", menuCacheGlobal[i].id);
-          await updateDoc(docRef, { orden: i });
-        }
+        // Guardar todos los nuevos índices de orden en Firestore
+        const promesas = nuevoArray.map((item, idx) => {
+          const docRef = doc(db, "carpetacout", "configuracion_general", "menuprestamistas", item.id);
+          return updateDoc(docRef, { orden: idx });
+        });
+        await Promise.all(promesas);
         localStorage.removeItem('cout_menu_cache');
       } catch (err) {
         console.error("Error al reordenar ítem:", err);
       }
     };
 
-    // 5. Reubicar Categoría Completa
+    // 5. Reubicar Categoría Completa (Reorganiza y persiste el bloque completo)
     window.cambiarPosicionCategoria = async (catName, direccion) => {
       const catsOrdenadas = [];
       menuCacheGlobal.forEach(item => {
@@ -796,10 +797,12 @@
       const nuevoCatIndex = catIndex + direccion;
       if (nuevoCatIndex < 0 || nuevoCatIndex >= catsOrdenadas.length) return;
 
+      // Intercambiar categorías en la lista
       const tempCat = catsOrdenadas[catIndex];
       catsOrdenadas[catIndex] = catsOrdenadas[nuevoCatIndex];
       catsOrdenadas[nuevoCatIndex] = tempCat;
 
+      // Reconstruir el nuevo orden global de todos los ítems
       let nuevoOrdenGlobal = [];
       catsOrdenadas.forEach(c => {
         const itemsDeCat = menuCacheGlobal.filter(item => (item.Categoria || item.categoria || 'General') === c);
@@ -807,10 +810,11 @@
       });
 
       try {
-        for (let i = 0; i < nuevoOrdenGlobal.length; i++) {
-          const docRef = doc(db, "carpetacout", "configuracion_general", "menuprestamistas", nuevoOrdenGlobal[i].id);
-          await updateDoc(docRef, { orden: i });
-        }
+        const promesas = nuevoOrdenGlobal.map((item, idx) => {
+          const docRef = doc(db, "carpetacout", "configuracion_general", "menuprestamistas", item.id);
+          return updateDoc(docRef, { orden: idx });
+        });
+        await Promise.all(promesas);
         localStorage.removeItem('cout_menu_cache');
       } catch (err) {
         console.error("Error al reordenar categoría:", err);
