@@ -472,9 +472,104 @@
       color: var(--text-secondary);
       line-height: 1.5;
     }
+
+    /* Modal de Alerta Profesional */
+    .custom-alert-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 7, 11, 0.88);
+      backdrop-filter: blur(12px);
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .custom-alert-overlay.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .custom-alert-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 400px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+      transform: scale(0.9);
+      transition: transform 0.25s ease;
+    }
+
+    .custom-alert-overlay.is-open .custom-alert-box {
+      transform: scale(1);
+    }
+
+    .custom-alert-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 16px;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px auto;
+    }
+
+    .custom-alert-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: #ef4444;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .custom-alert-box h4 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .custom-alert-box p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .btn-alert-primary {
+      width: 100%;
+      height: 42px;
+      background: var(--accent-flame);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
+
+  <!-- MODAL DE ALERTA PROFESIONAL -->
+  <div class="custom-alert-overlay" id="customAlertOverlay">
+    <div class="custom-alert-box">
+      <div class="custom-alert-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      </div>
+      <h4 id="alertTitle">Acceso Denegado</h4>
+      <p id="alertMessage">No tienes permisos para acceder a este módulo.</p>
+      <button class="btn-alert-primary" id="alertOkBtn">Entendido</button>
+    </div>
+  </div>
 
   <!-- Overlay Menú Hamburguesa -->
   <div class="sidebar-overlay" id="sidebarOverlay">
@@ -530,7 +625,6 @@
       </div>
 
       <div class="cards-grid">
-        <!-- Card 1: Notas rápidas -->
         <a href="notas.html" class="feature-card">
           <div class="card-header-row">
             <div class="card-icon-box">
@@ -546,7 +640,6 @@
           </div>
         </a>
 
-        <!-- Card 2: Configura tu negocio -->
         <a href="configuracion.html" class="feature-card">
           <div class="card-header-row">
             <div class="card-icon-box">
@@ -562,7 +655,6 @@
           </div>
         </a>
 
-        <!-- Card 3: Ver estadísticas -->
         <a href="estadisticas.html" class="feature-card">
           <div class="card-header-row">
             <div class="card-icon-box">
@@ -583,14 +675,23 @@
 
   <script type="module">
     import { db } from './app.js';
-    import { collection, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { collection, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // 1. Guardián de autenticación inicial
     const prestamistaId = localStorage.getItem('cout_prestamista_id');
     const usuarioLogueado = localStorage.getItem('cout_prestamista_user');
 
     if (!prestamistaId || !usuarioLogueado) {
       window.location.replace('loginprestamista.html');
+    }
+
+    function mostrarAlertaAcceso(mensaje, callback) {
+      const overlay = document.getElementById('customAlertOverlay');
+      document.getElementById('alertMessage').textContent = mensaje;
+      overlay.classList.add('is-open');
+      document.getElementById('alertOkBtn').onclick = () => {
+        overlay.classList.remove('is-open');
+        if (callback) callback();
+      };
     }
     
     const sidebarUserTag = document.getElementById('sidebarUserTag');
@@ -617,34 +718,57 @@
       window.location.replace('loginprestamista.html');
     });
 
-    // 2. Killswitch en tiempo real (Vigila eliminación o suspensión por venceEn)
+    // Killswitch en tiempo real
     const userDocRef = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId);
-    
     onSnapshot(userDocRef, (docSnap) => {
       if (!docSnap.exists()) {
-        console.warn("Acceso revocado: El usuario fue eliminado.");
         localStorage.clear();
         window.location.replace('loginprestamista.html');
         return;
       }
-
       const userData = docSnap.data();
-
       if (userData.venceEn) {
         const hoy = new Date();
         hoy.setHours(0, 0, 0, 0);
         const fVence = new Date(userData.venceEn);
         fVence.setHours(0, 0, 0, 0);
-
         if (!isNaN(fVence.getTime()) && fVence < hoy) {
-          console.warn("Acceso revocado: Suscripción vencida o usuario suspendido.");
           localStorage.clear();
           window.location.replace('loginprestamista.html');
         }
       }
     });
 
-    // 3. Renderizado instantáneo y ordenado por la propiedad 'orden'
+    // Validar seguridad de acceso por URL directa si esta página actual está restringida
+    async function validarAccesoPaginaActual() {
+      const paginaActual = window.location.pathname.split("/").pop() || 'gestionprestamista.html';
+      if (paginaActual === 'gestionprestamista.html') return; // El panel principal siempre es accesible para logueados
+
+      const menuRef = collection(db, "carpetacout", "configuracion_general", "menuprestamistas");
+      const snap = await getDocs(menuRef);
+      
+      let encontradaConfig = null;
+      snap.forEach(d => {
+        const dat = d.data();
+        const red = dat.Redireccion || dat.redireccion || '';
+        if (red === paginaActual) {
+          encontradaConfig = dat;
+        }
+      });
+
+      if (encontradaConfig && encontradaConfig.acceso === 'personalizado') {
+        const permitidos = encontradaConfig.usuariosPermitidos || [];
+        if (!permitidos.includes(usuarioLogueado)) {
+          mostrarAlertaAcceso("Acceso Restringido: No cuentas con autorización para visualizar este módulo.", () => {
+            window.location.replace('gestionprestamista.html');
+          });
+        }
+      }
+    }
+
+    validarAccesoPaginaActual();
+
+    // Renderizado del menú filtrado estrictamente por permisos del usuario logueado
     function renderizarMenu(itemsArray) {
       sidebarContent.innerHTML = '';
       if (!itemsArray || itemsArray.length === 0) {
@@ -652,11 +776,23 @@
         return;
       }
 
-      // Ordenar estrictamente por el campo orden configurado en el panel
-      itemsArray.sort((a, b) => (Number(a.orden) || 0) - (Number(b.orden) || 0));
+      // Filtrar páginas según el acceso del usuario actual (@usuarioLogueado)
+      const itemsPermitidos = itemsArray.filter(item => {
+        const tipoAcceso = item.acceso || 'todos';
+        if (tipoAcceso === 'todos') return true;
+        const permitidos = item.usuariosPermitidos || [];
+        return permitidos.includes(usuarioLogueado);
+      });
+
+      if (itemsPermitidos.length === 0) {
+        sidebarContent.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); padding: 20px; font-size: 12px;">No tienes módulos habilitados.</div>';
+        return;
+      }
+
+      itemsPermitidos.sort((a, b) => (Number(a.orden) || 0) - (Number(b.orden) || 0));
 
       const categoriasMap = {};
-      itemsArray.forEach((item) => {
+      itemsPermitidos.forEach((item) => {
         const cat = item.Categoria || item.categoria || 'General';
         if (!categoriasMap[cat]) categoriasMap[cat] = [];
         categoriasMap[cat].push(item);
@@ -697,12 +833,11 @@
       try {
         renderizarMenu(JSON.parse(menuCacheGuardado));
       } catch (e) {
-        console.error("Error leyendo caché del menú", e);
+        console.error("Error leyendo caché", e);
       }
     }
 
     const menuRef = collection(db, "carpetacout", "configuracion_general", "menuprestamistas");
-    
     onSnapshot(menuRef, (snapshot) => {
       const items = [];
       snapshot.forEach((docSnap) => {
