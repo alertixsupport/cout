@@ -350,7 +350,7 @@
 
   <!-- MODAL: ABONAR CUOTA (PARCIAL O TOTAL) -->
   <div class="modal-overlay" id="paymentModalOverlay">
-    <div class="modal-container" style="max-width: 420px;">
+    <div class="modal-container" style="max-width: 420px; z-index: 2500;">
       <div class="modal-header">
         <h3>Registrar Abono / Pago</h3>
         <button class="btn-close-modal" id="closePayModalBtn">
@@ -376,7 +376,7 @@
 
   <!-- MODAL: MOTIVO DE MOROSIDAD / QUITAR MOROSIDAD -->
   <div class="modal-overlay" id="morosoModalOverlay">
-    <div class="modal-container" style="max-width: 420px;">
+    <div class="modal-container" style="max-width: 420px; z-index: 2500;">
       <div class="modal-header">
         <h3 id="morosoModalTitle">Gestionar Estado de Morosidad</h3>
         <button class="btn-close-modal" id="closeMorosoModalBtn">
@@ -408,7 +408,7 @@
 
     let creditosCacheGlobal = [];
     let clientesCacheGlobal = {};
-    let currentOpenCreditoId = null; // Mantiene abierta la ficha al abonar
+    let currentOpenCreditoId = null;
 
     window.mostrarAlerta = (titulo, mensaje, callback = null) => {
       const overlay = document.getElementById('customAlertOverlay');
@@ -450,14 +450,8 @@
       currentOpenCreditoId = null;
       viewModalOverlay.classList.remove('is-open');
     });
-    viewModalOverlay.addEventListener('click', (e) => {
-      if (e.target === viewModalOverlay) {
-        currentOpenCreditoId = null;
-        viewModalOverlay.classList.remove('is-open');
-      }
-    });
 
-    // Cargar caché de clientes (para DNI y firmas)
+    // Cargar caché de clientes
     const cacheClientes = localStorage.getItem(`cout_clientes_cache_${prestamistaId}`);
     if (cacheClientes) {
       try {
@@ -486,12 +480,11 @@
       });
     };
 
-    // Renderizar Cards con DNI visible
+    // Renderizar Cards
     function renderizarCreditos(arrayCreditos) {
       creditsGrid.innerHTML = '';
       let totalCreds = arrayCreditos.length;
       let totalMorosos = 0;
-
       creditCounter.textContent = totalCreds;
 
       if (!arrayCreditos || totalCreds === 0) {
@@ -531,7 +524,7 @@
           </div>
 
           <div class="credit-card-footer">
-            <button class="btn-action-icon" onclick="window.verFichaCredito('${c.id}')" title="Ver Ficha, Cuotas y Timeline (Ojito)">
+            <button class="btn-action-icon" onclick="window.verFichaCredito('${c.id}')" title="Ver Ficha y Cuotas">
               <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
             </button>
 
@@ -562,19 +555,17 @@
       morosoCounter.textContent = totalMorosos;
     }
 
-    function filtrarCreditos() {
-      const q = searchInput.value.toLowerCase().trim();
+    searchInput.oninput = (e) => {
+      const q = e.target.value.toLowerCase().trim();
       if (!q) { renderizarCreditos(creditosCacheGlobal); return; }
-      const filtrados = creditosCacheGlobal.filter(c => {
+      renderizarCreditos(creditosCacheGlobal.filter(c => {
         const clienteInfo = clientesCacheGlobal[c.clienteId] || {};
         const dni = (clienteInfo.dni || c.clienteDni || '').toLowerCase();
-        return (c.clienteNombre || '').toLowerCase().includes(q) || dni.includes(q) || (c.tipoCredito || '').toLowerCase().includes(q);
-      });
-      renderizarCreditos(filtrados);
-    }
-    searchInput.addEventListener('input', filtrarCreditos);
+        return (c.clienteNombre || '').toLowerCase().includes(q) || dni.includes(q);
+      }));
+    };
 
-    // Ver Ficha, Cuotas y Timeline (Ojito)
+    // Ver Ficha y Cuotas (Ojito)
     window.verFichaCredito = (id) => {
       currentOpenCreditoId = id;
       const c = creditosCacheGlobal.find(item => item.id === id);
@@ -584,7 +575,6 @@
       const dniCliente = clienteInfo.dni || c.clienteDni || 'N/D';
       const firmaImg = clienteInfo.firmaDigital || '';
 
-      // Generar cuotas si no existen
       let cuotasArr = c.cuotasDetalle || [];
       if (cuotasArr.length === 0) {
         cuotasArr = [];
@@ -625,7 +615,6 @@
         `;
       });
 
-      // Timeline de Auditoría
       let timelineHtml = '';
       const auditLog = c.auditoria || [{ fecha: c.creadoEn || new Date().toISOString(), descripcion: 'Crédito emitido y registrado en el sistema.' }];
       auditLog.forEach(log => {
@@ -648,13 +637,6 @@
           <div class="profile-row"><span class="lbl">Estado:</span><span class="val" style="text-transform: uppercase; color: var(--accent-flame);">${c.estado || 'activo'}</span></div>
         </div>
 
-        ${c.tipoCredito === 'producto' ? `
-          <div class="profile-details-table">
-            <div class="profile-row"><span class="lbl">Producto:</span><span class="val">${c.productoTitulo || 'N/D'}</span></div>
-            <div class="profile-row"><span class="lbl">Descripción:</span><span class="val">${c.productoDescripcion || '-'}</span></div>
-          </div>
-        ` : ''}
-
         <div style="width: 100%; text-align: left;"><span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">Cronograma y Pagos de Cuotas</span></div>
         <div class="cuotas-table-container">${cuotasHtml}</div>
 
@@ -670,40 +652,36 @@
       viewModalOverlay.classList.add('is-open');
     };
 
-    // --- MODAL DE PAGOS (Parcial o Total) ---
+    // --- MODAL DE PAGOS (FUNCIONALIDAD PRINCIPAL) ---
     let activeCreditIdForPay = null;
     let activeCuotaIndexForPay = null;
     const paymentModalOverlay = document.getElementById('paymentModalOverlay');
-    const closePayModalBtn = document.getElementById('closePayModalBtn');
-    const montoPagoInput = document.getElementById('montoPagoInput');
-    const notaPagoInput = document.getElementById('notaPagoInput');
-    const payCuotaInfoLabel = document.getElementById('payCuotaInfoLabel');
-    const confirmPaymentBtn = document.getElementById('confirmPaymentBtn');
-
-    closePayModalBtn.addEventListener('click', () => paymentModalOverlay.classList.remove('is-open'));
+    document.getElementById('closePayModalBtn').onclick = () => paymentModalOverlay.classList.remove('is-open');
 
     window.abrirModalPago = (creditoId, cuotaIndex) => {
       activeCreditIdForPay = creditoId;
       activeCuotaIndexForPay = cuotaIndex;
       const c = creditosCacheGlobal.find(item => item.id === creditoId);
+      if (!c) return;
+
       const cuota = c.cuotasDetalle[cuotaIndex];
       const restante = cuota.monto - (cuota.pagado || 0);
 
-      payCuotaInfoLabel.textContent = `Cuota #${cuota.numero} (Restante: $${restante.toLocaleString('es-AR')})`;
-      montoPagoInput.value = restante;
-      notaPagoInput.value = '';
+      document.getElementById('payCuotaInfoLabel').textContent = `Cuota #${cuota.numero} (Restante: $${restante.toLocaleString('es-AR')})`;
+      document.getElementById('montoPagoInput').value = restante;
+      document.getElementById('notaPagoInput').value = '';
       paymentModalOverlay.classList.add('is-open');
     };
 
-    confirmPaymentBtn.addEventListener('click', async () => {
-      const montoAbonado = parseFloat(montoPagoInput.value) || 0;
-      const nota = notaPagoInput.value.trim() || 'Abono de cuota';
+    document.getElementById('confirmPaymentBtn').onclick = async () => {
+      const montoAbonado = parseFloat(document.getElementById('montoPagoInput').value) || 0;
+      const nota = document.getElementById('notaPagoInput').value.trim() || 'Abono de cuota';
       if (montoAbonado <= 0) return;
 
       const c = creditosCacheGlobal.find(item => item.id === activeCreditIdForPay);
       if (!c) return;
 
-      let cuotasArr = [...c.cuotasDetalle];
+      let cuotasArr = JSON.parse(JSON.stringify(c.cuotasDetalle || []));
       let cuota = cuotasArr[activeCuotaIndexForPay];
       let pagadoActual = (cuota.pagado || 0) + montoAbonado;
 
@@ -715,11 +693,10 @@
         cuota.estado = 'parcial';
       }
 
-      // Auditoría timeline
       const auditoria = c.auditoria || [];
       auditoria.unshift({
         fecha: new Date().toISOString(),
-        descripcion: `Abono de $${montoAbonado.toLocaleString('es-AR')} en Cuota #${cuota.numero}. Nota: ${nota}`
+        descripcion: `Abono de $${montoAbonado.toLocaleString('es-AR')} en Cuota #${cuota.numero}. Detalle: ${nota}`
       });
 
       try {
@@ -727,61 +704,50 @@
         await updateDoc(ref, { cuotasDetalle: cuotasArr, auditoria });
         paymentModalOverlay.classList.remove('is-open');
         window.mostrarAlerta("Éxito", "Pago registrado correctamente en el timeline de auditoría.");
-      } catch (err) { console.error(err); }
-    });
+      } catch (err) {
+        console.error(err);
+        window.mostrarAlerta("Error", "No se pudo registrar el pago.");
+      }
+    };
 
-    // --- MODAL DE MOROSIDAD (Con párrafo explicativo) ---
+    // --- MODAL DE MOROSIDAD ---
     let activeCreditIdForMoroso = null;
     let targetMorosoState = null;
     const morosoModalOverlay = document.getElementById('morosoModalOverlay');
-    const closeMorosoModalBtn = document.getElementById('closeMorosoModalBtn');
-    const morosoMotivoInput = document.getElementById('morosoMotivoInput');
-    const confirmMorosoBtn = document.getElementById('confirmMorosoBtn');
-    const morosoModalTitle = document.getElementById('morosoModalTitle');
-    const morosoLabelDesc = document.getElementById('morosoLabelDesc');
-
-    closeMorosoModalBtn.addEventListener('click', () => morosoModalOverlay.classList.remove('is-open'));
+    document.getElementById('closeMorosoModalBtn').onclick = () => morosoModalOverlay.classList.remove('is-open');
 
     window.abrirModalMoroso = (creditoId, nuevoEstado) => {
       activeCreditIdForMoroso = creditoId;
       targetMorosoState = nuevoEstado;
-      morosoMotivoInput.value = '';
-
+      document.getElementById('morosoMotivoInput').value = '';
       if (nuevoEstado === 'moroso') {
-        morosoModalTitle.textContent = "Marcar Crédito como Moroso";
-        morosoLabelDesc.textContent = "Motivo del atraso o morosidad (párrafo explicativo)";
+        document.getElementById('morosoModalTitle').textContent = "Marcar Crédito como Moroso";
+        document.getElementById('morosoLabelDesc').textContent = "Motivo del atraso o morosidad (párrafo explicativo)";
       } else {
-        morosoModalTitle.textContent = "Quitar de Morosidad";
-        morosoLabelDesc.textContent = "Detalle del pago o acuerdo para reactivar el crédito";
+        document.getElementById('morosoModalTitle').textContent = "Quitar de Morosidad";
+        document.getElementById('morosoLabelDesc').textContent = "Detalle del pago o acuerdo para reactivar";
       }
-
       morosoModalOverlay.classList.add('is-open');
     };
 
-    confirmMorosoBtn.addEventListener('click', async () => {
-      const motivo = morosoMotivoInput.value.trim();
-      if (!motivo) {
-        window.mostrarAlerta("Requerido", "Por favor ingresa un párrafo explicativo.");
-        return;
-      }
+    document.getElementById('confirmMorosoBtn').onclick = async () => {
+      const motivo = document.getElementById('morosoMotivoInput').value.trim();
+      if (!motivo) { window.mostrarAlerta("Requerido", "Ingrese una explicación."); return; }
 
       const c = creditosCacheGlobal.find(item => item.id === activeCreditIdForMoroso);
       if (!c) return;
 
       const auditoria = c.auditoria || [];
-      const accionTxt = targetMorosoState === 'moroso' ? 'Marcado como MOROSO' : 'Reactivado / Quitado de morosidad';
-      auditoria.unshift({
-        fecha: new Date().toISOString(),
-        descripcion: `${accionTxt}. Motivo: ${motivo}`
-      });
+      const accionTxt = targetMorosoState === 'moroso' ? 'Marcado como MOROSO' : 'Reactivado';
+      auditoria.unshift({ fecha: new Date().toISOString(), descripcion: `${accionTxt}. Motivo: ${motivo}` });
 
       try {
         const ref = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos", activeCreditIdForMoroso);
         await updateDoc(ref, { estado: targetMorosoState, auditoria });
         morosoModalOverlay.classList.remove('is-open');
-        window.mostrarAlerta("Actualizado", "El estado del crédito y la auditoría fueron actualizados.");
+        window.mostrarAlerta("Actualizado", "Estado e historial actualizados.");
       } catch(err) { console.error(err); }
-    });
+    };
 
     // Sincronización en tiempo real con Firestore
     const creditosRef = collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos");
@@ -789,9 +755,8 @@
       const arr = [];
       snapshot.forEach(docSnap => { arr.push({ id: docSnap.id, ...docSnap.data() }); });
       creditosCacheGlobal = arr;
-      filtrarCreditos();
+      renderizarCreditos(creditosCacheGlobal);
 
-      // Si el modal de la ficha estaba abierto, actualiza su contenido en tiempo real al registrar pagos
       if (currentOpenCreditoId) {
         window.verFichaCredito(currentOpenCreditoId);
       }
