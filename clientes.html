@@ -198,10 +198,9 @@
       stroke-width: 2.5;
     }
 
-    /* BARRA DE BÚSQUEDA EN TIEMPO REAL */
+    /* BARRA DE BÚSQUEDA COMPACTA Y ELEGANTE */
     .search-container {
       margin-bottom: 20px;
-      position: relative;
       width: 100%;
     }
 
@@ -209,13 +208,20 @@
       position: relative;
       display: flex;
       align-items: center;
+      width: 100%;
+    }
+
+    @media (min-width: 768px) {
+      .search-input-wrapper {
+        max-width: 340px; /* Tamaño compacto y profesional en PC */
+      }
     }
 
     .search-input-wrapper svg.search-icon {
       position: absolute;
       left: 14px;
-      width: 16px;
-      height: 16px;
+      width: 15px;
+      height: 15px;
       stroke: var(--text-tertiary);
       fill: none;
       stroke-width: 2;
@@ -225,10 +231,10 @@
 
     .search-input-wrapper input {
       width: 100%;
-      padding: 10px 14px 10px 40px;
+      padding: 9px 14px 9px 38px;
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
-      border-radius: 12px;
+      border-radius: 10px;
       color: var(--text-primary);
       font-size: 13px;
       outline: none;
@@ -898,7 +904,7 @@
             <h1>Gestión de <span>Clientes</span></h1>
             <p>Fichas técnicas, documentación y control de cartera de créditos.</p>
           </div>
-          <!-- CONTADOR DE CLIENTES INTEGRADO Y COMPACTO -->
+          <!-- CONTADOR DE CLIENTES -->
           <div class="client-counter-badge" title="Total de clientes registrados">
             <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
             <span id="clientCounter">0</span>
@@ -911,10 +917,10 @@
         </button>
       </div>
 
-      <!-- BUSCADOR EN TIEMPO REAL -->
+      <!-- BUSCADOR COMPACTO EN TIEMPO REAL -->
       <div class="search-container">
         <div class="search-input-wrapper">
-          <input type="text" id="searchInput" placeholder="Buscar cliente por nombre, DNI, WhatsApp o domicilio...">
+          <input type="text" id="searchInput" placeholder="Buscar cliente por nombre, DNI, WhatsApp...">
           <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         </div>
       </div>
@@ -1471,7 +1477,6 @@
       clientesCacheGlobal = arrayTemp;
       localStorage.setItem(`cout_clientes_cache_${prestamistaId}`, JSON.stringify(arrayTemp));
       
-      // Aplicar filtro o renderizado actual
       filtrarClientes();
     });
   </script>
