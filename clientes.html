@@ -198,7 +198,7 @@
       stroke-width: 2.5;
     }
 
-    /* BARRA DE BÚSQUEDA COMPACTA Y ELEGANTE */
+    /* BARRA DE BÚSQUEDA COMPACTA */
     .search-container {
       margin-bottom: 20px;
       width: 100%;
@@ -213,7 +213,7 @@
 
     @media (min-width: 768px) {
       .search-input-wrapper {
-        max-width: 340px; /* Tamaño compacto y profesional en PC */
+        max-width: 340px;
       }
     }
 
@@ -415,6 +415,10 @@
       background: rgba(239, 68, 68, 0.2);
       color: #fca5a5;
       border-color: rgba(239, 68, 68, 0.4);
+    }
+
+    .btn-action-icon.signature-btn {
+      color: var(--accent-flame);
     }
 
     .btn-action-icon svg {
@@ -772,6 +776,23 @@
       border-radius: 8px;
       object-fit: contain;
       border: 1px solid var(--border-subtle);
+    }
+
+    .signature-preview-box {
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .signature-preview-box img {
+      max-width: 100%;
+      max-height: 120px;
+      object-fit: contain;
     }
 
     /* Modal de Alerta Profesional */
@@ -1232,6 +1253,16 @@
     modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) modalOverlay.classList.remove('is-open'); });
     viewModalOverlay.addEventListener('click', (e) => { if (e.target === viewModalOverlay) viewModalOverlay.classList.remove('is-open'); });
 
+    // Copiar Link de Firma Digital
+    window.copiarLinkFirma = (id) => {
+      const link = `${window.location.origin}/firma.html?id=${id}&p=${prestamistaId}`;
+      navigator.clipboard.writeText(link).then(() => {
+        mostrarAlerta("Enlace Copiado", "El link de firma digital fue copiado al portapapeles. Puedes enviárselo al cliente por WhatsApp.");
+      }).catch(err => {
+        console.error("Error al copiar enlace:", err);
+      });
+    };
+
     // Renderizar HTML dinámico de clientes y actualizar contador
     function renderizarClientes(arrayClientes) {
       clientsGrid.innerHTML = '';
@@ -1279,6 +1310,10 @@
           <div class="client-card-footer">
             <button class="btn-action-icon" onclick="window.verFichaCliente('${id}')" title="Ver Ficha Técnica (Ojito)">
               <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+
+            <button class="btn-action-icon signature-btn" onclick="window.copiarLinkFirma('${id}')" title="Copiar Link de Firma Digital">
+              <svg viewBox="0 0 24 24"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
             </button>
 
             <button class="btn-action-icon" onclick="window.editarCliente('${id}')" title="Editar Cliente">
@@ -1408,6 +1443,16 @@
             <span class="lbl">Domicilio:</span>
             <span class="val">${c.domicilio || '-'}</span>
           </div>
+        </div>
+
+        <div style="width: 100%; text-align: left; margin-top: 4px;">
+          <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">Firma Digital Manuscrita</span>
+        </div>
+
+        <div class="signature-preview-box">
+          ${c.firmaDigital 
+            ? `<img src="${c.firmaDigital}" alt="Firma Digital">` 
+            : `<span style="font-size: 12px; color: var(--text-tertiary);">Pendiente de firma (Envía el enlace al cliente)</span>`}
         </div>
 
         <div style="width: 100%; text-align: left; margin-top: 4px;">
