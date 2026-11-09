@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>COUT.APP | Configuración de Menú Dinámico</title>
+  <title>COUT.APP | Configuración de Menú Dinámico y Accesos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -46,7 +46,7 @@
     }
 
     .container {
-      max-width: 900px;
+      max-width: 920px;
       margin: 0 auto;
       padding: 24px 20px;
       width: 100%;
@@ -171,7 +171,7 @@
       stroke-width: 2.5;
     }
 
-    /* --- VENTANA EMERGENTE (MODAL FLOTANTE) --- */
+    /* --- VENTANAS MODALES PROFESIONALES --- */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -197,12 +197,15 @@
       border: 1px solid var(--border-subtle);
       border-radius: 20px;
       width: 100%;
-      max-width: 500px;
+      max-width: 520px;
       padding: 28px;
       box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
       transform: scale(0.95) translateY(10px);
       transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
     }
 
     .modal-overlay.is-open .modal-container {
@@ -214,6 +217,7 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 20px;
+      flex-shrink: 0;
     }
 
     .modal-header h3 {
@@ -250,6 +254,15 @@
       stroke: currentColor;
       fill: none;
       stroke-width: 2.2;
+    }
+
+    .modal-body-scroll {
+      overflow-y: auto;
+      flex: 1;
+      padding-right: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
 
     /* Formulario */
@@ -305,6 +318,47 @@
       box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
     }
 
+    /* Lista de Usuarios Personalizados (Checkboxes) */
+    .users-access-list {
+      background: #090e18;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 180px;
+      overflow-y: auto;
+    }
+
+    .user-checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .user-checkbox-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .user-checkbox-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent-flame);
+      cursor: pointer;
+    }
+
+    .user-checkbox-item span {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
     .btn-submit-modal {
       width: 100%;
       height: 48px;
@@ -346,7 +400,6 @@
       gap: 8px;
     }
 
-    /* Contenedor Agrupado */
     .menu-grouped-container {
       display: flex;
       flex-direction: column;
@@ -364,11 +417,6 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      transition: border-color 0.2s;
-    }
-
-    .category-group-block:hover {
-      border-color: rgba(255, 255, 255, 0.15);
     }
 
     .category-group-header {
@@ -438,27 +486,36 @@
       stroke-width: 2;
     }
 
-    .item-details {
-      min-width: 0;
-    }
-
     .item-details h4 {
       font-size: 13px;
       font-weight: 700;
       color: var(--text-primary);
       margin-bottom: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .item-details .meta-text {
       font-size: 11px;
       color: var(--text-secondary);
       font-family: 'JetBrains Mono', monospace;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    }
+
+    .access-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: rgba(37, 99, 235, 0.15);
+      color: #93c5fd;
+      border: 1px solid rgba(37, 99, 235, 0.3);
+      margin-left: 6px;
+    }
+
+    .access-badge.custom {
+      background: rgba(249, 115, 22, 0.15);
+      color: #fed7aa;
+      border-color: rgba(249, 115, 22, 0.3);
     }
 
     .item-actions {
@@ -501,9 +558,133 @@
       fill: none;
       stroke-width: 2.2;
     }
+
+    /* --- MODAL DE ALERTA / CONFIRMACIÓN PROFESIONAL --- */
+    .custom-alert-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 7, 11, 0.88);
+      backdrop-filter: blur(12px);
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .custom-alert-overlay.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .custom-alert-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 400px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+      transform: scale(0.9);
+      transition: transform 0.25s ease;
+    }
+
+    .custom-alert-overlay.is-open .custom-alert-box {
+      transform: scale(1);
+    }
+
+    .custom-alert-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 16px;
+      background: rgba(249, 115, 22, 0.1);
+      border: 1px solid rgba(249, 115, 22, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px auto;
+    }
+
+    .custom-alert-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--accent-flame);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .custom-alert-box h4 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .custom-alert-box p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .custom-alert-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-alert-primary {
+      flex: 1;
+      height: 42px;
+      background: var(--accent-flame);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn-alert-primary:hover {
+      opacity: 0.9;
+    }
+
+    .btn-alert-secondary {
+      flex: 1;
+      height: 42px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-alert-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
   </style>
 </head>
 <body>
+
+  <!-- MODAL DE ALERTA / CONFIRMACIÓN PERSONALIZADO -->
+  <div class="custom-alert-overlay" id="customAlertOverlay">
+    <div class="custom-alert-box">
+      <div class="custom-alert-icon" id="alertIconBox">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      </div>
+      <h4 id="alertTitle">Atención</h4>
+      <p id="alertMessage">Mensaje del sistema...</p>
+      <div class="custom-alert-buttons" id="alertButtonsContainer">
+        <button class="btn-alert-primary" id="alertOkBtn">Aceptar</button>
+      </div>
+    </div>
+  </div>
 
   <div class="container">
     <header>
@@ -520,8 +701,8 @@
     <main>
       <div class="dashboard-hero">
         <div class="hero-text">
-          <h1>Gestión de Menú <span>Dinámico</span></h1>
-          <p>Administre páginas, ordene categorías completas o reubique ítems verticalmente en tiempo real.</p>
+          <h1>Gestión de Menú y <span>Accesos</span></h1>
+          <p>Administre páginas, permisos personalizados por usuario y orden jerárquico en tiempo real.</p>
         </div>
         <button class="btn-open-modal" id="openModalBtn">
           <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -529,11 +710,10 @@
         </button>
       </div>
 
-      <!-- LISTA PRINCIPAL AGRUPADA Y REUBICABLE -->
       <div class="card-panel">
         <h2>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-flame)" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-          Estructura de Categorías y Páginas Activas
+          Estructura y Accesos Activos
         </h2>
 
         <div class="menu-grouped-container" id="menuGroupedContainer">
@@ -558,51 +738,108 @@
         </button>
       </div>
 
-      <form class="menu-form" id="menuForm">
-        <input type="hidden" id="editDocId" value="">
+      <div class="modal-body-scroll">
+        <form class="menu-form" id="menuForm">
+          <input type="hidden" id="editDocId" value="">
 
-        <div class="form-field">
-          <label for="nombre">Título del Menú</label>
-          <input type="text" id="nombre" required placeholder="Ej. Clientes o Testimonios">
-        </div>
+          <div class="form-field">
+            <label for="nombre">Título del Menú</label>
+            <input type="text" id="nombre" required placeholder="Ej. Clientes o Testimonios">
+          </div>
 
-        <div class="form-field">
-          <label for="redireccion">Redirección (Link / Archivo)</label>
-          <input type="text" id="redireccion" required placeholder="Ej. testimonio.html">
-        </div>
+          <div class="form-field">
+            <label for="redireccion">Redirección (Link / Archivo)</label>
+            <input type="text" id="redireccion" required placeholder="Ej. testimonio.html">
+          </div>
 
-        <div class="form-field">
-          <label for="categoriaSelect">Categoría</label>
-          <select id="categoriaSelect">
-            <!-- Las opciones se cargan dinámicamente -->
-          </select>
-        </div>
+          <div class="form-field">
+            <label for="categoriaSelect">Categoría</label>
+            <select id="categoriaSelect"></select>
+          </div>
 
-        <div class="form-field" id="nuevaCategoriaContainer" style="display: none;">
-          <label for="categoriaNueva">Escribir Nueva Categoría</label>
-          <input type="text" id="categoriaNueva" placeholder="Ej. Operativo, Finanzas">
-        </div>
+          <div class="form-field" id="nuevaCategoriaContainer" style="display: none;">
+            <label for="categoriaNueva">Escribir Nueva Categoría</label>
+            <input type="text" id="categoriaNueva" placeholder="Ej. Operativo, Finanzas">
+          </div>
 
-        <div class="form-field">
-          <label for="logotipo">Código Ícono SVG (completo)</label>
-          <textarea id="logotipo" required placeholder='<svg viewBox="0 0 24 24"><path d="..."/></svg>'></textarea>
-        </div>
+          <!-- NUEVO: Selector de Tipo de Acceso -->
+          <div class="form-field">
+            <label for="accesoTipo">Tipo de Acceso</label>
+            <select id="accesoTipo">
+              <option value="todos">Todos los usuarios</option>
+              <option value="personalizado">Personalizado (Elegir usuarios)</option>
+            </select>
+          </div>
 
-        <button type="submit" class="btn-submit-modal" id="submitBtnTxt">
-          Guardar Página en Menú
-        </button>
-      </form>
+          <!-- NUEVO: Contenedor con checkboxes de usuarios -->
+          <div class="form-field" id="usuariosPersonalizadosContainer" style="display: none;">
+            <label>Seleccione usuarios con acceso permitido:</label>
+            <div class="users-access-list" id="usersAccessList">
+              <!-- Se inyecta dinámicamente -->
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="logotipo">Código Ícono SVG (completo)</label>
+            <textarea id="logotipo" required placeholder='<svg viewBox="0 0 24 24"><path d="..."/></svg>'></textarea>
+          </div>
+
+          <button type="submit" class="btn-submit-modal" id="submitBtnTxt">
+            Guardar Página en Menú
+          </button>
+        </form>
+      </div>
     </div>
   </div>
 
   <script type="module">
     import { db } from './app.js';
-    import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const prestamistaId = localStorage.getItem('cout_prestamista_id');
     if (!prestamistaId) {
       window.location.replace('loginprestamista.html');
     }
+
+    // --- SISTEMA DE MODAL DE ALERTA PROFESIONAL ---
+    window.mostrarAlerta = (titulo, mensaje, tipo = 'info', callback = null) => {
+      const overlay = document.getElementById('customAlertOverlay');
+      document.getElementById('alertTitle').textContent = titulo;
+      document.getElementById('alertMessage').textContent = mensaje;
+      
+      const buttonsContainer = document.getElementById('alertButtonsContainer');
+      buttonsContainer.innerHTML = `<button class="btn-alert-primary" id="alertOkBtn">Aceptar</button>`;
+
+      overlay.classList.add('is-open');
+
+      document.getElementById('alertOkBtn').onclick = () => {
+        overlay.classList.remove('is-open');
+        if (callback) callback();
+      };
+    };
+
+    window.mostrarConfirmacion = (titulo, mensaje, callbackAceptar) => {
+      const overlay = document.getElementById('customAlertOverlay');
+      document.getElementById('alertTitle').textContent = titulo;
+      document.getElementById('alertMessage').textContent = mensaje;
+      
+      const buttonsContainer = document.getElementById('alertButtonsContainer');
+      buttonsContainer.innerHTML = `
+        <button class="btn-alert-secondary" id="alertCancelBtn">Cancelar</button>
+        <button class="btn-alert-primary" id="alertOkBtn">Eliminar</button>
+      `;
+
+      overlay.classList.add('is-open');
+
+      document.getElementById('alertCancelBtn').onclick = () => {
+        overlay.classList.remove('is-open');
+      };
+
+      document.getElementById('alertOkBtn').onclick = () => {
+        overlay.classList.remove('is-open');
+        callbackAceptar();
+      };
+    };
 
     const modalOverlay = document.getElementById('modalOverlay');
     const openModalBtn = document.getElementById('openModalBtn');
@@ -614,16 +851,62 @@
     const categoriaSelect = document.getElementById('categoriaSelect');
     const nuevaCategoriaContainer = document.getElementById('nuevaCategoriaContainer');
     const categoriaNuevaInput = document.getElementById('categoriaNueva');
+    const accesoTipoSelect = document.getElementById('accesoTipo');
+    const usuariosPersonalizadosContainer = document.getElementById('usuariosPersonalizadosContainer');
+    const usersAccessList = document.getElementById('usersAccessList');
     const logotipoInput = document.getElementById('logotipo');
     const modalTitle = document.getElementById('modalTitle');
     const submitBtnTxt = document.getElementById('submitBtnTxt');
     const menuGroupedContainer = document.getElementById('menuGroupedContainer');
 
     let menuCacheGlobal = [];
+    let listaUsuariosGlobal = [];
+
+    // Cargar usuarios registrados desde Firestore para los permisos personalizados
+    async function cargarUsuariosRegistrados() {
+      try {
+        const usersRef = collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas");
+        const snapshot = await getDocs(usersRef);
+        listaUsuariosGlobal = [];
+        snapshot.forEach(docSnap => {
+          const dat = docSnap.data();
+          const nombreUser = dat.usuario || dat.nombre || dat.email || docSnap.id;
+          listaUsuariosGlobal.push(nombreUser);
+        });
+      } catch (e) {
+        console.error("Error cargando usuarios:", e);
+      }
+    }
+
+    function renderizarCheckboxesUsuarios(permitidosArray = []) {
+      usersAccessList.innerHTML = '';
+      if (listaUsuariosGlobal.length === 0) {
+        usersAccessList.innerHTML = '<div style="font-size: 12px; color: var(--text-tertiary); text-align: center;">No hay usuarios registrados.</div>';
+        return;
+      }
+
+      listaUsuariosGlobal.forEach(user => {
+        const isChecked = permitidosArray.includes(user);
+        const label = document.createElement('label');
+        label.className = 'user-checkbox-item';
+        label.innerHTML = `
+          <input type="checkbox" name="usuarioPermiso" value="${user}" ${isChecked ? 'checked' : ''}>
+          <span>@${user}</span>
+        `;
+        usersAccessList.appendChild(label);
+      });
+    }
+
+    accesoTipoSelect.addEventListener('change', () => {
+      if (accesoTipoSelect.value === 'personalizado') {
+        usuariosPersonalizadosContainer.style.display = 'flex';
+      } else {
+        usuariosPersonalizadosContainer.style.display = 'none';
+      }
+    });
 
     function actualizarSelectorCategorias(categoriaSeleccionada = '') {
       categoriaSelect.innerHTML = '';
-      
       const categoriasUnicas = [];
       menuCacheGlobal.forEach(item => {
         const cat = item.Categoria || item.categoria || 'General';
@@ -651,10 +934,10 @@
         categoriaSelect.insertBefore(optCustom, categoriaSelect.firstChild);
       }
 
-      manejarCambioSelector();
+      manejarCambioSelectorCat();
     }
 
-    function manejarCambioSelector() {
+    function manejarCambioSelectorCat() {
       if (categoriaSelect.value === '__NUEVA__') {
         nuevaCategoriaContainer.style.display = 'flex';
         categoriaNuevaInput.required = true;
@@ -666,11 +949,13 @@
       }
     }
 
-    categoriaSelect.addEventListener('change', manejarCambioSelector);
+    categoriaSelect.addEventListener('change', manejarCambioSelectorCat);
 
-    openModalBtn.addEventListener('click', () => {
+    openModalBtn.addEventListener('click', async () => {
       resetearFormulario();
+      await cargarUsuariosRegistrados();
       actualizarSelectorCategorias();
+      renderizarCheckboxesUsuarios([]);
       modalOverlay.classList.add('is-open');
     });
 
@@ -683,6 +968,8 @@
       menuForm.reset();
       editDocIdInput.value = '';
       nuevaCategoriaContainer.style.display = 'none';
+      usuariosPersonalizadosContainer.style.display = 'none';
+      accesoTipoSelect.value = 'todos';
       modalTitle.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-flame)" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Nueva Página de Menú`;
       submitBtnTxt.textContent = "Guardar Página en Menú";
     }
@@ -697,10 +984,19 @@
         categoriaFinal = categoriaNuevaInput.value.trim() || 'General';
       }
 
+      const accesoTipo = accesoTipoSelect.value;
+      let usuariosPermitidos = [];
+      if (accesoTipo === 'personalizado') {
+        const checkboxes = usersAccessList.querySelectorAll('input[name="usuarioPermiso"]:checked');
+        checkboxes.forEach(cb => usuariosPermitidos.push(cb.value));
+      }
+
       const dataItem = {
         Nombre: nombreInput.value.trim(),
         Redireccion: redireccionInput.value.trim(),
         Categoria: categoriaFinal,
+        acceso: accesoTipo,
+        usuariosPermitidos: usuariosPermitidos,
         LOGOTIPO: logotipoInput.value.trim()
       };
 
@@ -718,15 +1014,18 @@
         localStorage.removeItem('cout_menu_cache');
         modalOverlay.classList.remove('is-open');
         resetearFormulario();
+        mostrarAlerta("Éxito", "La página y sus permisos se han guardado correctamente.", "success");
       } catch (err) {
         console.error("Error al guardar:", err);
-        alert("Ocurrió un error al guardar.");
+        mostrarAlerta("Error", "Ocurrió un error al guardar la página.", "error");
       }
     });
 
-    window.cargarParaEditar = (id) => {
+    window.cargarParaEditar = async (id) => {
       const item = menuCacheGlobal.find(m => m.id === id);
       if (!item) return;
+
+      await cargarUsuariosRegistrados();
 
       editDocIdInput.value = item.id;
       nombreInput.value = item.Nombre || '';
@@ -736,13 +1035,23 @@
       const catActual = item.Categoria || item.categoria || 'General';
       actualizarSelectorCategorias(catActual);
 
+      const accesoVal = item.acceso || 'todos';
+      accesoTipoSelect.value = accesoVal;
+      if (accesoVal === 'personalizado') {
+        usuariosPersonalizadosContainer.style.display = 'flex';
+        renderizarCheckboxesUsuarios(item.usuariosPermitidos || []);
+      } else {
+        usuariosPersonalizadosContainer.style.display = 'none';
+        renderizarCheckboxesUsuarios([]);
+      }
+
       modalTitle.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-flame)" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Editar: ${item.Nombre}`;
       submitBtnTxt.textContent = "Actualizar Cambios";
       modalOverlay.classList.add('is-open');
     };
 
-    window.eliminarItemMenu = async (id) => {
-      if (confirm("¿Está seguro de eliminar esta página del menú?")) {
+    window.eliminarItemMenu = (id) => {
+      mostrarConfirmacion("Eliminar Página", "¿Está seguro de eliminar esta página del menú?", async () => {
         try {
           const docRef = doc(db, "carpetacout", "configuracion_general", "menuprestamistas", id);
           await deleteDoc(docRef);
@@ -760,21 +1069,15 @@
         } catch (err) {
           console.error("Error al eliminar:", err);
         }
-      }
+      });
     };
 
-    // --- NUEVO: ELIMINAR CATEGORÍA COMPLETA CON CONTEO DETALLADO ---
-    window.eliminarCategoriaCompleta = async (catName) => {
-      // Filtrar todas las páginas que pertenecen a esta categoría
+    window.eliminarCategoriaCompleta = (catName) => {
       const paginasDeCategoria = menuCacheGlobal.filter(item => (item.Categoria || item.categoria || 'General') === catName);
       const totalPaginas = paginasDeCategoria.length;
 
-      // Mensaje detallado solicitando confirmación
-      const mensajeConfirmacion = `¿Quieres eliminar esta categoría "${catName}"?\n\nEsta categoría contiene ${totalPaginas} ${totalPaginas === 1 ? 'página' : 'páginas'} que también serán eliminadas.`;
-
-      if (confirm(mensajeConfirmacion)) {
+      mostrarConfirmacion("Eliminar Categoría", `¿Quieres eliminar esta categoría "${catName}"?\n\nEsta categoría contiene ${totalPaginas} ${totalPaginas === 1 ? 'página' : 'páginas'} que también serán eliminadas.`, async () => {
         try {
-          // Eliminar de Firebase todos los documentos de esta categoría
           const promesasEliminacion = paginasDeCategoria.map(item => {
             const docRef = doc(db, "carpetacout", "configuracion_general", "menuprestamistas", item.id);
             return deleteDoc(docRef);
@@ -783,7 +1086,6 @@
           await Promise.all(promesasEliminacion);
           localStorage.removeItem('cout_menu_cache');
 
-          // Re-indexar los restantes para mantener secuencia limpia
           setTimeout(async () => {
             const restanes = menuCacheGlobal.filter(m => (m.Categoria || m.categoria || 'General') !== catName);
             if (restanes.length > 0) {
@@ -794,15 +1096,12 @@
               await Promise.all(promesasOrden);
             }
           }, 300);
-
         } catch (err) {
           console.error("Error al eliminar la categoría:", err);
-          alert("Ocurrió un error al intentar eliminar la categoría.");
         }
-      }
+      });
     };
 
-    // Reubicar posición de página individual
     window.cambiarPosicionItem = async (id, direccion) => {
       const index = menuCacheGlobal.findIndex(m => m.id === id);
       if (index === -1) return;
@@ -827,7 +1126,6 @@
       }
     };
 
-    // Reubicar categoría completa
     window.cambiarPosicionCategoria = async (catName, direccion) => {
       const catsOrdenadas = [];
       menuCacheGlobal.forEach(item => {
@@ -863,7 +1161,6 @@
       }
     };
 
-    // Listener en tiempo real con ordenamiento robusto
     const menuRef = collection(db, "carpetacout", "configuracion_general", "menuprestamistas");
 
     onSnapshot(menuRef, (snapshot) => {
@@ -925,12 +1222,16 @@
           const nombre = navItem.Nombre || navItem.nombre || 'Sin título';
           const redireccion = navItem.Redireccion || navItem.redireccion || '#';
           const svgCode = navItem.LOGOTIPO || navItem.logotipo || '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle></svg>';
+          const acceso = navItem.acceso || 'todos';
+          const badgeHtml = acceso === 'personalizado' 
+            ? `<span class="access-badge custom">Personalizado (${(navItem.usuariosPermitidos || []).length})</span>` 
+            : `<span class="access-badge">Todos</span>`;
 
           row.innerHTML = `
             <div class="item-info">
               <div class="item-svg-preview">${svgCode}</div>
               <div class="item-details">
-                <h4>${nombre}</h4>
+                <h4>${nombre} ${badgeHtml}</h4>
                 <div class="meta-text">${redireccion}</div>
               </div>
             </div>
