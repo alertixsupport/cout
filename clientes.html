@@ -15,13 +15,10 @@
       --bg-surface-hover: #161d2e;
       --border-subtle: rgba(255, 255, 255, 0.08);
       --border-focus: #f97316;
-      --accent-primary: #2563eb;
       --accent-flame: #f97316;
       --text-primary: #f8fafc;
       --text-secondary: #94a3b8;
       --text-tertiary: #64748b;
-      --status-success: #10b981;
-      --status-error: #ef4444;
     }
 
     * {
@@ -48,7 +45,7 @@
     .container {
       max-width: 1100px;
       margin: 0 auto;
-      padding: 24px 20px;
+      padding: 20px;
       width: 100%;
     }
 
@@ -57,8 +54,8 @@
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
       border-radius: 16px;
-      padding: 16px 24px;
-      margin-bottom: 28px;
+      padding: 14px 20px;
+      margin-bottom: 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -75,8 +72,8 @@
       text-decoration: none;
       font-size: 13px;
       font-weight: 600;
-      padding: 10px 16px;
-      border-radius: 12px;
+      padding: 8px 14px;
+      border-radius: 10px;
       transition: all 0.2s;
     }
 
@@ -101,7 +98,7 @@
     }
 
     .logo-text {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
       letter-spacing: -0.5px;
       color: var(--text-primary);
@@ -113,7 +110,7 @@
 
     /* Panel Hero */
     .dashboard-hero {
-      margin-bottom: 28px;
+      margin-bottom: 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -122,10 +119,10 @@
     }
 
     .hero-text h1 {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 800;
       letter-spacing: -0.5px;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     .hero-text h1 span {
@@ -149,7 +146,7 @@
       color: white;
       font-weight: 700;
       font-size: 13px;
-      padding: 12px 20px;
+      padding: 10px 18px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -171,14 +168,14 @@
       stroke-width: 2.5;
     }
 
-    /* --- GRID DE CARDS DE CLIENTES --- */
+    /* --- GRID Y CARDS COMPACTAS --- */
     .clients-grid {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 20px;
+      gap: 16px;
     }
 
-    @media (min-width: 768px) {
+    @media (min-width: 640px) {
       .clients-grid {
         grid-template-columns: repeat(2, 1fr);
       }
@@ -193,34 +190,35 @@
     .client-card {
       background: var(--bg-surface);
       border: 1px solid var(--border-subtle);
-      border-radius: 20px;
-      padding: 22px;
+      border-radius: 16px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.5);
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      justify-content: space-between;
+      gap: 14px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      transition: all 0.25s ease;
       position: relative;
-      overflow: hidden;
     }
 
     .client-card:hover {
       transform: translateY(-3px);
       border-color: rgba(249, 115, 22, 0.4);
       background: var(--bg-surface-hover);
+      box-shadow: 0 15px 35px -8px rgba(249, 115, 22, 0.15);
     }
 
     .client-header {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
     }
 
     .client-avatar {
-      width: 52px;
-      height: 52px;
-      border-radius: 14px;
-      background: rgba(249, 115, 22, 0.1);
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      background: rgba(249, 115, 22, 0.12);
       border: 1px solid rgba(249, 115, 22, 0.3);
       display: flex;
       align-items: center;
@@ -236,68 +234,122 @@
     }
 
     .client-avatar svg {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       stroke: var(--accent-flame);
       fill: none;
       stroke-width: 2;
     }
 
+    .client-title-info {
+      min-width: 0;
+      flex: 1;
+    }
+
     .client-title-info h3 {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       color: var(--text-primary);
-      margin-bottom: 3px;
-      letter-spacing: -0.2px;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .client-title-info span {
-      font-size: 12px;
+    .client-title-info .dni-badge {
+      font-size: 11px;
       color: var(--text-secondary);
       font-family: 'JetBrains Mono', monospace;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid var(--border-subtle);
+      display: inline-block;
     }
 
-    .client-details-list {
-      display: flex;
-      flex-direction: column;
+    .client-compact-data {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 8px;
       background: #090e18;
       border: 1px solid var(--border-subtle);
-      border-radius: 12px;
-      padding: 12px;
+      border-radius: 10px;
+      padding: 10px;
     }
 
-    .client-detail-row {
+    .data-item {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 13px;
+      flex-direction: column;
+      gap: 2px;
     }
 
-    .client-detail-row .label {
+    .data-item .lbl {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
       color: var(--text-tertiary);
-      font-weight: 600;
     }
 
-    .client-detail-row .value {
-      color: var(--text-primary);
+    .data-item .val {
+      font-size: 12px;
       font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
       font-family: 'JetBrains Mono', monospace;
     }
 
-    .client-card-actions {
+    .client-card-footer {
       display: flex;
-      gap: 10px;
+      align-items: center;
+      gap: 6px;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 12px;
     }
 
-    .btn-whatsapp {
+    .btn-action-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .btn-action-icon:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-primary);
+      border-color: rgba(249, 115, 22, 0.4);
+    }
+
+    .btn-action-icon.delete:hover {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+
+    .btn-action-icon svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .btn-whatsapp-compact {
       flex: 1;
-      height: 40px;
-      background: rgba(16, 185, 129, 0.1);
+      height: 34px;
+      background: rgba(16, 185, 129, 0.12);
       border: 1px solid rgba(16, 185, 129, 0.3);
-      border-radius: 10px;
+      border-radius: 8px;
       color: #6ee7b7;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 700;
       text-decoration: none;
       display: flex;
@@ -307,47 +359,19 @@
       transition: all 0.2s;
     }
 
-    .btn-whatsapp:hover {
-      background: rgba(16, 185, 129, 0.2);
+    .btn-whatsapp-compact:hover {
+      background: rgba(16, 185, 129, 0.25);
     }
 
-    .btn-whatsapp svg {
-      width: 16px;
-      height: 16px;
+    .btn-whatsapp-compact svg {
+      width: 14px;
+      height: 14px;
       stroke: currentColor;
       fill: none;
       stroke-width: 2.2;
     }
 
-    .btn-delete-client {
-      width: 40px;
-      height: 40px;
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.25);
-      border-radius: 10px;
-      color: #fca5a5;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      flex-shrink: 0;
-    }
-
-    .btn-delete-client:hover {
-      background: rgba(239, 68, 68, 0.25);
-      color: white;
-    }
-
-    .btn-delete-client svg {
-      width: 16px;
-      height: 16px;
-      stroke: currentColor;
-      fill: none;
-      stroke-width: 2.2;
-    }
-
-    /* --- VENTANA EMERGENTE (MODAL FLOTANTE) --- */
+    /* --- MODALES Y VENTANAS --- */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -373,12 +397,11 @@
       border: 1px solid var(--border-subtle);
       border-radius: 20px;
       width: 100%;
-      max-width: 520px;
-      padding: 28px;
+      max-width: 480px;
+      padding: 24px;
       box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
       transform: scale(0.95) translateY(10px);
       transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      position: relative;
       max-height: 90vh;
       display: flex;
       flex-direction: column;
@@ -392,14 +415,12 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 20px;
-      flex-shrink: 0;
+      margin-bottom: 18px;
     }
 
     .modal-header h3 {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
-      letter-spacing: -0.3px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -410,23 +431,17 @@
       border: 1px solid var(--border-subtle);
       color: var(--text-secondary);
       cursor: pointer;
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s;
-    }
-
-    .btn-close-modal:hover {
-      background: rgba(255, 255, 255, 0.1);
-      color: var(--text-primary);
     }
 
     .btn-close-modal svg {
-      width: 18px;
-      height: 18px;
+      width: 16px;
+      height: 16px;
       stroke: currentColor;
       fill: none;
       stroke-width: 2.2;
@@ -436,21 +451,18 @@
       overflow-y: auto;
       flex: 1;
       padding-right: 4px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
     }
 
     .client-form {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
 
     .form-field {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
     }
 
     .form-field label {
@@ -463,14 +475,13 @@
 
     .form-field input {
       width: 100%;
-      padding: 12px 14px;
+      padding: 10px 12px;
       background: #090e18;
       border: 1px solid var(--border-subtle);
-      border-radius: 12px;
+      border-radius: 10px;
       color: var(--text-primary);
-      font-size: 14px;
+      font-size: 13px;
       outline: none;
-      transition: all 0.25s ease;
     }
 
     .form-field input:focus {
@@ -480,24 +491,87 @@
 
     .btn-submit-modal {
       width: 100%;
-      height: 48px;
+      height: 44px;
       margin-top: 6px;
       background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
       border: 1px solid rgba(249, 115, 22, 0.6);
-      border-radius: 12px;
+      border-radius: 10px;
       color: white;
       font-weight: 700;
-      font-size: 14px;
+      font-size: 13px;
       cursor: pointer;
-      transition: all 0.3s ease;
+    }
+
+    /* --- ESTILOS FICHA INFORMÁTICA (OJITO) --- */
+    .profile-card-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+      padding: 10px 0;
+    }
+
+    .profile-avatar-large {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: rgba(249, 115, 22, 0.15);
+      border: 2px solid var(--accent-flame);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      overflow: hidden;
     }
 
-    .btn-submit-modal:hover {
-      box-shadow: 0 8px 25px rgba(249, 115, 22, 0.4);
+    .profile-avatar-large img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-avatar-large svg {
+      width: 40px;
+      height: 40px;
+      stroke: var(--accent-flame);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .profile-details-table {
+      width: 100%;
+      background: #090e18;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-align: left;
+    }
+
+    .profile-row {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 6px;
+      font-size: 13px;
+    }
+
+    .profile-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .profile-row .lbl {
+      color: var(--text-tertiary);
+      font-weight: 600;
+    }
+
+    .profile-row .val {
+      color: var(--text-primary);
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
     }
 
     /* Modal de Alerta Profesional */
@@ -526,49 +600,43 @@
       border: 1px solid var(--border-subtle);
       border-radius: 20px;
       width: 100%;
-      max-width: 400px;
-      padding: 24px;
+      max-width: 380px;
+      padding: 22px;
       text-align: center;
       box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
-      transform: scale(0.9);
-      transition: transform 0.25s ease;
-    }
-
-    .custom-alert-overlay.is-open .custom-alert-box {
-      transform: scale(1);
     }
 
     .custom-alert-icon {
-      width: 50px;
-      height: 50px;
-      border-radius: 16px;
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
       background: rgba(249, 115, 22, 0.1);
       border: 1px solid rgba(249, 115, 22, 0.3);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 16px auto;
+      margin: 0 auto 14px auto;
     }
 
     .custom-alert-icon svg {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       stroke: var(--accent-flame);
       fill: none;
       stroke-width: 2;
     }
 
     .custom-alert-box h4 {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .custom-alert-box p {
       font-size: 13px;
       color: var(--text-secondary);
-      line-height: 1.5;
-      margin-bottom: 20px;
+      line-height: 1.4;
+      margin-bottom: 18px;
     }
 
     .custom-alert-buttons {
@@ -578,10 +646,10 @@
 
     .btn-alert-primary {
       flex: 1;
-      height: 42px;
+      height: 40px;
       background: var(--accent-flame);
       border: none;
-      border-radius: 10px;
+      border-radius: 8px;
       color: white;
       font-weight: 700;
       font-size: 13px;
@@ -590,10 +658,10 @@
 
     .btn-alert-secondary {
       flex: 1;
-      height: 42px;
+      height: 40px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border-subtle);
-      border-radius: 10px;
+      border-radius: 8px;
       color: var(--text-primary);
       font-weight: 600;
       font-size: 13px;
@@ -603,7 +671,7 @@
 </head>
 <body>
 
-  <!-- MODAL DE ALERTA / CONFIRMACIÓN -->
+  <!-- MODAL DE ALERTA PROFESIONAL -->
   <div class="custom-alert-overlay" id="customAlertOverlay">
     <div class="custom-alert-box">
       <div class="custom-alert-icon">
@@ -633,7 +701,7 @@
       <div class="dashboard-hero">
         <div class="hero-text">
           <h1>Gestión de <span>Clientes</span></h1>
-          <p>Administre su cartera de clientes registrados con acceso directo a WhatsApp y detalles.</p>
+          <p>Fichas técnicas, edición rápida y control de cartera de créditos.</p>
         </div>
         <button class="btn-open-modal" id="openModalBtn">
           <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -641,30 +709,32 @@
         </button>
       </div>
 
-      <!-- LISTADO DE CARDS DE CLIENTES -->
+      <!-- CARDS DE CLIENTES -->
       <div class="clients-grid" id="clientsGrid">
-        <div style="text-align: center; color: var(--text-tertiary); grid-column: span 3; padding: 40px; font-size: 13px;">
-          Cargando clientes en tiempo real...
+        <div style="text-align: center; color: var(--text-tertiary); grid-column: 1/-1; padding: 40px; font-size: 13px;">
+          Cargando clientes...
         </div>
       </div>
     </main>
   </div>
 
-  <!-- VENTANA EMERGENTE (MODAL) PARA AGREGAR CLIENTE -->
+  <!-- MODAL: REGISTRAR / EDITAR CLIENTE -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal-container">
       <div class="modal-header">
-        <h3>
+        <h3 id="formModalTitle">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-flame)" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
           Registrar Nuevo Cliente
         </h3>
-        <button class="btn-close-modal" id="closeModalBtn" title="Cerrar ventana">
+        <button class="btn-close-modal" id="closeModalBtn">
           <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
 
       <div class="modal-body-scroll">
         <form class="client-form" id="clientForm">
+          <input type="hidden" id="editClientId" value="">
+
           <div class="form-field">
             <label for="nombre">Nombre y Apellido</label>
             <input type="text" id="nombre" required placeholder="Ej. Carlos Mendoza">
@@ -691,7 +761,7 @@
           </div>
 
           <div class="form-field">
-            <label for="imagen">Adjuntar Imagen (Opcional)</label>
+            <label for="imagen">Adjuntar / Cambiar Imagen (Opcional)</label>
             <input type="file" id="imagen" accept="image/*">
           </div>
 
@@ -703,9 +773,30 @@
     </div>
   </div>
 
+  <!-- MODAL: FICHA INFORMÁTICA DEL CLIENTE (OJITO) -->
+  <div class="modal-overlay" id="viewModalOverlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-flame)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          Ficha Técnica de Cliente
+        </h3>
+        <button class="btn-close-modal" id="closeViewModalBtn">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div class="modal-body-scroll">
+        <div class="profile-card-view" id="profileCardContent">
+          <!-- Se inyecta dinámicamente la ficha -->
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { db } from './app.js';
-    import { collection, addDoc, deleteDoc, doc, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const prestamistaId = localStorage.getItem('cout_prestamista_id');
     const usuarioLogueado = localStorage.getItem('cout_prestamista_user');
@@ -714,7 +805,9 @@
       window.location.replace('loginprestamista.html');
     }
 
-    // Alertas profesionales
+    let clientesCacheGlobal = [];
+
+    // Modal de Alertas
     window.mostrarAlerta = (titulo, mensaje, callback = null) => {
       const overlay = document.getElementById('customAlertOverlay');
       document.getElementById('alertTitle').textContent = titulo;
@@ -743,7 +836,7 @@
       };
     };
 
-    // Killswitch en tiempo real
+    // Killswitch
     const userDocRef = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId);
     onSnapshot(userDocRef, (docSnap) => {
       if (!docSnap.exists()) {
@@ -764,7 +857,7 @@
       }
     });
 
-    // Validar acceso estricto de roles por URL si esta página está restringida
+    // Validar accesos
     async function validarAccesoPagina() {
       const paginaActual = 'clientes.html';
       const menuRef = collection(db, "carpetacout", "configuracion_general", "menuprestamistas");
@@ -789,26 +882,37 @@
     }
     validarAccesoPagina();
 
+    // Referencias a elementos
     const modalOverlay = document.getElementById('modalOverlay');
     const openModalBtn = document.getElementById('openModalBtn');
     const closeModalBtn = document.getElementById('closeModalBtn');
+    const viewModalOverlay = document.getElementById('viewModalOverlay');
+    const closeViewModalBtn = document.getElementById('closeViewModalBtn');
     const clientForm = document.getElementById('clientForm');
+    const editClientIdInput = document.getElementById('editClientId');
+    const formModalTitle = document.getElementById('formModalTitle');
+    const submitBtnTxt = document.getElementById('submitBtnTxt');
     const clientsGrid = document.getElementById('clientsGrid');
+    const profileCardContent = document.getElementById('profileCardContent');
 
     openModalBtn.addEventListener('click', () => {
       clientForm.reset();
+      editClientIdInput.value = '';
+      formModalTitle.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-flame)" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg> Registrar Nuevo Cliente`;
+      submitBtnTxt.textContent = "Guardar Cliente";
       modalOverlay.classList.add('is-open');
     });
 
     closeModalBtn.addEventListener('click', () => modalOverlay.classList.remove('is-open'));
-    modalOverlay.addEventListener('click', (e) => {
-      if (e.target === modalOverlay) modalOverlay.classList.remove('is-open');
-    });
+    closeViewModalBtn.addEventListener('click', () => viewModalOverlay.classList.remove('is-open'));
+    modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) modalOverlay.classList.remove('is-open'); });
+    viewModalOverlay.addEventListener('click', (e) => { if (e.target === viewModalOverlay) viewModalOverlay.classList.remove('is-open'); });
 
-    // Guardar Cliente con imagen opcional en Base64
+    // Guardar / Actualizar Cliente
     clientForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
+      const docId = editClientIdInput.value;
       const nombre = document.getElementById('nombre').value.trim();
       const edad = document.getElementById('edad').value.trim();
       const whatsapp = document.getElementById('whatsapp').value.trim();
@@ -816,38 +920,94 @@
       const dni = document.getElementById('dni').value.trim();
       const imagenFile = document.getElementById('imagen').files[0];
 
-      const guardarEnFirestore = async (imageBase64 = '') => {
+      const procesarGuardado = async (imageBase64 = null) => {
         try {
-          const clientesRef = collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "clientes");
-          await addDoc(clientesRef, {
-            nombre,
-            edad,
-            whatsapp,
-            domicilio,
-            dni,
-            imagen: imageBase64,
-            creadoEn: new Date().toISOString()
-          });
+          const payload = { nombre, edad, whatsapp, domicilio, dni };
+          if (imageBase64 !== null) payload.imagen = imageBase64;
+
+          if (docId) {
+            const clientDocRef = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "clientes", docId);
+            await updateDoc(clientDocRef, payload);
+          } else {
+            payload.creadoEn = new Date().toISOString();
+            if (imageBase64 === null) payload.imagen = '';
+            const clientesRef = collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "clientes");
+            await addDoc(clientesRef, payload);
+          }
 
           modalOverlay.classList.remove('is-open');
           clientForm.reset();
-          mostrarAlerta("Éxito", "Cliente registrado correctamente.", "success");
+          mostrarAlerta("Éxito", docId ? "Cliente actualizado correctamente." : "Cliente registrado correctamente.");
         } catch (err) {
           console.error("Error al guardar cliente:", err);
-          mostrarAlerta("Error", "No se pudo registrar el cliente.", "error");
+          mostrarAlerta("Error", "No se pudo guardar la información del cliente.");
         }
       };
 
       if (imagenFile) {
         const reader = new FileReader();
         reader.onload = function(uploadEvent) {
-          guardarEnFirestore(uploadEvent.target.result);
+          procesarGuardado(uploadEvent.target.result);
         };
         reader.readAsDataURL(imagenFile);
       } else {
-        guardarEnFirestore('');
+        procesarGuardado(null);
       }
     });
+
+    // Ver Ficha (Ojito)
+    window.verFichaCliente = (id) => {
+      const c = clientesCacheGlobal.find(item => item.id === id);
+      if (!c) return;
+
+      profileCardContent.innerHTML = `
+        <div class="profile-avatar-large">
+          ${c.imagen ? `<img src="${c.imagen}" alt="Avatar">` : `<svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`}
+        </div>
+        <div>
+          <h2 style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 2px;">${c.nombre || 'Sin Nombre'}</h2>
+          <span style="font-size: 12px; color: var(--accent-flame); font-weight: 700; text-transform: uppercase;">Cliente Activo</span>
+        </div>
+
+        <div class="profile-details-table">
+          <div class="profile-row">
+            <span class="lbl">DNI / Identificación:</span>
+            <span class="val">${c.dni || 'N/D'}</span>
+          </div>
+          <div class="profile-row">
+            <span class="lbl">Edad:</span>
+            <span class="val">${c.edad || '-'} años</span>
+          </div>
+          <div class="profile-row">
+            <span class="lbl">WhatsApp:</span>
+            <span class="val">${c.whatsapp || '-'}</span>
+          </div>
+          <div class="profile-row">
+            <span class="lbl">Domicilio:</span>
+            <span class="val">${c.domicilio || '-'}</span>
+          </div>
+        </div>
+      `;
+
+      viewModalOverlay.classList.add('is-open');
+    };
+
+    // Editar Cliente
+    window.editarCliente = (id) => {
+      const c = clientesCacheGlobal.find(item => item.id === id);
+      if (!c) return;
+
+      editClientIdInput.value = c.id;
+      document.getElementById('nombre').value = c.nombre || '';
+      document.getElementById('edad').value = c.edad || '';
+      document.getElementById('whatsapp').value = c.whatsapp || '';
+      document.getElementById('domicilio').value = c.domicilio || '';
+      document.getElementById('dni').value = c.dni || '';
+
+      formModalTitle.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-flame)" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg> Editar Cliente`;
+      submitBtnTxt.textContent = "Actualizar Cambios";
+      modalOverlay.classList.add('is-open');
+    };
 
     // Eliminar Cliente
     window.eliminarCliente = (id) => {
@@ -855,27 +1015,29 @@
         try {
           const clientRef = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "clientes", id);
           await deleteDoc(clientRef);
-          mostrarAlerta("Eliminado", "El cliente ha sido eliminado.", "success");
+          mostrarAlerta("Eliminado", "El cliente ha sido eliminado de la base de datos.");
         } catch (err) {
           console.error("Error al eliminar:", err);
-          mostrarAlerta("Error", "No se pudo eliminar el cliente.", "error");
         }
       });
     };
 
-    // Lectura en tiempo real de los clientes del prestamista logueado
+    // Lectura en tiempo real
     const clientesRef = collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "clientes");
     onSnapshot(clientesRef, (snapshot) => {
       clientsGrid.innerHTML = '';
+      clientesCacheGlobal = [];
 
       if (snapshot.empty) {
-        clientsGrid.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); grid-column: span 3; padding: 40px; font-size: 13px;">No hay clientes registrados en su cartera.</div>';
+        clientsGrid.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); grid-column: 1/-1; padding: 40px; font-size: 13px;">No hay clientes registrados en su cartera.</div>';
         return;
       }
 
       snapshot.forEach((docSnap) => {
         const data = docSnap.data();
         const id = docSnap.id;
+        clientesCacheGlobal.push({ id, ...data });
+
         const limpiaWp = (data.whatsapp || '').replace(/[^0-9]/g, '');
 
         const card = document.createElement('div');
@@ -888,31 +1050,36 @@
             </div>
             <div class="client-title-info">
               <h3>${data.nombre || 'Sin Nombre'}</h3>
-              <span>DNI: ${data.dni || 'N/D'}</span>
+              <span class="dni-badge">DNI: ${data.dni || 'N/D'}</span>
             </div>
           </div>
 
-          <div class="client-details-list">
-            <div class="client-detail-row">
-              <span class="label">Edad:</span>
-              <span class="value">${data.edad || '-'} años</span>
+          <div class="client-compact-data">
+            <div class="data-item">
+              <span class="lbl">Edad</span>
+              <span class="val">${data.edad ? data.edad + ' años' : '-'}</span>
             </div>
-            <div class="client-detail-row">
-              <span class="label">WhatsApp:</span>
-              <span class="value">${data.whatsapp || '-'}</span>
-            </div>
-            <div class="client-detail-row">
-              <span class="label">Domicilio:</span>
-              <span class="value">${data.domicilio || '-'}</span>
+            <div class="data-item">
+              <span class="lbl">Domicilio</span>
+              <span class="val" title="${data.domicilio || '-'}">${data.domicilio || '-'}</span>
             </div>
           </div>
 
-          <div class="client-card-actions">
-            <a href="https://wa.me/${limpiaWp}" target="_blank" class="btn-whatsapp">
+          <div class="client-card-footer">
+            <button class="btn-action-icon" onclick="window.verFichaCliente('${id}')" title="Ver Ficha Técnica (Ojito)">
+              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+
+            <button class="btn-action-icon" onclick="window.editarCliente('${id}')" title="Editar Cliente">
+              <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+            </button>
+
+            <a href="https://wa.me/${limpiaWp}" target="_blank" class="btn-whatsapp-compact" title="Enviar WhatsApp">
               <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-              WhatsApp
+              Chat
             </a>
-            <button class="btn-delete-client" onclick="window.eliminarCliente('${id}')" title="Eliminar cliente">
+
+            <button class="btn-action-icon delete" onclick="window.eliminarCliente('${id}')" title="Eliminar Cliente">
               <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
             </button>
           </div>
