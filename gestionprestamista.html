@@ -617,7 +617,7 @@
       window.location.replace('loginprestamista.html');
     });
 
-    // --- 2. KILLSWITCH EN TIEMPO REAL (Vigila eliminación o suspensión por venceEn) ---
+    // 2. Killswitch en tiempo real (Vigila eliminación o suspensión por venceEn)
     const userDocRef = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId);
     
     onSnapshot(userDocRef, (docSnap) => {
@@ -630,7 +630,6 @@
 
       const userData = docSnap.data();
 
-      // Verificación en tiempo real del campo venceEn (suspensión o expiración)
       if (userData.venceEn) {
         const hoy = new Date();
         hoy.setHours(0, 0, 0, 0);
@@ -645,13 +644,16 @@
       }
     });
 
-    // --- 3. RENDERIZADO INSTANTÁNEO Y TIEMPO REAL DEL MENÚ ---
+    // 3. Renderizado instantáneo y ordenado por la propiedad 'orden'
     function renderizarMenu(itemsArray) {
       sidebarContent.innerHTML = '';
       if (!itemsArray || itemsArray.length === 0) {
         sidebarContent.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); padding: 20px; font-size: 12px;">No hay herramientas configuradas.</div>';
         return;
       }
+
+      // Ordenar estrictamente por el campo orden configurado en el panel
+      itemsArray.sort((a, b) => (Number(a.orden) || 0) - (Number(b.orden) || 0));
 
       const categoriasMap = {};
       itemsArray.forEach((item) => {
