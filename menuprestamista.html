@@ -21,6 +21,7 @@
       --text-secondary: #94a3b8;
       --text-tertiary: #64748b;
       --status-success: #10b981;
+      --status-error: #ef4444;
     }
 
     * {
@@ -391,7 +392,7 @@
     .category-actions {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
     }
 
     .menu-item-row {
@@ -747,7 +748,6 @@
           await deleteDoc(docRef);
           localStorage.removeItem('cout_menu_cache');
           
-          // Re-indexar los restantes para mantener secuencia limpia
           setTimeout(async () => {
             if (menuCacheGlobal.length > 0) {
               const promesas = menuCacheGlobal.filter(m => m.id !== id).map((item, idx) => {
@@ -759,6 +759,45 @@
           }, 300);
         } catch (err) {
           console.error("Error al eliminar:", err);
+        }
+      }
+    };
+
+    // --- NUEVO: ELIMINAR CATEGORÍA COMPLETA CON CONTEO DETALLADO ---
+    window.eliminarCategoriaCompleta = async (catName) => {
+      // Filtrar todas las páginas que pertenecen a esta categoría
+      const paginasDeCategoria = menuCacheGlobal.filter(item => (item.Categoria || item.categoria || 'General') === catName);
+      const totalPaginas = paginasDeCategoria.length;
+
+      // Mensaje detallado solicitando confirmación
+      const mensajeConfirmacion = `¿Quieres eliminar esta categoría "${catName}"?\n\nEsta categoría contiene ${totalPaginas} ${totalPaginas === 1 ? 'página' : 'páginas'} que también serán eliminadas.`;
+
+      if (confirm(mensajeConfirmacion)) {
+        try {
+          // Eliminar de Firebase todos los documentos de esta categoría
+          const promesasEliminacion = paginasDeCategoria.map(item => {
+            const docRef = doc(db, "carpetacout", "configuracion_general", "menuprestamistas", item.id);
+            return deleteDoc(docRef);
+          });
+
+          await Promise.all(promesasEliminacion);
+          localStorage.removeItem('cout_menu_cache');
+
+          // Re-indexar los restantes para mantener secuencia limpia
+          setTimeout(async () => {
+            const restanes = menuCacheGlobal.filter(m => (m.Categoria || m.categoria || 'General') !== catName);
+            if (restanes.length > 0) {
+              const promesasOrden = restanes.map((item, idx) => {
+                const ref = doc(db, "carpetacout", "configuracion_general", "menuprestamistas", item.id);
+                return updateDoc(ref, { orden: idx });
+              });
+              await Promise.all(promesasOrden);
+            }
+          }, 300);
+
+        } catch (err) {
+          console.error("Error al eliminar la categoría:", err);
+          alert("Ocurrió un error al intentar eliminar la categoría.");
         }
       }
     };
@@ -788,7 +827,7 @@
       }
     };
 
-    // Reubicar categoría completa y reescribir orden completo
+    // Reubicar categoría completa
     window.cambiarPosicionCategoria = async (catName, direccion) => {
       const catsOrdenadas = [];
       menuCacheGlobal.forEach(item => {
@@ -835,7 +874,6 @@
         items.push({ id: docSnap.id, ...docSnap.data() });
       });
 
-      // Ordenar estrictamente por el campo 'orden' asegurando valor por defecto numérico
       items.sort((a, b) => (Number(a.orden) || 0) - (Number(b.orden) || 0));
       menuCacheGlobal = items;
 
@@ -860,7 +898,7 @@
 
         const groupTitle = document.createElement('div');
         groupTitle.className = 'category-group-title';
-        groupTitle.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 9h16M4 15h16"/></svg> ${catName}`;
+        groupTitle.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 9h16M4 15h16"/></svg> ${catName} (${categoriasMap[catName].length})`;
         
         const catActions = document.createElement('div');
         catActions.className = 'category-actions';
@@ -870,6 +908,9 @@
           </button>
           <button class="btn-action" onclick="window.cambiarPosicionCategoria('${catName}', 1)" title="Mover categoría abajo">
             <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <button class="btn-action delete" onclick="window.eliminarCategoriaCompleta('${catName}')" title="Eliminar categoría completa">
+            <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
           </button>
         `;
 
