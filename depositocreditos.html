@@ -24,124 +24,52 @@
       --status-danger: #ef4444;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    html, body {
-      width: 100%;
-      min-height: 100vh;
-      background-color: var(--bg-base);
-      color: var(--text-primary);
-      overflow-x: hidden;
-      scrollbar-width: none;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    html, body { width: 100%; min-height: 100vh; background-color: var(--bg-base); color: var(--text-primary); overflow-x: hidden; scrollbar-width: none; }
     html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 20px; width: 100%; }
 
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 20px;
-      width: 100%;
-    }
-
-    /* Navbar Principal */
     header {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: 16px;
-      padding: 14px 20px;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 16px;
+      padding: 14px 20px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;
       box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
     }
-
     .btn-back {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 8px 14px;
-      border-radius: 10px;
-      transition: all 0.2s;
+      display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle); color: var(--text-secondary); text-decoration: none;
+      font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 10px; transition: all 0.2s;
     }
-
-    .btn-back:hover {
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--text-primary);
-      border-color: rgba(249, 115, 22, 0.3);
-    }
-
+    .btn-back:hover { background: rgba(255, 255, 255, 0.08); color: var(--text-primary); border-color: rgba(249, 115, 22, 0.3); }
     .btn-back svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2; }
-
     .brand-section { display: flex; align-items: center; gap: 8px; }
-    .logo-text { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: var(--text-primary); }
+    .logo-text { font-size: 20px; font-weight: 800; color: var(--text-primary); }
     .logo-text span { color: var(--accent-flame); }
 
-    /* Panel Hero & Contadores */
-    .dashboard-hero {
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-
+    .dashboard-hero { margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
     .hero-text-wrapper { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-    .hero-text h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 2px; }
+    .hero-text h1 { font-size: 22px; font-weight: 800; margin-bottom: 2px; }
     .hero-text h1 span { color: var(--accent-flame); }
     .hero-text p { font-size: 13px; color: var(--text-secondary); }
 
     .counters-wrapper { display: flex; gap: 10px; }
-
     .credit-counter-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(249, 115, 22, 0.1);
-      border: 1px solid rgba(249, 115, 22, 0.3);
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--accent-flame);
-      font-family: 'JetBrains Mono', monospace;
+      display: inline-flex; align-items: center; gap: 6px; background: rgba(249, 115, 22, 0.1);
+      border: 1px solid rgba(249, 115, 22, 0.3); padding: 6px 12px; border-radius: 20px;
+      font-size: 12px; font-weight: 700; color: var(--accent-flame); font-family: 'JetBrains Mono', monospace;
     }
-
-    .credit-counter-badge.moroso-badge {
-      background: rgba(239, 68, 68, 0.1);
-      border-color: rgba(239, 68, 68, 0.3);
-      color: #fca5a5;
-    }
-
+    .credit-counter-badge.moroso-badge { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: #fca5a5; }
     .credit-counter-badge svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.2; }
 
-    /* Buscador Compacto */
     .search-container { margin-bottom: 20px; width: 100%; }
     .search-input-wrapper { position: relative; display: flex; align-items: center; width: 100%; }
     @media (min-width: 768px) { .search-input-wrapper { max-width: 340px; } }
     .search-input-wrapper svg.search-icon { position: absolute; left: 14px; width: 15px; height: 15px; stroke: var(--text-tertiary); fill: none; stroke-width: 2; pointer-events: none; }
     .search-input-wrapper input {
-      width: 100%; padding: 9px 14px 9px 38px; background: var(--bg-surface);
-      border: 1px solid var(--border-subtle); border-radius: 10px; color: var(--text-primary);
-      font-size: 13px; outline: none; transition: all 0.25s ease; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      width: 100%; padding: 9px 14px 9px 38px; background: var(--bg-surface); border: 1px solid var(--border-subtle);
+      border-radius: 10px; color: var(--text-primary); font-size: 13px; outline: none; transition: all 0.25s ease;
     }
     .search-input-wrapper input:focus { border-color: var(--accent-flame); box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15); }
 
-    /* Grid y Cards */
     .credits-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
     @media (min-width: 640px) { .credits-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (min-width: 1024px) { .credits-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -149,7 +77,7 @@
     .credit-card {
       background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 16px;
       padding: 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); transition: all 0.25s ease; position: relative;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); transition: all 0.25s ease;
     }
     .credit-card:hover { transform: translateY(-3px); border-color: rgba(249, 115, 22, 0.4); background: var(--bg-surface-hover); }
 
@@ -162,10 +90,7 @@
     .status-badge.moroso { background: rgba(239, 68, 68, 0.12); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
     .status-badge.finalizado { background: rgba(100, 116, 139, 0.12); color: #94a3b8; border: 1px solid rgba(100, 116, 139, 0.3); }
 
-    .credit-compact-data {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-      background: #090e18; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 10px;
-    }
+    .credit-compact-data { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #090e18; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 10px; }
     .data-item { display: flex; flex-direction: column; gap: 2px; }
     .data-item .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); }
     .data-item .val { font-size: 12px; font-weight: 600; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; }
@@ -198,28 +123,21 @@
     .modal-overlay.is-open { opacity: 1; pointer-events: auto; }
     .modal-container {
       background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px;
-      width: 100%; max-width: 540px; padding: 24px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+      width: 100%; max-width: 560px; padding: 24px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
       max-height: 90vh; display: flex; flex-direction: column;
     }
     .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
     .modal-header h3 { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-    .btn-close-modal {
-      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-subtle); color: var(--text-secondary);
-      cursor: pointer; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
-    }
+    .btn-close-modal { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-subtle); color: var(--text-secondary); cursor: pointer; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
     .btn-close-modal svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2; }
     .modal-body-scroll { overflow-y: auto; flex: 1; padding-right: 4px; display: flex; flex-direction: column; gap: 14px; }
 
-    /* Ficha Técnica */
-    .profile-details-table {
-      width: 100%; background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px;
-    }
+    .profile-details-table { width: 100%; background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
     .profile-row { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 6px; font-size: 13px; }
     .profile-row:last-child { border-bottom: none; padding-bottom: 0; }
     .profile-row .lbl { color: var(--text-tertiary); font-weight: 600; }
     .profile-row .val { color: var(--text-primary); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
 
-    /* Cuotas y Pagos */
     .cuotas-table-container { display: flex; flex-direction: column; gap: 8px; }
     .cuota-row-item {
       background: #090e18; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 10px 12px;
@@ -234,31 +152,21 @@
     .cuota-status-tag.parcial { background: rgba(59, 130, 246, 0.15); color: #93c5fd; }
     .cuota-status-tag.pendiente { background: rgba(245, 158, 11, 0.15); color: #fcd34d; }
 
-    .btn-pagar-cuota {
-      background: var(--accent-flame); border: none; color: white; font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 6px; cursor: pointer;
-    }
+    .btn-pagar-cuota { background: var(--accent-flame); border: none; color: white; font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: opacity 0.2s; }
+    .btn-pagar-cuota:hover { opacity: 0.85; }
 
-    /* Timeline de Auditoría */
     .timeline-box { background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
     .timeline-item { border-left: 2px solid var(--accent-flame); padding-left: 10px; margin-bottom: 6px; font-size: 12px; }
     .timeline-item .t-date { font-size: 10px; color: var(--text-tertiary); font-family: 'JetBrains Mono', monospace; }
     .timeline-item .t-desc { color: var(--text-primary); font-weight: 600; margin-top: 2px; }
 
-    /* Firma */
     .signature-preview-box { background: #ffffff; border-radius: 12px; padding: 10px; display: flex; align-items: center; justify-content: center; }
     .signature-preview-box img { max-width: 100%; max-height: 90px; object-fit: contain; }
 
-    /* Modal Pago Parcial/Total */
     .payment-form-box { background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
-    .payment-form-box input, .payment-form-box textarea {
-      width: 100%; padding: 10px; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); font-size: 13px; outline: none;
-    }
+    .payment-form-box input, .payment-form-box textarea { width: 100%; padding: 10px; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); font-size: 13px; outline: none; }
 
-    /* Alerta */
-    .custom-alert-overlay {
-      position: fixed; inset: 0; background: rgba(5, 7, 11, 0.88); backdrop-filter: blur(12px);
-      z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
-    }
+    .custom-alert-overlay { position: fixed; inset: 0; background: rgba(5, 7, 11, 0.88); backdrop-filter: blur(12px); z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
     .custom-alert-overlay.is-open { opacity: 1; pointer-events: auto; }
     .custom-alert-box { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px; width: 100%; max-width: 380px; padding: 22px; text-align: center; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8); }
     .custom-alert-icon { width: 46px; height: 46px; border-radius: 14px; background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.3); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px auto; }
@@ -272,7 +180,6 @@
 </head>
 <body>
 
-  <!-- MODAL DE ALERTA / CONFIRMACIÓN -->
   <div class="custom-alert-overlay" id="customAlertOverlay">
     <div class="custom-alert-box">
       <div class="custom-alert-icon">
@@ -292,9 +199,7 @@
         <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         Volver al Panel
       </a>
-      <div class="brand-section">
-        <h1 class="logo-text">cout<span>.app</span></h1>
-      </div>
+      <div class="brand-section"><h1 class="logo-text">cout<span>.app</span></h1></div>
     </header>
 
     <main>
@@ -304,7 +209,6 @@
             <h1>Depósito de <span>Créditos</span></h1>
             <p>Control de cartera, auditoría en tiempo real y gestión de morosidad.</p>
           </div>
-          <!-- CONTADORES -->
           <div class="counters-wrapper">
             <div class="credit-counter-badge" title="Total de créditos otorgados">
               <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
@@ -318,7 +222,6 @@
         </div>
       </div>
 
-      <!-- BUSCADOR -->
       <div class="search-container">
         <div class="search-input-wrapper">
           <input type="text" id="searchInput" placeholder="Buscar por cliente, DNI, tipo...">
@@ -326,7 +229,6 @@
         </div>
       </div>
 
-      <!-- CARDS -->
       <div class="credits-grid" id="creditsGrid"></div>
     </main>
   </div>
@@ -335,7 +237,7 @@
   <div class="modal-overlay" id="viewModalOverlay">
     <div class="modal-container">
       <div class="modal-header">
-        <h3 id="modalTitleView">
+        <h3>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-flame)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
           Ficha del Crédito y Auditoría
         </h3>
@@ -343,16 +245,15 @@
           <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
-
       <div class="modal-body-scroll" id="profileCardContent"></div>
     </div>
   </div>
 
-  <!-- MODAL: ABONAR CUOTA (PARCIAL O TOTAL) -->
+  <!-- MODAL: ABONAR CUOTA -->
   <div class="modal-overlay" id="paymentModalOverlay">
     <div class="modal-container" style="max-width: 420px; z-index: 2500;">
       <div class="modal-header">
-        <h3>Registrar Abono / Pago</h3>
+        <h3>Registrar Abono a Cuota</h3>
         <button class="btn-close-modal" id="closePayModalBtn">
           <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
@@ -361,11 +262,11 @@
         <div class="payment-form-box">
           <span style="font-size: 13px; font-weight: 700;" id="payCuotaInfoLabel">Cuota #1</span>
           <div style="display:flex; flex-direction:column; gap:4px;">
-            <label style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">Monto a Abonar ($)</label>
+            <label style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">Monto en Pesos a Abonar ($)</label>
             <input type="number" id="montoPagoInput" step="any" placeholder="Ej. 5000">
           </div>
           <div style="display:flex; flex-direction:column; gap:4px;">
-            <label style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">Nota / Detalle de Auditoría</label>
+            <label style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">Nota / Detalle de Pago</label>
             <textarea id="notaPagoInput" rows="2" placeholder="Ej. Pago parcial en efectivo, saldo pendiente..."></textarea>
           </div>
           <button class="btn-alert-primary" id="confirmPaymentBtn" style="margin-top:6px;">Confirmar y Registrar Pago</button>
@@ -374,7 +275,7 @@
     </div>
   </div>
 
-  <!-- MODAL: MOTIVO DE MOROSIDAD / QUITAR MOROSIDAD -->
+  <!-- MODAL: GESTIONAR MOROSIDAD -->
   <div class="modal-overlay" id="morosoModalOverlay">
     <div class="modal-container" style="max-width: 420px; z-index: 2500;">
       <div class="modal-header">
@@ -387,7 +288,7 @@
         <div class="payment-form-box">
           <div style="display:flex; flex-direction:column; gap:4px;">
             <label style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;" id="morosoLabelDesc">Explicación / Detalle en Párrafo</label>
-            <textarea id="morosoMotivoInput" rows="4" placeholder="Detalle breve del atraso o motivo del cambio de estado..."></textarea>
+            <textarea id="morosoMotivoInput" rows="4" placeholder="Detalle breve del atraso o motivo..."></textarea>
           </div>
           <button class="btn-alert-primary" id="confirmMorosoBtn" style="margin-top:6px;">Guardar y Actualizar</button>
         </div>
@@ -401,10 +302,7 @@
 
     const prestamistaId = localStorage.getItem('cout_prestamista_id');
     const usuarioLogueado = localStorage.getItem('cout_prestamista_user');
-
-    if (!prestamistaId || !usuarioLogueado) {
-      window.location.replace('loginprestamista.html');
-    }
+    if (!prestamistaId || !usuarioLogueado) window.location.replace('loginprestamista.html');
 
     let creditosCacheGlobal = [];
     let clientesCacheGlobal = {};
@@ -439,141 +337,103 @@
     };
 
     const viewModalOverlay = document.getElementById('viewModalOverlay');
-    const closeViewModalBtn = document.getElementById('closeViewModalBtn');
-    const profileCardContent = document.getElementById('profileCardContent');
-    const creditsGrid = document.getElementById('creditsGrid');
-    const creditCounter = document.getElementById('creditCounter');
-    const morosoCounter = document.getElementById('morosoCounter');
-    const searchInput = document.getElementById('searchInput');
-
-    closeViewModalBtn.addEventListener('click', () => {
+    document.getElementById('closeViewModalBtn').onclick = () => {
       currentOpenCreditoId = null;
       viewModalOverlay.classList.remove('is-open');
-    });
-
-    // Cargar caché de clientes
-    const cacheClientes = localStorage.getItem(`cout_clientes_cache_${prestamistaId}`);
-    if (cacheClientes) {
-      try {
-        const arr = JSON.parse(cacheClientes);
-        arr.forEach(c => { clientesCacheGlobal[c.id] = c; });
-      } catch(e) { console.error(e); }
-    }
-
-    // Compartir link
-    window.compartirCredito = (id) => {
-      const basePath = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
-      const link = `${basePath}vercredito.html?id=${id}&p=${prestamistaId}`;
-      navigator.clipboard.writeText(link).then(() => {
-        window.mostrarAlerta("Enlace Copiado", "El enlace de seguimiento del crédito fue copiado al portapapeles.");
-      });
     };
 
-    // Eliminar Crédito
+    // Caché de clientes
+    const cacheClientes = localStorage.getItem(`cout_clientes_cache_${prestamistaId}`);
+    if (cacheClientes) {
+      try { JSON.parse(cacheClientes).forEach(c => { clientesCacheGlobal[c.id] = c; }); } catch(e) {}
+    }
+
+    window.compartirCredito = (id) => {
+      const link = `${window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1)}vercredito.html?id=${id}&p=${prestamistaId}`;
+      navigator.clipboard.writeText(link).then(() => window.mostrarAlerta("Enlace Copiado", "El enlace fue copiado al portapapeles."));
+    };
+
     window.eliminarCredito = (id) => {
-      window.mostrarConfirmacion("Eliminar Crédito", "¿Está seguro de eliminar este crédito del sistema?", async () => {
+      window.mostrarConfirmacion("Eliminar Crédito", "¿Está seguro de eliminar este crédito?", async () => {
         try {
-          const ref = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos", id);
-          await deleteDoc(ref);
-          window.mostrarAlerta("Eliminado", "El crédito ha sido eliminado correctamente.");
+          await deleteDoc(doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos", id));
+          window.mostrarAlerta("Eliminado", "Crédito eliminado correctamente.");
         } catch(err) { console.error(err); }
       });
     };
 
-    // Renderizar Cards
-    function renderizarCreditos(arrayCreditos) {
-      creditsGrid.innerHTML = '';
-      let totalCreds = arrayCreditos.length;
+    function renderizarCreditos(arr) {
+      const grid = document.getElementById('creditsGrid');
+      grid.innerHTML = '';
+      let totalCreds = arr.length;
       let totalMorosos = 0;
-      creditCounter.textContent = totalCreds;
+      document.getElementById('creditCounter').textContent = totalCreds;
 
-      if (!arrayCreditos || totalCreds === 0) {
-        morosoCounter.textContent = '0';
-        creditsGrid.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); grid-column: 1/-1; padding: 40px; font-size: 13px;">No hay créditos registrados en el depósito.</div>';
+      if (!arr || totalCreds === 0) {
+        document.getElementById('morosoCounter').textContent = '0';
+        grid.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); grid-column: 1/-1; padding: 40px; font-size: 13px;">No hay créditos registrados.</div>';
         return;
       }
 
-      arrayCreditos.forEach((c) => {
+      arr.forEach((c) => {
         const estado = c.estado || 'activo';
         if (estado === 'moroso') totalMorosos++;
+        const dniCliente = (clientesCacheGlobal[c.clienteId] || {}).dni || c.clienteDni || 'N/D';
 
-        const clienteInfo = clientesCacheGlobal[c.clienteId] || {};
-        const dniCliente = clienteInfo.dni || c.clienteDni || 'N/D';
-
-        const card = document.createElement('div');
-        card.className = 'credit-card';
-
-        card.innerHTML = `
-          <div class="credit-header">
-            <div>
-              <span class="client-name-title">${c.clienteNombre || 'Cliente'}</span>
-              <div><span class="dni-tag">DNI: ${dniCliente}</span></div>
+        grid.innerHTML += `
+          <div class="credit-card">
+            <div class="credit-header">
+              <div>
+                <span class="client-name-title">${c.clienteNombre || 'Cliente'}</span>
+                <div><span class="dni-tag">DNI: ${dniCliente}</span></div>
+              </div>
+              <span class="status-badge ${estado}">${estado}</span>
             </div>
-            <span class="status-badge ${estado}">${estado}</span>
-          </div>
-
-          <div class="credit-compact-data">
-            <div class="data-item">
-              <span class="lbl">Tipo / Total</span>
-              <span class="val">$${(c.totalConInteres || 0).toLocaleString('es-AR')}</span>
+            <div class="credit-compact-data">
+              <div class="data-item"><span class="lbl">Tipo / Total</span><span class="val">$${(c.totalConInteres || 0).toLocaleString('es-AR')}</span></div>
+              <div class="data-item"><span class="lbl">Cuotas</span><span class="val">${c.cantidadCuotas} cuota(s)</span></div>
             </div>
-            <div class="data-item">
-              <span class="lbl">Cuotas</span>
-              <span class="val">${c.cantidadCuotas} cuota(s)</span>
-            </div>
-          </div>
-
-          <div class="credit-card-footer">
-            <button class="btn-action-icon" onclick="window.verFichaCredito('${c.id}')" title="Ver Ficha y Cuotas">
-              <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            </button>
-
-            <button class="btn-action-icon share" onclick="window.compartirCredito('${c.id}')" title="Compartir Link">
-              <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-            </button>
-
-            ${estado !== 'moroso' ? `
-              <button class="btn-action-icon moroso" onclick="window.abrirModalMoroso('${c.id}', 'moroso')" title="Marcar como Moroso">
-                <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <div class="credit-card-footer">
+              <button class="btn-action-icon" onclick="window.verFichaCredito('${c.id}')" title="Ver Ficha y Cuotas">
+                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
               </button>
-            ` : `
-              <button class="btn-action-icon moroso" onclick="window.abrirModalMoroso('${c.id}', 'activo')" title="Quitar de Morosidad" style="color:var(--status-success);">
-                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <button class="btn-action-icon share" onclick="window.compartirCredito('${c.id}')" title="Compartir Link">
+                <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
               </button>
-            `}
-
-            <button class="btn-action-icon delete" onclick="window.eliminarCredito('${c.id}')" title="Eliminar Crédito">
-              <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-            </button>
-
-            <button class="btn-pay-compact" onclick="window.verFichaCredito('${c.id}')">Abonar</button>
+              ${estado !== 'moroso' ? `
+                <button class="btn-action-icon moroso" onclick="window.abrirModalMoroso('${c.id}', 'moroso')" title="Marcar Moroso">
+                  <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                </button>
+              ` : `
+                <button class="btn-action-icon moroso" onclick="window.abrirModalMoroso('${c.id}', 'activo')" title="Quitar Morosidad" style="color:var(--status-success);">
+                  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </button>
+              `}
+              <button class="btn-action-icon delete" onclick="window.eliminarCredito('${c.id}')" title="Eliminar">
+                <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
+              </button>
+              <button class="btn-pay-compact" onclick="window.verFichaCredito('${c.id}')">Abonar</button>
+            </div>
           </div>
         `;
-        creditsGrid.appendChild(card);
       });
-
-      morosoCounter.textContent = totalMorosos;
+      document.getElementById('morosoCounter').textContent = totalMorosos;
     }
 
-    searchInput.oninput = (e) => {
+    document.getElementById('searchInput').oninput = (e) => {
       const q = e.target.value.toLowerCase().trim();
       if (!q) { renderizarCreditos(creditosCacheGlobal); return; }
-      renderizarCreditos(creditosCacheGlobal.filter(c => {
-        const clienteInfo = clientesCacheGlobal[c.clienteId] || {};
-        const dni = (clienteInfo.dni || c.clienteDni || '').toLowerCase();
-        return (c.clienteNombre || '').toLowerCase().includes(q) || dni.includes(q);
-      }));
+      renderizarCreditos(creditosCacheGlobal.filter(c => (c.clienteNombre || '').toLowerCase().includes(q) || ((clientesCacheGlobal[c.clienteId] || {}).dni || '').toLowerCase().includes(q)));
     };
 
-    // Ver Ficha y Cuotas (Ojito)
+    // Ficha y Cuotas con botones de Abonar funcionales
     window.verFichaCredito = (id) => {
       currentOpenCreditoId = id;
       const c = creditosCacheGlobal.find(item => item.id === id);
       if (!c) return;
 
-      const clienteInfo = clientesCacheGlobal[c.clienteId] || {};
-      const dniCliente = clienteInfo.dni || c.clienteDni || 'N/D';
-      const firmaImg = clienteInfo.firmaDigital || '';
+      const dniCliente = (clientesCacheGlobal[c.clienteId] || {}).dni || c.clienteDni || 'N/D';
+      const firmaImg = (clientesCacheGlobal[c.clienteId] || {}).firmaDigital || '';
 
       let cuotasArr = c.cuotasDetalle || [];
       if (cuotasArr.length === 0) {
@@ -585,13 +445,7 @@
           else if (c.frecuencia === 'quincenal') fechaBase.setDate(fechaBase.getDate() + 15);
           else if (c.frecuencia === 'mensual') fechaBase.setMonth(fechaBase.getMonth() + 1);
 
-          cuotasArr.push({
-            numero: i,
-            vencimiento: fechaBase.toISOString().split('T')[0],
-            monto: valorCuota,
-            pagado: 0,
-            estado: 'pendiente'
-          });
+          cuotasArr.push({ numero: i, vencimiento: fechaBase.toISOString().split('T')[0], monto: valorCuota, pagado: 0, estado: 'pendiente' });
         }
       }
 
@@ -616,18 +470,16 @@
       });
 
       let timelineHtml = '';
-      const auditLog = c.auditoria || [{ fecha: c.creadoEn || new Date().toISOString(), descripcion: 'Crédito emitido y registrado en el sistema.' }];
-      auditLog.forEach(log => {
-        const fechaFmt = new Date(log.fecha).toLocaleString('es-AR');
+      (c.auditoria || [{ fecha: c.creadoEn || new Date().toISOString(), descripcion: 'Crédito emitido y registrado.' }]).forEach(log => {
         timelineHtml += `
           <div class="timeline-item">
-            <div class="t-date">${fechaFmt}</div>
+            <div class="t-date">${new Date(log.fecha).toLocaleString('es-AR')}</div>
             <div class="t-desc">${log.descripcion}</div>
           </div>
         `;
       });
 
-      profileCardContent.innerHTML = `
+      document.getElementById('profileCardContent').innerHTML = `
         <div class="profile-details-table">
           <div class="profile-row"><span class="lbl">Cliente:</span><span class="val">${c.clienteNombre}</span></div>
           <div class="profile-row"><span class="lbl">DNI:</span><span class="val">${dniCliente}</span></div>
@@ -636,13 +488,10 @@
           <div class="profile-row"><span class="lbl">Frecuencia:</span><span class="val" style="text-transform: uppercase;">${c.frecuencia}</span></div>
           <div class="profile-row"><span class="lbl">Estado:</span><span class="val" style="text-transform: uppercase; color: var(--accent-flame);">${c.estado || 'activo'}</span></div>
         </div>
-
         <div style="width: 100%; text-align: left;"><span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">Cronograma y Pagos de Cuotas</span></div>
         <div class="cuotas-table-container">${cuotasHtml}</div>
-
         <div style="width: 100%; text-align: left; margin-top: 4px;"><span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">Línea de Tiempo y Auditoría</span></div>
         <div class="timeline-box">${timelineHtml}</div>
-
         <div style="width: 100%; text-align: left; margin-top: 4px;"><span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">Firma Digital del Cliente</span></div>
         <div class="signature-preview-box">
           ${firmaImg ? `<img src="${firmaImg}" alt="Firma">` : `<span style="font-size: 12px; color: var(--text-tertiary);">Sin firma registrada</span>`}
@@ -652,7 +501,7 @@
       viewModalOverlay.classList.add('is-open');
     };
 
-    // --- MODAL DE PAGOS (ABONAR) ---
+    // --- MODAL DE PAGOS (ABONAR CUOTA) ---
     let activeCreditIdForPay = null;
     let activeCuotaIndexForPay = null;
     const paymentModalOverlay = document.getElementById('paymentModalOverlay');
@@ -664,12 +513,10 @@
       const c = creditosCacheGlobal.find(item => item.id === creditoId);
       if (!c) return;
 
-      const cuotasList = c.cuotasDetalle || [];
-      const cuota = cuotasList[cuotaIndex];
+      const cuota = (c.cuotasDetalle || [])[cuotaIndex];
       if (!cuota) return;
 
       const restante = cuota.monto - (cuota.pagado || 0);
-
       document.getElementById('payCuotaInfoLabel').textContent = `Cuota #${cuota.numero} (Restante: $${restante.toLocaleString('es-AR')})`;
       document.getElementById('montoPagoInput').value = restante;
       document.getElementById('notaPagoInput').value = '';
@@ -680,7 +527,7 @@
       const montoAbonado = parseFloat(document.getElementById('montoPagoInput').value) || 0;
       const nota = document.getElementById('notaPagoInput').value.trim() || 'Abono de cuota';
       if (montoAbonado <= 0) {
-        window.mostrarAlerta("Monto inválido", "Por favor ingresa un monto mayor a 0.");
+        window.mostrarAlerta("Monto inválido", "Ingrese un monto mayor a 0.");
         return;
       }
 
@@ -716,7 +563,7 @@
       }
     };
 
-    // --- MODAL DE MOROSIDAD ---
+    // --- GESTIÓN DE MOROSIDAD ---
     let activeCreditIdForMoroso = null;
     let targetMorosoState = null;
     const morosoModalOverlay = document.getElementById('morosoModalOverlay');
@@ -728,10 +575,10 @@
       document.getElementById('morosoMotivoInput').value = '';
       if (nuevoEstado === 'moroso') {
         document.getElementById('morosoModalTitle').textContent = "Marcar Crédito como Moroso";
-        document.getElementById('morosoLabelDesc').textContent = "Motivo del atraso o morosidad (párrafo explicativo)";
+        document.getElementById('morosoLabelDesc').textContent = "Motivo del atraso o morosidad";
       } else {
         document.getElementById('morosoModalTitle').textContent = "Quitar de Morosidad";
-        document.getElementById('morosoLabelDesc').textContent = "Detalle del pago o acuerdo para reactivar";
+        document.getElementById('morosoLabelDesc').textContent = "Detalle del acuerdo para reactivar";
       }
       morosoModalOverlay.classList.add('is-open');
     };
@@ -744,14 +591,12 @@
       if (!c) return;
 
       const auditoria = c.auditoria || [];
-      const accionTxt = targetMorosoState === 'moroso' ? 'Marcado como MOROSO' : 'Reactivado';
-      auditoria.unshift({ fecha: new Date().toISOString(), descripcion: `${accionTxt}. Motivo: ${motivo}` });
+      auditoria.unshift({ fecha: new Date().toISOString(), descripcion: `${targetMorosoState === 'moroso' ? 'Marcado como MOROSO' : 'Reactivado'}. Motivo: ${motivo}` });
 
       try {
-        const ref = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos", activeCreditIdForMoroso);
-        await updateDoc(ref, { estado: targetMorosoState, auditoria });
+        await updateDoc(doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos", activeCreditIdForMoroso), { estado: targetMorosoState, auditoria });
         morosoModalOverlay.classList.remove('is-open');
-        window.mostrarAlerta("Actualizado", "Estado e historial actualizados.");
+        window.mostrarAlerta("Actualizado", "Estado actualizado correctamente.");
       } catch(err) { console.error(err); }
     };
 
