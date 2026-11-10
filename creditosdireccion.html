@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>COUT.APP | Dirección y Ficha de Crédito</title>
+  <title>COUT.APP | Dirección y Fichas de Crédito</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -75,7 +75,7 @@
     .info-box .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); }
     .info-box .val { font-size: 13px; font-weight: 700; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; }
 
-    /* Sección de Cuotas Detalladas con Botón Registrar Pago */
+    /* Sección de Cuotas Detalladas */
     .cuotas-section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px; }
     .cuotas-direccion-list { display: flex; flex-direction: column; gap: 10px; }
     .cuota-direccion-row {
@@ -115,6 +115,7 @@
     .form-field label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); }
     .form-field input, .form-field textarea { width: 100%; padding: 10px; background: #090e18; border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); font-size: 13px; outline: none; }
     .btn-confirm-pay { width: 100%; height: 42px; background: var(--accent-flame); border: none; border-radius: 8px; color: white; font-weight: 700; font-size: 13px; cursor: pointer; margin-top: 6px; }
+    .btn-confirm-pay:disabled { opacity: 0.5; cursor: not-allowed; }
 
     /* Alerta Custom */
     .custom-alert-overlay { position: fixed; inset: 0; background: rgba(5, 7, 11, 0.88); backdrop-filter: blur(12px); z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
@@ -213,6 +214,7 @@
     let activeCreditoId = null;
     let activeCuotaIndex = null;
 
+    // Función global para abrir modal cargando cuotas reales
     window.abrirModalPago = (creditoId, cuotaIndex, restante) => {
       activeCreditoId = creditoId;
       activeCuotaIndex = cuotaIndex;
@@ -222,18 +224,46 @@
       modal.classList.add('is-open');
     };
 
+    // GUARDAR PAGO CORREGIDO Y CON CONTROL DE ERRORES
     document.getElementById('confirmPayBtn').onclick = async () => {
+      const confirmBtn = document.getElementById('confirmPayBtn');
       const montoAbonado = parseFloat(document.getElementById('montoInput').value) || 0;
-      const nota = document.getElementById('notaInput').value.trim() || 'Abono de cuota';
+      const nota = document.getElementById('notaInput').value.trim() || 'Abono registrado desde Dirección';
+      
       if (montoAbonado <= 0) {
-        window.mostrarAlerta("Monto inválido", "Ingrese un monto mayor a 0.");
+        window.mostrarAlerta("Monto inválido", "Por favor, ingresa un monto mayor a 0.");
         return;
       }
 
       const c = creditosCache.find(item => item.id === activeCreditoId);
-      if (!c) return;
+      if (!c) {
+        window.mostrarAlerta("Error", "No se encontró el registro del crédito.");
+        return;
+      }
 
-      let cuotasArr = JSON.parse(JSON.stringify(c.cuotasDetalle || []));
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = "Guardando en Firestore...";
+
+      // Estructurar array de cuotas si venía vacío
+      let cuotasArr = c.cuotasDetalle ? JSON.parse(JSON.stringify(c.cuotasDetalle)) : [];
+      if (cuotasArr.length === 0) {
+        const valorCuota = c.valorCuota || (c.totalConInteres / c.cantidadCuotas);
+        let fechaBase = new Date(c.fechaInicio || Date.now());
+        for (let i = 1; i <= c.cantidadCuotas; i++) {
+          if (c.frecuencia === 'semanal') fechaBase.setDate(fechaBase.getDate() + 7);
+          else if (c.frecuencia === 'quincenal') fechaBase.setDate(fechaBase.getDate() + 15);
+          else if (c.frecuencia === 'mensual') fechaBase.setMonth(fechaBase.getMonth() + 1);
+
+          cuotasArr.push({
+            numero: i,
+            vencimiento: fechaBase.toISOString().split('T')[0],
+            monto: valorCuota,
+            pagado: 0,
+            estado: 'pendiente'
+          });
+        }
+      }
+
       let cuota = cuotasArr[activeCuotaIndex];
       let pagadoActual = (cuota.pagado || 0) + montoAbonado;
 
@@ -248,19 +278,24 @@
       const auditoria = c.auditoria || [];
       auditoria.unshift({
         fecha: new Date().toISOString(),
-        descripcion: `[Dirección de Pagos] Abono de $${montoAbonado.toLocaleString('es-AR')} en Cuota #${cuota.numero}. Detalle: ${nota}`
+        descripcion: `[Dirección] Abono de $${montoAbonado.toLocaleString('es-AR')} en Cuota #${cuota.numero}. Detalle: ${nota}`
       });
 
       try {
-        await updateDoc(doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos", activeCreditoId), {
+        const docRef = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos", activeCreditoId);
+        await updateDoc(docRef, {
           cuotasDetalle: cuotasArr,
-          auditoria
+          auditoria: auditoria
         });
+        
         modal.classList.remove('is-open');
-        window.mostrarAlerta("Éxito", "Pago registrado y descontado del crédito correctamente.");
+        window.mostrarAlerta("¡Éxito!", `Pago de $${montoAbonado.toLocaleString('es-AR')} guardado y descontado correctamente.`);
       } catch(err) {
-        console.error(err);
-        window.mostrarAlerta("Error", "No se pudo registrar el pago.");
+        console.error("Error al guardar en Firestore:", err);
+        window.mostrarAlerta("Error al guardar", "No se pudo actualizar el pago en la base de datos.");
+      } finally {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = "Confirmar y Descontar del Crédito";
       }
     };
 
