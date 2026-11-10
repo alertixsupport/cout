@@ -652,7 +652,7 @@
       viewModalOverlay.classList.add('is-open');
     };
 
-    // --- MODAL DE PAGOS (FUNCIONALIDAD PRINCIPAL) ---
+    // --- MODAL DE PAGOS (ABONAR) ---
     let activeCreditIdForPay = null;
     let activeCuotaIndexForPay = null;
     const paymentModalOverlay = document.getElementById('paymentModalOverlay');
@@ -664,7 +664,10 @@
       const c = creditosCacheGlobal.find(item => item.id === creditoId);
       if (!c) return;
 
-      const cuota = c.cuotasDetalle[cuotaIndex];
+      const cuotasList = c.cuotasDetalle || [];
+      const cuota = cuotasList[cuotaIndex];
+      if (!cuota) return;
+
       const restante = cuota.monto - (cuota.pagado || 0);
 
       document.getElementById('payCuotaInfoLabel').textContent = `Cuota #${cuota.numero} (Restante: $${restante.toLocaleString('es-AR')})`;
@@ -676,7 +679,10 @@
     document.getElementById('confirmPaymentBtn').onclick = async () => {
       const montoAbonado = parseFloat(document.getElementById('montoPagoInput').value) || 0;
       const nota = document.getElementById('notaPagoInput').value.trim() || 'Abono de cuota';
-      if (montoAbonado <= 0) return;
+      if (montoAbonado <= 0) {
+        window.mostrarAlerta("Monto inválido", "Por favor ingresa un monto mayor a 0.");
+        return;
+      }
 
       const c = creditosCacheGlobal.find(item => item.id === activeCreditIdForPay);
       if (!c) return;
