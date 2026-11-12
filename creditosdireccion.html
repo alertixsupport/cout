@@ -60,7 +60,7 @@
     }
     .search-input-wrapper input:focus { border-color: var(--accent-flame); box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15); }
 
-    /* Grid de Cards Compactas */
+    /* Grid de Cards */
     .credits-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
     @media (min-width: 640px) { .credits-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (min-width: 1024px) { .credits-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -87,7 +87,7 @@
     .data-item .val { font-size: 12px; font-weight: 600; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; }
 
     .credit-card-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-subtle); padding-top: 12px; }
-    .id-tag-badge { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--accent-flame); font-weight: 700; background: rgba(249, 115, 22, 0.1); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(249, 115, 22, 0.3); }
+    .id-tag-badge { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--accent-flame); font-weight: 700; background: rgba(249, 115, 22, 0.1); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(249, 115, 22, 0.3); display: inline-flex; align-items: center; gap: 4px; }
     
     .btn-action-view {
       height: 34px; background: rgba(249, 115, 22, 0.12); border: 1px solid rgba(249, 115, 22, 0.3);
@@ -116,6 +116,19 @@
     .modal-body-scroll { overflow-y: auto; flex: 1; padding-right: 4px; display: flex; flex-direction: column; gap: 14px; }
 
     /* Ficha Técnica dentro del Modal */
+    .ficha-top-bar { display: flex; justify-content: space-between; align-items: center; background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 12px 16px; }
+    .ficha-id-display { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--accent-flame); }
+    .btn-copy-pro { background: none; border: none; cursor: pointer; color: var(--text-secondary); display: inline-flex; align-items: center; transition: color 0.2s; }
+    .btn-copy-pro:hover { color: var(--text-primary); }
+    .btn-copy-pro svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    .btn-toggle-moroso {
+      background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--status-warning);
+      font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;
+    }
+    .btn-toggle-moroso.es-moroso { background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.3); color: var(--status-success); }
+    .btn-toggle-moroso svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; }
+
     .profile-details-table { width: 100%; background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
     .profile-row { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 6px; font-size: 13px; }
     .profile-row:last-child { border-bottom: none; padding-bottom: 0; }
@@ -139,9 +152,11 @@
     .btn-pagar-cuota { background: var(--accent-flame); border: none; color: white; font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: opacity 0.2s; }
     .btn-pagar-cuota:hover { opacity: 0.85; }
 
-    /* Timeline de Auditoría */
+    /* Auditoría (Colores dinámicos) */
     .timeline-box { background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
-    .timeline-item { border-left: 2px solid var(--accent-flame); padding-left: 10px; margin-bottom: 6px; font-size: 12px; }
+    .timeline-item { border-left: 2px solid var(--text-tertiary); padding-left: 10px; margin-bottom: 6px; font-size: 12px; }
+    .timeline-item.pago { border-left-color: var(--status-success); }
+    .timeline-item.moroso { border-left-color: var(--status-danger); }
     .timeline-item .t-date { font-size: 10px; color: var(--text-tertiary); font-family: 'JetBrains Mono', monospace; }
     .timeline-item .t-desc { color: var(--text-primary); font-weight: 600; margin-top: 2px; }
 
@@ -257,7 +272,6 @@
     };
     document.getElementById('alertOkBtn').onclick = () => document.getElementById('customAlertOverlay').classList.remove('is-open');
 
-    // Sincronizar clientes directamente desde Firestore
     async function sincronizarClientesFirestore() {
       try {
         const clientesRef = collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "clientes");
@@ -287,7 +301,32 @@
       });
     };
 
-    // Renderizar Cards Compactas
+    // Cambiar estado entre activo y moroso profesionalmente con icono
+    window.toggleEstadoMoroso = async (creditoId) => {
+      const c = creditosCacheGlobal.find(item => item.id === creditoId);
+      if (!c) return;
+
+      const nuevoEstado = (c.estado === 'moroso') ? 'activo' : 'moroso';
+      const descAuditoria = nuevoEstado === 'moroso' 
+        ? '[AUDITORÍA] Crédito marcado como MOROSO.' 
+        : '[AUDITORÍA] Crédito reactivado a ACTIVO.';
+
+      const auditoria = c.auditoria || [];
+      auditoria.unshift({
+        fecha: new Date().toISOString(),
+        descripcion: descAuditoria
+      });
+
+      try {
+        const ref = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos", creditoId);
+        await updateDoc(ref, { estado: nuevoEstado, auditoria });
+        window.mostrarAlerta("Actualizado", `El estado del crédito ahora es: ${nuevoEstado.toUpperCase()}`);
+      } catch(err) {
+        console.error(err);
+        window.mostrarAlerta("Error", "No se pudo actualizar el estado.");
+      }
+    };
+
     function renderizarCreditosGrid(arr) {
       const grid = document.getElementById('creditsGrid');
       grid.innerHTML = '';
@@ -325,7 +364,12 @@
             </div>
 
             <div class="credit-card-footer">
-              <span class="id-tag-badge" title="ID Único" onclick="window.copiarIdCredito('${creditIdTag}')" style="cursor:pointer;" >${creditIdTag} 📋</span>
+              <span class="id-tag-badge">
+                ${creditIdTag}
+                <button class="btn-copy-pro" onclick="window.copiarIdCredito('${creditIdTag}')" title="Copiar ID">
+                  <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                </button>
+              </span>
               <button class="btn-action-view" onclick="window.verFichaCredito('${c.id}')">
                 <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                 Ver Ficha
@@ -336,7 +380,6 @@
       });
     }
 
-    // Abrir Modal con Ficha Completa del Crédito
     window.verFichaCredito = (id) => {
       currentOpenCreditoId = id;
       const c = creditosCacheGlobal.find(item => item.id === id);
@@ -345,6 +388,7 @@
       const clienteInfo = clientesCache[c.clienteId] || {};
       const dniCliente = clienteInfo.dni || c.clienteDni || 'N/D';
       const creditIdTag = c.codigoUnico || `#CRED-${c.id.substring(0, 6).toUpperCase()}`;
+      const esMoroso = c.estado === 'moroso';
 
       let cuotasArr = c.cuotasDetalle || [];
       if (cuotasArr.length === 0) {
@@ -382,8 +426,17 @@
 
       let timelineHtml = '';
       (c.auditoria || [{ fecha: c.creadoEn || new Date().toISOString(), descripcion: 'Crédito emitido y registrado en el sistema.' }]).forEach(log => {
+        const descLower = (log.descripcion || '').toLowerCase();
+        // Determinar si es auditoría de pago (verde) o moroso (rojo)
+        let tipoAuditoriaCls = '';
+        if (descLower.includes('abono') || descLower.includes('pago')) {
+          tipoAuditoriaCls = 'pago';
+        } else if (descLower.includes('moroso') || descLower.includes('atraso')) {
+          tipoAuditoriaCls = 'moroso';
+        }
+
         timelineHtml += `
-          <div class="timeline-item">
+          <div class="timeline-item ${tipoAuditoriaCls}">
             <div class="t-date">${new Date(log.fecha).toLocaleString('es-AR')}</div>
             <div class="t-desc">${log.descripcion}</div>
           </div>
@@ -391,8 +444,21 @@
       });
 
       document.getElementById('profileCardContent').innerHTML = `
+        <div class="ficha-top-bar">
+          <div class="ficha-id-display">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
+            ${creditIdTag}
+            <button class="btn-copy-pro" onclick="window.copiarIdCredito('${creditIdTag}')" title="Copiar ID">
+              <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            </button>
+          </div>
+          <button class="btn-toggle-moroso ${esMoroso ? 'es-moroso' : ''}" onclick="window.toggleEstadoMoroso('${id}')">
+            <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            ${esMoroso ? 'Marcar Activo' : 'Marcar Moroso'}
+          </button>
+        </div>
+
         <div class="profile-details-table">
-          <div class="profile-row"><span class="lbl">ID Crédito:</span><span class="val">${creditIdTag}</span></div>
           <div class="profile-row"><span class="lbl">Cliente:</span><span class="val">${c.clienteNombre}</span></div>
           <div class="profile-row"><span class="lbl">DNI:</span><span class="val">${dniCliente}</span></div>
           <div class="profile-row"><span class="lbl">Monto Total:</span><span class="val">$${(c.totalConInteres || 0).toLocaleString('es-AR')}</span></div>
@@ -403,14 +469,13 @@
         <div style="width: 100%; text-align: left;"><span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">Cronograma de Cuotas</span></div>
         <div class="cuotas-table-container">${cuotasHtml}</div>
 
-        <div style="width: 100%; text-align: left; margin-top: 4px;"><span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">Línea de Tiempo y Auditoría</span></div>
+        <div style="width: 100%; text-align: left; margin-top: 4px;"><span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">AUDITORÍA</span></div>
         <div class="timeline-box">${timelineHtml}</div>
       `;
 
       viewModalOverlay.classList.add('is-open');
     };
 
-    // --- MODAL DE PAGOS ---
     let activeCreditIdForPay = null;
     let activeCuotaIndexForPay = null;
 
@@ -461,7 +526,7 @@
       const auditoria = c.auditoria || [];
       auditoria.unshift({
         fecha: new Date().toISOString(),
-        descripcion: `[Dirección de Pagos] Abono de $${montoAbonado.toLocaleString('es-AR')} en Cuota #${cuota.numero}. Detalle: ${nota}`
+        descripcion: `[PAGO] Abono de $${montoAbonado.toLocaleString('es-AR')} en Cuota #${cuota.numero}. Detalle: ${nota}`
       });
 
       try {
@@ -488,7 +553,6 @@
       }));
     };
 
-    // Sincronización en tiempo real
     sincronizarClientesFirestore().then(() => {
       onSnapshot(collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos"), snap => {
         creditosCacheGlobal = [];
