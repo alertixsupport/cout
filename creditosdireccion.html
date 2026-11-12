@@ -202,7 +202,7 @@
     /* Alerta Custom */
     .custom-alert-overlay { position: fixed; inset: 0; background: rgba(5, 7, 11, 0.88); backdrop-filter: blur(12px); z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
     .custom-alert-overlay.is-open { opacity: 1; pointer-events: auto; }
-    .custom-alert-box { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px; width: 100%; max-width: 380px; padding: 22px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.8); }
+    .custom-alert-box { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px; width: 100%; max-width: 380px; padding: 22px; text-align: center; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8); }
     .custom-alert-box h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
     .custom-alert-box p { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
     .custom-alert-actions { display: flex; gap: 10px; margin-top: 16px; }
@@ -239,7 +239,7 @@
           <h1>Dirección de <span>Créditos</span></h1>
           <p>Gestión de cartera, abonos y auditoría en tiempo real.</p>
         </div>
-        <!-- Contadores Estadísticos (Activos, Morosos, Finalizados) -->
+        <!-- Contadores Estadísticos -->
         <div class="stats-container">
           <div class="stat-pill active">
             <div class="dot"></div>
@@ -413,10 +413,16 @@
       });
     };
 
+    // --- MENSAJE PROFESIONAL DE MARKETING Y COMPARTIR ENLACE ---
     window.compartirEnlaceVerCredito = (id) => {
+      const c = creditosCacheGlobal.find(item => item.id === id);
+      const nombreCliente = c ? (c.clienteNombre || 'Estimado Cliente') : 'Estimado Cliente';
       const link = `${window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1)}vercredito.html?id=${id}&p=${prestamistaId}`;
-      navigator.clipboard.writeText(link).then(() => {
-        window.mostrarAlerta("Enlace Copiado", "El enlace de visualización del crédito (vercredito.html) fue copiado al portapapeles.");
+      
+      const mensajeProfesional = `Hola *${nombreCliente}* 👋\n\n¡Mirá tu crédito en tiempo real! 📊✨\n${link}\n\nAquí podés chequear todo en detalle absoluto: desde tus pagos registrados al instante hasta tus próximas fechas y el estado actual de tu crédito. 💼📈\n\nRecordá que cuanto mayor sea tu cumplimiento en nuestro sistema, mayores serán las posibilidades de seguir trabajando juntos y acceder a nuevos y mayores montos. 🚀💰\n\n¡Muchas gracias por confiar en nosotros! 🙌`;
+
+      navigator.clipboard.writeText(mensajeProfesional).then(() => {
+        window.mostrarAlerta("¡Mensaje Copiado!", "El mensaje profesional con el enlace para ver el crédito fue copiado al portapapeles listo para enviar por WhatsApp o redes.");
       });
     };
 
@@ -472,7 +478,6 @@
       return cuotasArr;
     }
 
-    // Verificar si todas las cuotas están pagadas al 100% y actualizar estado a "finalizado" si corresponde
     async function verificarEstadoFinalizado(c, creditoId) {
       const cuotas = c.cuotasDetalle || [];
       if (cuotas.length === 0) return c.estado || 'activo';
@@ -545,7 +550,6 @@
         descripcion: `[PAGO] Abono de $${montoAbonado.toLocaleString('es-AR')} en Cuota #${cuota.numero}. Detalle: ${nota}`
       });
 
-      // Chequear si con este pago se completa el 100% del crédito
       const todasPagadas = cuotasArr.every(q => (q.pagado || 0) >= q.monto || q.estado === 'pagada');
       let nuevoEstado = todasPagadas ? 'finalizado' : (c.estado === 'finalizado' ? 'activo' : (c.estado || 'activo'));
 
@@ -640,7 +644,6 @@
         return;
       }
 
-      // ORDENAR: Primero Activos y Morosos, y al FINAL de todo los Finalizados
       const arrOrdenado = [...arr].sort((a, b) => {
         const estA = a.estado || 'activo';
         const estB = b.estado || 'activo';
@@ -686,7 +689,7 @@
                   <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                 </button>
               </span>
-              <button class="btn-action-icon" title="Copiar Enlace del Crédito (vercredito.html)" data-action="share-link">
+              <button class="btn-action-icon" title="Copiar Mensaje Profesional con Enlace (vercredito.html)" data-action="share-link">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
               </button>
             </div>
@@ -714,7 +717,6 @@
       const dniCliente = clienteInfo.dni || c.clienteDni || 'N/D';
       const creditIdTag = c.codigoUnico || `#CRED-${c.id.substring(0, 6).toUpperCase()}`;
       
-      // Sincronizar y verificar si está finalizado
       const cuotasArr = await asegurarYObtenerCuotas(c, id);
       const estadoReal = await verificarEstadoFinalizado(c, id);
       const esMoroso = estadoReal === 'moroso';
@@ -776,7 +778,7 @@
             <button class="btn-copy-pro" id="modalCopyIdBtn" title="Copiar ID">
               <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
             </button>
-            <button class="btn-copy-pro" id="modalShareLinkBtn" title="Copiar Enlace (vercredito.html)" style="color:#60a5fa; margin-left:4px;">
+            <button class="btn-copy-pro" id="modalShareLinkBtn" title="Copiar Mensaje Profesional con Enlace (vercredito.html)" style="color:#60a5fa; margin-left:4px;">
               <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
             </button>
           </div>
