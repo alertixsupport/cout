@@ -128,6 +128,20 @@
     .btn-close-modal { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-subtle); color: var(--text-secondary); cursor: pointer; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
     .modal-body-scroll { overflow-y: auto; flex: 1; padding-right: 4px; display: flex; flex-direction: column; gap: 10px; }
 
+    /* Total del día a cobrar */
+    .daily-total-summary {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .daily-total-summary span:first-child { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+    .daily-total-summary .total-amount { font-size: 18px; font-weight: 800; color: var(--status-success); font-family: 'JetBrains Mono', monospace; }
+
     .day-detail-card { background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
     .day-detail-card .card-top-row { display: flex; align-items: center; justify-content: space-between; }
     .day-detail-card .client-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
@@ -368,6 +382,19 @@
         return;
       }
 
+      // Calcular el total a cobrar en el día
+      const totalDelDia = eventos.reduce((sum, ev) => sum + (parseFloat(ev.monto) || 0), 0);
+      
+      // Inyectar la tarjeta de total general arriba del todo
+      const summaryCard = document.createElement('div');
+      summaryCard.className = 'daily-total-summary';
+      summaryCard.innerHTML = `
+        <span>A cobrar:</span>
+        <span class="total-amount">$${totalDelDia.toLocaleString('es-AR', {minimumFractionDigits: 2})}</span>
+      `;
+      content.appendChild(summaryCard);
+
+      // Inyectar el resto de las tarjetas por cliente
       eventos.forEach((ev, idx) => {
         const pagadoVal = parseFloat(ev.pagado) || 0;
         const restante = ev.monto - pagadoVal;
