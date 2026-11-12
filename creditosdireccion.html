@@ -67,8 +67,14 @@
     }
     .ficha-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 16px; }
     .ficha-client-title h2 { font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
-    .ficha-meta-tags { display: flex; gap: 8px; flex-wrap: wrap; }
-    .meta-tag { font-size: 11px; font-family: 'JetBrains Mono', monospace; background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); padding: 3px 8px; border-radius: 6px; color: var(--text-secondary); }
+    .ficha-meta-tags { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .meta-tag { font-size: 11px; font-family: 'JetBrains Mono', monospace; background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); padding: 3px 8px; border-radius: 6px; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 6px; }
+    
+    .btn-copy-id {
+      background: none; border: none; cursor: pointer; color: var(--accent-flame); padding: 0; display: inline-flex; align-items: center; justify-content: center; transition: transform 0.1s;
+    }
+    .btn-copy-id:hover { transform: scale(1.1); }
+    .btn-copy-id svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; }
 
     .ficha-grid-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; background: #090e18; border: 1px solid var(--border-subtle); border-radius: 14px; padding: 14px; }
     .info-box { display: flex; flex-direction: column; gap: 3px; }
@@ -149,13 +155,13 @@
       <div class="dashboard-hero">
         <div class="hero-text">
           <h1>Dirección y Fichas de <span>Crédito</span></h1>
-          <p>Visualice la ficha exacta de cada crédito y registre abonos por cuota con descuento automático en tiempo real.</p>
+          <p>Visualice la ficha exacta de cada crédito, copie su ID único y registre abonos con auditoría y descuento automático desde la base de datos.</p>
         </div>
       </div>
 
       <div class="search-container">
         <div class="search-input-wrapper">
-          <input type="text" id="searchInput" placeholder="Buscar crédito por nombre de cliente o DNI...">
+          <input type="text" id="searchInput" placeholder="Buscar crédito por nombre de cliente, DNI o ID...">
           <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         </div>
       </div>
@@ -177,7 +183,7 @@
           <input type="number" id="montoInput" step="any" placeholder="Ej. 5000">
         </div>
         <div class="form-field">
-          <label>Nota / Detalle del Pago</label>
+          <label>Nota / Detalle del Pago (Auditoría)</label>
           <textarea id="notaInput" rows="2" placeholder="Ej. Cobro en efectivo, transferencia..."></textarea>
         </div>
         <button class="btn-confirm-pay" id="confirmPayBtn">Confirmar y Descontar del Crédito</button>
@@ -187,7 +193,7 @@
 
   <script type="module">
     import { db } from './app.js';
-    import { collection, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { collection, doc, updateDoc, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const prestamistaId = localStorage.getItem('cout_prestamista_id');
     if (!prestamistaId) window.location.replace('loginprestamista.html');
@@ -202,10 +208,25 @@
     };
     document.getElementById('alertOkBtn').onclick = () => document.getElementById('customAlertOverlay').classList.remove('is-open');
 
-    // Cargar caché de clientes
-    const cacheCli = localStorage.getItem(`cout_clientes_cache_${prestamistaId}`);
-    if (cacheCli) {
-      try { JSON.parse(cacheCli).forEach(c => clientesCache[c.id] = c); } catch(e) {}
+    // Carga robusta de clientes directamente desde la base de datos (Firestore) en tiempo real
+    async function sincronizarClientesFirestore() {
+      try {
+        const clientesRef = collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "clientes");
+        const snap = await getDocs(clientesRef);
+        clientesCache = {};
+        snap.forEach(d => {
+          clientesCache[d.id] = { id: d.id, ...d.data() };
+        });
+        // Actualizamos también el caché local para respaldar
+        localStorage.setItem(`cout_clientes_cache_${prestamistaId}`, JSON.stringify(Object.values(clientesCache)));
+      } catch(err) {
+        console.error("Error al obtener los clientes de la base de datos:", err);
+        // Respaldo secundario con localStorage si falla la red momentáneamente
+        const cacheCli = localStorage.getItem(`cout_clientes_cache_${prestamistaId}`);
+        if (cacheCli) {
+          try { JSON.parse(cacheCli).forEach(c => clientesCache[c.id] = c); } catch(e) {}
+        }
+      }
     }
 
     const modal = document.getElementById('paymentModal');
@@ -214,7 +235,6 @@
     let activeCreditoId = null;
     let activeCuotaIndex = null;
 
-    // Función global para abrir modal cargando cuotas reales
     window.abrirModalPago = (creditoId, cuotaIndex, restante) => {
       activeCreditoId = creditoId;
       activeCuotaIndex = cuotaIndex;
@@ -224,7 +244,13 @@
       modal.classList.add('is-open');
     };
 
-    // GUARDAR PAGO CORREGIDO Y CON CONTROL DE ERRORES
+    window.copiarIdCredito = (idUnico) => {
+      navigator.clipboard.writeText(idUnico).then(() => {
+        window.mostrarAlerta("Copiado", `ID del crédito (${idUnico}) copiado al portapapeles.`);
+      });
+    };
+
+    // GUARDAR PAGO CON AUDITORÍA ABSOLUTA EN FIRESTORE
     document.getElementById('confirmPayBtn').onclick = async () => {
       const confirmBtn = document.getElementById('confirmPayBtn');
       const montoAbonado = parseFloat(document.getElementById('montoInput').value) || 0;
@@ -244,7 +270,6 @@
       confirmBtn.disabled = true;
       confirmBtn.textContent = "Guardando en Firestore...";
 
-      // Estructurar array de cuotas si venía vacío
       let cuotasArr = c.cuotasDetalle ? JSON.parse(JSON.stringify(c.cuotasDetalle)) : [];
       if (cuotasArr.length === 0) {
         const valorCuota = c.valorCuota || (c.totalConInteres / c.cantidadCuotas);
@@ -275,10 +300,12 @@
         cuota.estado = 'parcial';
       }
 
+      // Auditoría exacta guardada en base de datos
+      const fechaHoraActual = new Date().toISOString();
       const auditoria = c.auditoria || [];
       auditoria.unshift({
-        fecha: new Date().toISOString(),
-        descripcion: `[Dirección] Abono de $${montoAbonado.toLocaleString('es-AR')} en Cuota #${cuota.numero}. Detalle: ${nota}`
+        fecha: fechaHoraActual,
+        descripcion: `[Dirección de Pagos] Abono de $${montoAbonado.toLocaleString('es-AR')} aplicado a la Cuota #${cuota.numero}. Detalle: ${nota}`
       });
 
       try {
@@ -289,7 +316,7 @@
         });
         
         modal.classList.remove('is-open');
-        window.mostrarAlerta("¡Éxito!", `Pago de $${montoAbonado.toLocaleString('es-AR')} guardado y descontado correctamente.`);
+        window.mostrarAlerta("¡Éxito!", `Pago de $${montoAbonado.toLocaleString('es-AR')} registrado y descontado correctamente.`);
       } catch(err) {
         console.error("Error al guardar en Firestore:", err);
         window.mostrarAlerta("Error al guardar", "No se pudo actualizar el pago en la base de datos.");
@@ -312,6 +339,9 @@
         const clienteInfo = clientesCache[c.clienteId] || {};
         const dniCliente = clienteInfo.dni || c.clienteDni || 'N/D';
         const estadoCredito = c.estado || 'activo';
+        
+        // ID único del crédito (ej. #CRED-1900 o basado en su identificador)
+        const creditIdTag = c.codigoUnico || `#CRED-${c.id.substring(0, 6).toUpperCase()}`;
 
         let cuotasArr = c.cuotasDetalle || [];
         if (cuotasArr.length === 0) {
@@ -359,6 +389,12 @@
               <div class="ficha-client-title">
                 <h2>${c.clienteNombre || 'Cliente'}</h2>
                 <div class="ficha-meta-tags">
+                  <span class="meta-tag">
+                    ID: <strong>${creditIdTag}</strong>
+                    <button class="btn-copy-id" onclick="window.copiarIdCredito('${creditIdTag}')" title="Copiar ID de Crédito">
+                      <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    </button>
+                  </span>
                   <span class="meta-tag">DNI: ${dniCliente}</span>
                   <span class="meta-tag">Tipo: ${c.tipoCredito || 'Efectivo'}</span>
                   <span class="meta-tag" style="text-transform: uppercase; color: var(--accent-flame);">Estado: ${estadoCredito}</span>
@@ -386,13 +422,20 @@
     document.getElementById('searchInput').oninput = (e) => {
       const q = e.target.value.toLowerCase().trim();
       if (!q) { renderFichas(creditosCache); return; }
-      renderFichas(creditosCache.filter(c => (c.clienteNombre || '').toLowerCase().includes(q) || ((clientesCache[c.clienteId] || {}).dni || '').toLowerCase().includes(q)));
+      renderFichas(creditosCache.filter(c => {
+        const dni = (clientesCache[c.clienteId] || {}).dni || c.clienteDni || '';
+        const idTag = `#CRED-${c.id.substring(0, 6)}`.toLowerCase();
+        return (c.clienteNombre || '').toLowerCase().includes(q) || dni.toLowerCase().includes(q) || idTag.includes(q);
+      }));
     };
 
-    onSnapshot(collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos"), snap => {
-      creditosCache = [];
-      snap.forEach(d => creditosCache.push({ id: d.id, ...d.data() }));
-      renderFichas(creditosCache);
+    // Inicializar sincronización con la base de datos de Firestore y escuchar cambios de créditos
+    sincronizarClientesFirestore().then(() => {
+      onSnapshot(collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos"), snap => {
+        creditosCache = [];
+        snap.forEach(d => creditosCache.push({ id: d.id, ...d.data() }));
+        renderFichas(creditosCache);
+      });
     });
   </script>
 </body>
