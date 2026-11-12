@@ -27,7 +27,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
     html, body { width: 100%; min-height: 100vh; background-color: var(--bg-base); color: var(--text-primary); overflow-x: hidden; scrollbar-width: none; }
     html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
-    .container { max-width: 1000px; margin: 0 auto; padding: 20px; width: 100%; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 20px; width: 100%; }
 
     header {
       background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 16px;
@@ -52,6 +52,7 @@
 
     .search-container { margin-bottom: 24px; width: 100%; }
     .search-input-wrapper { position: relative; display: flex; align-items: center; width: 100%; }
+    @media (min-width: 768px) { .search-input-wrapper { max-width: 380px; } }
     .search-input-wrapper svg.search-icon { position: absolute; left: 14px; width: 15px; height: 15px; stroke: var(--text-tertiary); fill: none; stroke-width: 2; pointer-events: none; }
     .search-input-wrapper input {
       width: 100%; padding: 11px 14px 11px 38px; background: var(--bg-surface); border: 1px solid var(--border-subtle);
@@ -59,69 +60,94 @@
     }
     .search-input-wrapper input:focus { border-color: var(--accent-flame); box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15); }
 
-    /* Ficha Completa del Crédito */
-    .credit-ficha-card {
-      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px;
-      padding: 24px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 20px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    /* Grid de Cards Compactas */
+    .credits-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 640px) { .credits-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .credits-grid { grid-template-columns: repeat(3, 1fr); } }
+
+    .credit-card {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 16px;
+      padding: 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 14px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); transition: all 0.25s ease;
     }
-    .ficha-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 16px; }
-    .ficha-client-title h2 { font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
-    .ficha-meta-tags { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-    .meta-tag { font-size: 11px; font-family: 'JetBrains Mono', monospace; background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); padding: 3px 8px; border-radius: 6px; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 6px; }
+    .credit-card:hover { transform: translateY(-3px); border-color: rgba(249, 115, 22, 0.4); background: var(--bg-surface-hover); }
+
+    .credit-header { display: flex; align-items: center; justify-content: space-between; }
+    .client-name-title { font-size: 15px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; }
+    .dni-tag { font-size: 11px; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; background: rgba(255,255,255,0.04); padding: 2px 6px; border-radius: 6px; border: 1px solid var(--border-subtle); display: inline-block; margin-top: 2px; }
+
+    .status-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; }
+    .status-badge.activo { background: rgba(16, 185, 129, 0.12); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .status-badge.moroso { background: rgba(239, 68, 68, 0.12); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .status-badge.finalizado { background: rgba(100, 116, 139, 0.12); color: #94a3b8; border: 1px solid rgba(100, 116, 139, 0.3); }
+
+    .credit-compact-data { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #090e18; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 10px; }
+    .data-item { display: flex; flex-direction: column; gap: 2px; }
+    .data-item .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); }
+    .data-item .val { font-size: 12px; font-weight: 600; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; }
+
+    .credit-card-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-subtle); padding-top: 12px; }
+    .id-tag-badge { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--accent-flame); font-weight: 700; background: rgba(249, 115, 22, 0.1); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(249, 115, 22, 0.3); }
     
-    .btn-copy-id {
-      background: none; border: none; cursor: pointer; color: var(--accent-flame); padding: 0; display: inline-flex; align-items: center; justify-content: center; transition: transform 0.1s;
+    .btn-action-view {
+      height: 34px; background: rgba(249, 115, 22, 0.12); border: 1px solid rgba(249, 115, 22, 0.3);
+      border-radius: 8px; color: var(--accent-flame); font-size: 12px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 14px; transition: all 0.2s;
     }
-    .btn-copy-id:hover { transform: scale(1.1); }
-    .btn-copy-id svg { width: 13px; height: 13px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .btn-action-view:hover { background: rgba(249, 115, 22, 0.25); }
+    .btn-action-view svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; }
 
-    .ficha-grid-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; background: #090e18; border: 1px solid var(--border-subtle); border-radius: 14px; padding: 14px; }
-    .info-box { display: flex; flex-direction: column; gap: 3px; }
-    .info-box .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); }
-    .info-box .val { font-size: 13px; font-weight: 700; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; }
-
-    /* Sección de Cuotas Detalladas */
-    .cuotas-section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px; }
-    .cuotas-direccion-list { display: flex; flex-direction: column; gap: 10px; }
-    .cuota-direccion-row {
-      background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px;
-      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
-    }
-    .cuota-detalles { display: flex; flex-direction: column; gap: 3px; }
-    .cuota-detalles .num { font-size: 14px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); }
-    .cuota-detalles .sub { font-size: 12px; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; }
-
-    .cuota-actions-right { display: flex; align-items: center; gap: 12px; }
-    .estado-tag { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; }
-    .estado-tag.pagada { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.3); }
-    .estado-tag.parcial { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59,130,246,0.3); }
-    .estado-tag.pendiente { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.3); }
-
-    .btn-registrar-pago {
-      background: var(--accent-flame); border: none; color: white; font-size: 12px; font-weight: 700;
-      padding: 8px 14px; border-radius: 8px; cursor: pointer; transition: opacity 0.2s;
-    }
-    .btn-registrar-pago:hover { opacity: 0.85; }
-
-    /* Modal Registrar Pago */
+    /* Modales */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(5, 7, 11, 0.85); backdrop-filter: blur(12px);
       z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px;
-      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .modal-overlay.is-open { opacity: 1; pointer-events: auto; }
-    .modal-container { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px; width: 100%; max-width: 420px; padding: 24px; box-shadow: 0 25px 60px rgba(0,0,0,0.8); }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .modal-header h3 { font-size: 16px; font-weight: 700; }
-    .btn-close-modal { background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle); color: var(--text-secondary); cursor: pointer; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .modal-container {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px;
+      width: 100%; max-width: 600px; padding: 24px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+      max-height: 90vh; display: flex; flex-direction: column;
+    }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .modal-header h3 { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .btn-close-modal { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-subtle); color: var(--text-secondary); cursor: pointer; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .btn-close-modal svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2; }
+    .modal-body-scroll { overflow-y: auto; flex: 1; padding-right: 4px; display: flex; flex-direction: column; gap: 14px; }
 
-    .payment-form { display: flex; flex-direction: column; gap: 12px; }
-    .form-field { display: flex; flex-direction: column; gap: 5px; }
-    .form-field label { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); }
-    .form-field input, .form-field textarea { width: 100%; padding: 10px; background: #090e18; border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); font-size: 13px; outline: none; }
-    .btn-confirm-pay { width: 100%; height: 42px; background: var(--accent-flame); border: none; border-radius: 8px; color: white; font-weight: 700; font-size: 13px; cursor: pointer; margin-top: 6px; }
-    .btn-confirm-pay:disabled { opacity: 0.5; cursor: not-allowed; }
+    /* Ficha Técnica dentro del Modal */
+    .profile-details-table { width: 100%; background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .profile-row { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 6px; font-size: 13px; }
+    .profile-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .profile-row .lbl { color: var(--text-tertiary); font-weight: 600; }
+    .profile-row .val { color: var(--text-primary); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+    .cuotas-table-container { display: flex; flex-direction: column; gap: 8px; }
+    .cuota-row-item {
+      background: #090e18; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 10px 12px;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+    }
+    .cuota-info { display: flex; flex-direction: column; gap: 2px; }
+    .cuota-info .num { font-size: 13px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+    .cuota-info .fec { font-size: 11px; color: var(--text-tertiary); }
+    .cuota-actions { display: flex; align-items: center; gap: 8px; }
+    .cuota-status-tag { font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; }
+    .cuota-status-tag.pagada { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; }
+    .cuota-status-tag.parcial { background: rgba(59, 130, 246, 0.15); color: #93c5fd; }
+    .cuota-status-tag.pendiente { background: rgba(245, 158, 11, 0.15); color: #fcd34d; }
+
+    .btn-pagar-cuota { background: var(--accent-flame); border: none; color: white; font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: opacity 0.2s; }
+    .btn-pagar-cuota:hover { opacity: 0.85; }
+
+    /* Timeline de Auditoría */
+    .timeline-box { background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+    .timeline-item { border-left: 2px solid var(--accent-flame); padding-left: 10px; margin-bottom: 6px; font-size: 12px; }
+    .timeline-item .t-date { font-size: 10px; color: var(--text-tertiary); font-family: 'JetBrains Mono', monospace; }
+    .timeline-item .t-desc { color: var(--text-primary); font-weight: 600; margin-top: 2px; }
+
+    /* Formulario de Pago dentro de su Modal */
+    .payment-form-box { background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+    .payment-form-box input, .payment-form-box textarea { width: 100%; padding: 10px; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); font-size: 13px; outline: none; }
 
     /* Alerta Custom */
     .custom-alert-overlay { position: fixed; inset: 0; background: rgba(5, 7, 11, 0.88); backdrop-filter: blur(12px); z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
@@ -154,39 +180,61 @@
     <main>
       <div class="dashboard-hero">
         <div class="hero-text">
-          <h1>Dirección y Fichas de <span>Crédito</span></h1>
-          <p>Visualice la ficha exacta de cada crédito, copie su ID único y registre abonos con auditoría y descuento automático desde la base de datos.</p>
+          <h1>Dirección de <span>Créditos</span></h1>
+          <p>Visualice la cartera en tarjetas compactas y gestione los abonos y auditoría desde la ficha de cada crédito.</p>
         </div>
       </div>
 
       <div class="search-container">
         <div class="search-input-wrapper">
-          <input type="text" id="searchInput" placeholder="Buscar crédito por nombre de cliente, DNI o ID...">
+          <input type="text" id="searchInput" placeholder="Buscar por cliente, DNI o ID (#CRED)...">
           <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
         </div>
       </div>
 
-      <div id="fichasContainer"></div>
+      <!-- GRID DE CARDS -->
+      <div class="credits-grid" id="creditsGrid"></div>
     </main>
   </div>
 
-  <!-- MODAL: REGISTRAR PAGO A CUOTA -->
-  <div class="modal-overlay" id="paymentModal">
+  <!-- MODAL: FICHA TÉCNICA DEL CRÉDITO Y CUOTAS -->
+  <div class="modal-overlay" id="viewModalOverlay">
     <div class="modal-container">
       <div class="modal-header">
-        <h3 id="modalPaymentTitle">Registrar Pago de Cuota</h3>
-        <button class="btn-close-modal" id="closeModalBtn">✕</button>
+        <h3>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-flame)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          Ficha del Crédito y Cronograma
+        </h3>
+        <button class="btn-close-modal" id="closeViewModalBtn">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
       </div>
-      <div class="payment-form">
-        <div class="form-field">
-          <label>Monto en Pesos a Abonar ($)</label>
-          <input type="number" id="montoInput" step="any" placeholder="Ej. 5000">
+      <div class="modal-body-scroll" id="profileCardContent"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTRAR ABONO A CUOTA -->
+  <div class="modal-overlay" id="paymentModalOverlay">
+    <div class="modal-container" style="max-width: 420px; z-index: 2500;">
+      <div class="modal-header">
+        <h3 id="modalPaymentTitle">Registrar Abono a Cuota</h3>
+        <button class="btn-close-modal" id="closePayModalBtn">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body-scroll">
+        <div class="payment-form-box">
+          <span style="font-size: 13px; font-weight: 700;" id="payCuotaInfoLabel">Cuota #1</span>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <label style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">Monto en Pesos a Abonar ($)</label>
+            <input type="number" id="montoPagoInput" step="any" placeholder="Ej. 5000">
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <label style="font-size:11px; color:var(--text-secondary); text-transform:uppercase;">Nota / Detalle (Auditoría)</label>
+            <textarea id="notaPagoInput" rows="2" placeholder="Ej. Cobro en efectivo, saldo pendiente..."></textarea>
+          </div>
+          <button class="btn-alert-primary" id="confirmPaymentBtn" style="margin-top:6px;">Confirmar y Descontar</button>
         </div>
-        <div class="form-field">
-          <label>Nota / Detalle del Pago (Auditoría)</label>
-          <textarea id="notaInput" rows="2" placeholder="Ej. Cobro en efectivo, transferencia..."></textarea>
-        </div>
-        <button class="btn-confirm-pay" id="confirmPayBtn">Confirmar y Descontar del Crédito</button>
       </div>
     </div>
   </div>
@@ -198,8 +246,9 @@
     const prestamistaId = localStorage.getItem('cout_prestamista_id');
     if (!prestamistaId) window.location.replace('loginprestamista.html');
 
-    let creditosCache = [];
+    let creditosCacheGlobal = [];
     let clientesCache = {};
+    let currentOpenCreditoId = null;
 
     window.mostrarAlerta = (t, m) => {
       document.getElementById('alertTitle').textContent = t;
@@ -208,41 +257,29 @@
     };
     document.getElementById('alertOkBtn').onclick = () => document.getElementById('customAlertOverlay').classList.remove('is-open');
 
-    // Carga robusta de clientes directamente desde la base de datos (Firestore) en tiempo real
+    // Sincronizar clientes directamente desde Firestore
     async function sincronizarClientesFirestore() {
       try {
         const clientesRef = collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "clientes");
         const snap = await getDocs(clientesRef);
         clientesCache = {};
-        snap.forEach(d => {
-          clientesCache[d.id] = { id: d.id, ...d.data() };
-        });
-        // Actualizamos también el caché local para respaldar
+        snap.forEach(d => { clientesCache[d.id] = { id: d.id, ...d.data() }; });
         localStorage.setItem(`cout_clientes_cache_${prestamistaId}`, JSON.stringify(Object.values(clientesCache)));
       } catch(err) {
-        console.error("Error al obtener los clientes de la base de datos:", err);
-        // Respaldo secundario con localStorage si falla la red momentáneamente
+        console.error("Error al obtener clientes:", err);
         const cacheCli = localStorage.getItem(`cout_clientes_cache_${prestamistaId}`);
-        if (cacheCli) {
-          try { JSON.parse(cacheCli).forEach(c => clientesCache[c.id] = c); } catch(e) {}
-        }
+        if (cacheCli) { try { JSON.parse(cacheCli).forEach(c => clientesCache[c.id] = c); } catch(e) {} }
       }
     }
 
-    const modal = document.getElementById('paymentModal');
-    document.getElementById('closeModalBtn').onclick = () => modal.classList.remove('is-open');
-
-    let activeCreditoId = null;
-    let activeCuotaIndex = null;
-
-    window.abrirModalPago = (creditoId, cuotaIndex, restante) => {
-      activeCreditoId = creditoId;
-      activeCuotaIndex = cuotaIndex;
-      document.getElementById('montoInput').value = restante;
-      document.getElementById('notaInput').value = '';
-      document.getElementById('modalPaymentTitle').textContent = `Registrar Pago - Cuota #${cuotaIndex + 1}`;
-      modal.classList.add('is-open');
+    const viewModalOverlay = document.getElementById('viewModalOverlay');
+    document.getElementById('closeViewModalBtn').onclick = () => {
+      currentOpenCreditoId = null;
+      viewModalOverlay.classList.remove('is-open');
     };
+
+    const paymentModalOverlay = document.getElementById('paymentModalOverlay');
+    document.getElementById('closePayModalBtn').onclick = () => paymentModalOverlay.classList.remove('is-open');
 
     window.copiarIdCredito = (idUnico) => {
       navigator.clipboard.writeText(idUnico).then(() => {
@@ -250,28 +287,68 @@
       });
     };
 
-    // GUARDAR PAGO CON AUDITORÍA ABSOLUTA EN FIRESTORE
-    document.getElementById('confirmPayBtn').onclick = async () => {
-      const confirmBtn = document.getElementById('confirmPayBtn');
-      const montoAbonado = parseFloat(document.getElementById('montoInput').value) || 0;
-      const nota = document.getElementById('notaInput').value.trim() || 'Abono registrado desde Dirección';
-      
-      if (montoAbonado <= 0) {
-        window.mostrarAlerta("Monto inválido", "Por favor, ingresa un monto mayor a 0.");
+    // Renderizar Cards Compactas
+    function renderizarCreditosGrid(arr) {
+      const grid = document.getElementById('creditsGrid');
+      grid.innerHTML = '';
+
+      if (!arr || arr.length === 0) {
+        grid.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); grid-column: 1/-1; padding: 40px; font-size: 13px;">No hay créditos registrados.</div>';
         return;
       }
 
-      const c = creditosCache.find(item => item.id === activeCreditoId);
-      if (!c) {
-        window.mostrarAlerta("Error", "No se encontró el registro del crédito.");
-        return;
-      }
+      arr.forEach((c) => {
+        const clienteInfo = clientesCache[c.clienteId] || {};
+        const dniCliente = clienteInfo.dni || c.clienteDni || 'N/D';
+        const estado = c.estado || 'activo';
+        const creditIdTag = c.codigoUnico || `#CRED-${c.id.substring(0, 6).toUpperCase()}`;
 
-      confirmBtn.disabled = true;
-      confirmBtn.textContent = "Guardando en Firestore...";
+        grid.innerHTML += `
+          <div class="credit-card">
+            <div class="credit-header">
+              <div>
+                <span class="client-name-title">${c.clienteNombre || 'Cliente'}</span>
+                <div><span class="dni-tag">DNI: ${dniCliente}</span></div>
+              </div>
+              <span class="status-badge ${estado}">${estado}</span>
+            </div>
 
-      let cuotasArr = c.cuotasDetalle ? JSON.parse(JSON.stringify(c.cuotasDetalle)) : [];
+            <div class="credit-compact-data">
+              <div class="data-item">
+                <span class="lbl">Total con Interés</span>
+                <span class="val">$${(c.totalConInteres || 0).toLocaleString('es-AR')}</span>
+              </div>
+              <div class="data-item">
+                <span class="lbl">Cuotas</span>
+                <span class="val">${c.cantidadCuotas} cuota(s)</span>
+              </div>
+            </div>
+
+            <div class="credit-card-footer">
+              <span class="id-tag-badge" title="ID Único" onclick="window.copiarIdCredito('${creditIdTag}')" style="cursor:pointer;" >${creditIdTag} 📋</span>
+              <button class="btn-action-view" onclick="window.verFichaCredito('${c.id}')">
+                <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                Ver Ficha
+              </button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // Abrir Modal con Ficha Completa del Crédito
+    window.verFichaCredito = (id) => {
+      currentOpenCreditoId = id;
+      const c = creditosCacheGlobal.find(item => item.id === id);
+      if (!c) return;
+
+      const clienteInfo = clientesCache[c.clienteId] || {};
+      const dniCliente = clienteInfo.dni || c.clienteDni || 'N/D';
+      const creditIdTag = c.codigoUnico || `#CRED-${c.id.substring(0, 6).toUpperCase()}`;
+
+      let cuotasArr = c.cuotasDetalle || [];
       if (cuotasArr.length === 0) {
+        cuotasArr = [];
         const valorCuota = c.valorCuota || (c.totalConInteres / c.cantidadCuotas);
         let fechaBase = new Date(c.fechaInicio || Date.now());
         for (let i = 1; i <= c.cantidadCuotas; i++) {
@@ -279,17 +356,98 @@
           else if (c.frecuencia === 'quincenal') fechaBase.setDate(fechaBase.getDate() + 15);
           else if (c.frecuencia === 'mensual') fechaBase.setMonth(fechaBase.getMonth() + 1);
 
-          cuotasArr.push({
-            numero: i,
-            vencimiento: fechaBase.toISOString().split('T')[0],
-            monto: valorCuota,
-            pagado: 0,
-            estado: 'pendiente'
-          });
+          cuotasArr.push({ numero: i, vencimiento: fechaBase.toISOString().split('T')[0], monto: valorCuota, pagado: 0, estado: 'pendiente' });
         }
       }
 
-      let cuota = cuotasArr[activeCuotaIndex];
+      let cuotasHtml = '';
+      cuotasArr.forEach((cuota, index) => {
+        const pagado = cuota.pagado || 0;
+        const restante = cuota.monto - pagado;
+        const statusClass = cuota.estado === 'pagada' ? 'pagada' : (cuota.estado === 'parcial' ? 'parcial' : 'pendiente');
+
+        cuotasHtml += `
+          <div class="cuota-row-item">
+            <div class="cuota-info">
+              <span class="num">Cuota #${cuota.numero} - Total: $${cuota.monto.toLocaleString('es-AR', {minimumFractionDigits: 2})}</span>
+              <span class="fec">Vence: ${cuota.vencimiento} | Pagado: $${pagado.toLocaleString('es-AR', {minimumFractionDigits: 2})} (Restante: $${restante.toLocaleString('es-AR', {minimumFractionDigits: 2})})</span>
+            </div>
+            <div class="cuota-actions">
+              <span class="cuota-status-tag ${statusClass}">${cuota.estado.toUpperCase()}</span>
+              ${cuota.estado !== 'pagada' ? `<button class="btn-pagar-cuota" onclick="window.abrirModalPago('${id}', ${index})">Abonar</button>` : ''}
+            </div>
+          </div>
+        `;
+      });
+
+      let timelineHtml = '';
+      (c.auditoria || [{ fecha: c.creadoEn || new Date().toISOString(), descripcion: 'Crédito emitido y registrado en el sistema.' }]).forEach(log => {
+        timelineHtml += `
+          <div class="timeline-item">
+            <div class="t-date">${new Date(log.fecha).toLocaleString('es-AR')}</div>
+            <div class="t-desc">${log.descripcion}</div>
+          </div>
+        `;
+      });
+
+      document.getElementById('profileCardContent').innerHTML = `
+        <div class="profile-details-table">
+          <div class="profile-row"><span class="lbl">ID Crédito:</span><span class="val">${creditIdTag}</span></div>
+          <div class="profile-row"><span class="lbl">Cliente:</span><span class="val">${c.clienteNombre}</span></div>
+          <div class="profile-row"><span class="lbl">DNI:</span><span class="val">${dniCliente}</span></div>
+          <div class="profile-row"><span class="lbl">Monto Total:</span><span class="val">$${(c.totalConInteres || 0).toLocaleString('es-AR')}</span></div>
+          <div class="profile-row"><span class="lbl">Frecuencia:</span><span class="val" style="text-transform: uppercase;">${c.frecuencia}</span></div>
+          <div class="profile-row"><span class="lbl">Estado:</span><span class="val" style="text-transform: uppercase; color: var(--accent-flame);">${c.estado || 'activo'}</span></div>
+        </div>
+
+        <div style="width: 100%; text-align: left;"><span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">Cronograma de Cuotas</span></div>
+        <div class="cuotas-table-container">${cuotasHtml}</div>
+
+        <div style="width: 100%; text-align: left; margin-top: 4px;"><span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">Línea de Tiempo y Auditoría</span></div>
+        <div class="timeline-box">${timelineHtml}</div>
+      `;
+
+      viewModalOverlay.classList.add('is-open');
+    };
+
+    // --- MODAL DE PAGOS ---
+    let activeCreditIdForPay = null;
+    let activeCuotaIndexForPay = null;
+
+    window.abrirModalPago = (creditoId, cuotaIndex) => {
+      activeCreditIdForPay = creditoId;
+      activeCuotaIndexForPay = cuotaIndex;
+      const c = creditosCacheGlobal.find(item => item.id === creditoId);
+      if (!c) return;
+
+      const cuota = (c.cuotasDetalle || [])[cuotaIndex];
+      if (!cuota) return;
+
+      const restante = cuota.monto - (cuota.pagado || 0);
+      document.getElementById('payCuotaInfoLabel').textContent = `Cuota #${cuota.numero} (Restante: $${restante.toLocaleString('es-AR')})`;
+      document.getElementById('montoPagoInput').value = restante;
+      document.getElementById('notaPagoInput').value = '';
+      paymentModalOverlay.classList.add('is-open');
+    };
+
+    document.getElementById('confirmPaymentBtn').onclick = async () => {
+      const confirmBtn = document.getElementById('confirmPaymentBtn');
+      const montoAbonado = parseFloat(document.getElementById('montoPagoInput').value) || 0;
+      const nota = document.getElementById('notaPagoInput').value.trim() || 'Abono de cuota';
+
+      if (montoAbonado <= 0) {
+        window.mostrarAlerta("Monto inválido", "Por favor ingresa un monto mayor a 0.");
+        return;
+      }
+
+      const c = creditosCacheGlobal.find(item => item.id === activeCreditIdForPay);
+      if (!c) return;
+
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = "Guardando...";
+
+      let cuotasArr = JSON.parse(JSON.stringify(c.cuotasDetalle || []));
+      let cuota = cuotasArr[activeCuotaIndexForPay];
       let pagadoActual = (cuota.pagado || 0) + montoAbonado;
 
       if (pagadoActual >= cuota.monto) {
@@ -300,141 +458,46 @@
         cuota.estado = 'parcial';
       }
 
-      // Auditoría exacta guardada en base de datos
-      const fechaHoraActual = new Date().toISOString();
       const auditoria = c.auditoria || [];
       auditoria.unshift({
-        fecha: fechaHoraActual,
-        descripcion: `[Dirección de Pagos] Abono de $${montoAbonado.toLocaleString('es-AR')} aplicado a la Cuota #${cuota.numero}. Detalle: ${nota}`
+        fecha: new Date().toISOString(),
+        descripcion: `[Dirección de Pagos] Abono de $${montoAbonado.toLocaleString('es-AR')} en Cuota #${cuota.numero}. Detalle: ${nota}`
       });
 
       try {
-        const docRef = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos", activeCreditoId);
-        await updateDoc(docRef, {
-          cuotasDetalle: cuotasArr,
-          auditoria: auditoria
-        });
-        
-        modal.classList.remove('is-open');
-        window.mostrarAlerta("¡Éxito!", `Pago de $${montoAbonado.toLocaleString('es-AR')} registrado y descontado correctamente.`);
-      } catch(err) {
-        console.error("Error al guardar en Firestore:", err);
-        window.mostrarAlerta("Error al guardar", "No se pudo actualizar el pago en la base de datos.");
+        const ref = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos", activeCreditIdForPay);
+        await updateDoc(ref, { cuotasDetalle: cuotasArr, auditoria });
+        paymentModalOverlay.classList.remove('is-open');
+        window.mostrarAlerta("Éxito", "Pago registrado y descontado correctamente.");
+      } catch (err) {
+        console.error(err);
+        window.mostrarAlerta("Error", "No se pudo registrar el pago.");
       } finally {
         confirmBtn.disabled = false;
-        confirmBtn.textContent = "Confirmar y Descontar del Crédito";
+        confirmBtn.textContent = "Confirmar y Descontar";
       }
     };
 
-    function renderFichas(arr) {
-      const container = document.getElementById('fichasContainer');
-      container.innerHTML = '';
-
-      if (!arr || arr.length === 0) {
-        container.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); padding: 40px; font-size: 13px;">No hay fichas de créditos disponibles.</div>';
-        return;
-      }
-
-      arr.forEach(c => {
-        const clienteInfo = clientesCache[c.clienteId] || {};
-        const dniCliente = clienteInfo.dni || c.clienteDni || 'N/D';
-        const estadoCredito = c.estado || 'activo';
-        
-        // ID único del crédito (ej. #CRED-1900 o basado en su identificador)
-        const creditIdTag = c.codigoUnico || `#CRED-${c.id.substring(0, 6).toUpperCase()}`;
-
-        let cuotasArr = c.cuotasDetalle || [];
-        if (cuotasArr.length === 0) {
-          cuotasArr = [];
-          const valorCuota = c.valorCuota || (c.totalConInteres / c.cantidadCuotas);
-          let fechaBase = new Date(c.fechaInicio || Date.now());
-          for (let i = 1; i <= c.cantidadCuotas; i++) {
-            if (c.frecuencia === 'semanal') fechaBase.setDate(fechaBase.getDate() + 7);
-            else if (c.frecuencia === 'quincenal') fechaBase.setDate(fechaBase.getDate() + 15);
-            else if (c.frecuencia === 'mensual') fechaBase.setMonth(fechaBase.getMonth() + 1);
-
-            cuotasArr.push({
-              numero: i,
-              vencimiento: fechaBase.toISOString().split('T')[0],
-              monto: valorCuota,
-              pagado: 0,
-              estado: 'pendiente'
-            });
-          }
-        }
-
-        let cuotasHtml = '';
-        cuotasArr.forEach((cuota, index) => {
-          const pagado = cuota.pagado || 0;
-          const restante = cuota.monto - pagado;
-          const estadoCls = cuota.estado === 'pagada' ? 'pagada' : (cuota.estado === 'parcial' ? 'parcial' : 'pendiente');
-
-          cuotasHtml += `
-            <div class="cuota-direccion-row">
-              <div class="cuota-detalles">
-                <span class="num">Cuota #${cuota.numero} — Total: $${cuota.monto.toLocaleString('es-AR', {minimumFractionDigits: 2})}</span>
-                <span class="sub">Vence: ${cuota.vencimiento} | Pagado: $${pagado.toLocaleString('es-AR', {minimumFractionDigits: 2})} | Restante: <strong style="color:var(--accent-flame);">$${restante.toLocaleString('es-AR', {minimumFractionDigits: 2})}</strong></span>
-              </div>
-              <div class="cuota-actions-right">
-                <span class="estado-tag ${estadoCls}">${cuota.estado.toUpperCase()}</span>
-                ${cuota.estado !== 'pagada' ? `<button class="btn-registrar-pago" onclick="window.abrirModalPago('${c.id}', ${index}, ${restante})">Registrar Pago</button>` : '<span style="font-size:11px; font-weight:700; color:var(--status-success);">PAGADA ✔</span>'}
-              </div>
-            </div>
-          `;
-        });
-
-        container.innerHTML += `
-          <div class="credit-ficha-card">
-            <div class="ficha-header">
-              <div class="ficha-client-title">
-                <h2>${c.clienteNombre || 'Cliente'}</h2>
-                <div class="ficha-meta-tags">
-                  <span class="meta-tag">
-                    ID: <strong>${creditIdTag}</strong>
-                    <button class="btn-copy-id" onclick="window.copiarIdCredito('${creditIdTag}')" title="Copiar ID de Crédito">
-                      <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                    </button>
-                  </span>
-                  <span class="meta-tag">DNI: ${dniCliente}</span>
-                  <span class="meta-tag">Tipo: ${c.tipoCredito || 'Efectivo'}</span>
-                  <span class="meta-tag" style="text-transform: uppercase; color: var(--accent-flame);">Estado: ${estadoCredito}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="ficha-grid-info">
-              <div class="info-box"><span class="lbl">Monto Total con Interés</span><span class="val">$${(c.totalConInteres || 0).toLocaleString('es-AR')}</span></div>
-              <div class="info-box"><span class="lbl">Frecuencia</span><span class="val" style="text-transform:uppercase;">${c.frecuencia || 'N/D'}</span></div>
-              <div class="info-box"><span class="lbl">Cantidad de Cuotas</span><span class="val">${c.cantidadCuotas} cuota(s)</span></div>
-            </div>
-
-            <div>
-              <div class="cuotas-section-title">Cronograma de Cuotas y Descuento de Pagos</div>
-              <div class="cuotas-direccion-list">
-                ${cuotasHtml}
-              </div>
-            </div>
-          </div>
-        `;
-      });
-    }
-
     document.getElementById('searchInput').oninput = (e) => {
       const q = e.target.value.toLowerCase().trim();
-      if (!q) { renderFichas(creditosCache); return; }
-      renderFichas(creditosCache.filter(c => {
+      if (!q) { renderizarCreditosGrid(creditosCacheGlobal); return; }
+      renderizarCreditosGrid(creditosCacheGlobal.filter(c => {
         const dni = (clientesCache[c.clienteId] || {}).dni || c.clienteDni || '';
-        const idTag = `#CRED-${c.id.substring(0, 6)}`.toLowerCase();
+        const idTag = (c.codigoUnico || `#CRED-${c.id.substring(0, 6)}`).toLowerCase();
         return (c.clienteNombre || '').toLowerCase().includes(q) || dni.toLowerCase().includes(q) || idTag.includes(q);
       }));
     };
 
-    // Inicializar sincronización con la base de datos de Firestore y escuchar cambios de créditos
+    // Sincronización en tiempo real
     sincronizarClientesFirestore().then(() => {
       onSnapshot(collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos"), snap => {
-        creditosCache = [];
-        snap.forEach(d => creditosCache.push({ id: d.id, ...d.data() }));
-        renderFichas(creditosCache);
+        creditosCacheGlobal = [];
+        snap.forEach(d => creditosCacheGlobal.push({ id: d.id, ...d.data() }));
+        renderizarCreditosGrid(creditosCacheGlobal);
+
+        if (currentOpenCreditoId) {
+          window.verFichaCredito(currentOpenCreditoId);
+        }
       });
     });
   </script>
