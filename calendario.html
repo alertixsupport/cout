@@ -96,7 +96,6 @@
       100% { transform: scale(0.95); opacity: 0.8; }
     }
 
-    /* Vista previa de eventos en escritorio */
     .events-preview-box { display: flex; flex-direction: column; gap: 3px; width: 100%; margin-top: 4px; overflow: hidden; }
     .event-pill-mini {
       font-size: 9px; font-weight: 600; padding: 2px 5px; border-radius: 5px;
@@ -105,10 +104,9 @@
     }
     .event-pill-mini.pagada { background: rgba(16, 185, 129, 0.12); color: #6ee7b7; border-color: rgba(16, 185, 129, 0.25); }
 
-    /* Adaptabilidad Móvil Extrema */
     @media (max-width: 640px) {
       .day-cell { min-height: 60px; padding: 6px; }
-      .events-preview-box { display: none; } /* En celular dejamos los puntitos limpios y al tocar se abre el modal */
+      .events-preview-box { display: none; }
       .day-cell-top { justify-content: center; }
       .day-number { font-size: 13px; }
     }
@@ -134,7 +132,6 @@
     .day-detail-card .client-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
     .day-detail-card .meta-info { font-size: 12px; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; display: flex; justify-content: space-between; }
 
-    /* Alerta Custom */
     .custom-alert-overlay { position: fixed; inset: 0; background: rgba(5, 7, 11, 0.88); backdrop-filter: blur(12px); z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
     .custom-alert-overlay.is-open { opacity: 1; pointer-events: auto; }
     .custom-alert-box { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px; width: 100%; max-width: 380px; padding: 22px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.8); }
@@ -166,7 +163,7 @@
       <div class="calendar-header-card">
         <div class="calendar-title-area">
           <h1>Calendario de <span>Cobros</span></h1>
-          <p>Controla las cuotas y vencimientos día a día en tiempo real.</p>
+          <p>Controla el 100% de los créditos y sus cuotas día a día en tiempo real.</p>
         </div>
         <div class="calendar-nav-controls">
           <button class="btn-nav" id="prevMonthBtn" title="Mes Anterior">
@@ -215,7 +212,6 @@
     if (!prestamistaId) window.location.replace('loginprestamista.html');
 
     let creditosCache = [];
-    let clientesCache = {};
     let fechaActualNav = new Date();
 
     window.mostrarAlerta = (t, m) => {
@@ -225,13 +221,31 @@
     };
     document.getElementById('alertOkBtn').onclick = () => document.getElementById('customAlertOverlay').classList.remove('is-open');
 
-    async function sincronizarClientes() {
-      try {
-        const snap = await getDocs(collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "clientes"));
-        snap.forEach(d => { clientesCache[d.id] = d.data(); });
-      } catch(err) {
-        console.error("Error sincronizando clientes:", err);
+    // Generar cuotas automáticamente si el crédito en Firestore no las tiene creadas
+    function asegurarCuotasLocal(c) {
+      let cuotasArr = c.cuotasDetalle || [];
+      if (!Array.isArray(cuotasArr) || cuotasArr.length === 0) {
+        cuotasArr = [];
+        const cantidad = parseInt(c.cantidadCuotas) || 1;
+        const totalInt = parseFloat(c.totalConInteres) || 0;
+        const valorCuota = c.valorCuota || (totalInt / cantidad);
+        let fechaBase = new Date(c.fechaInicio || Date.now());
+
+        for (let i = 1; i <= cantidad; i++) {
+          if (c.frecuencia === 'semanal') fechaBase.setDate(fechaBase.getDate() + 7);
+          else if (c.frecuencia === 'quincenal') fechaBase.setDate(fechaBase.getDate() + 15);
+          else if (c.frecuencia === 'mensual') fechaBase.setMonth(fechaBase.getMonth() + 1);
+
+          cuotasArr.push({
+            numero: i,
+            vencimiento: fechaBase.toISOString().split('T')[0],
+            monto: valorCuota,
+            pagado: 0,
+            estado: 'pendiente'
+          });
+        }
       }
+      return cuotasArr;
     }
 
     const mesesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
@@ -249,10 +263,10 @@
       const daysGrid = document.getElementById('daysGrid');
       daysGrid.innerHTML = '';
 
-      // Mapear eventos por fecha "YYYY-MM-DD"
+      // Mapear el 100% de las cuotas de TODOS los créditos del usuario prestamista
       const eventosMap = {};
       creditosCache.forEach(c => {
-        const cuotas = c.cuotasDetalle || [];
+        const cuotas = asegurarCuotasLocal(c);
         cuotas.forEach(q => {
           if (!q.vencimiento) return;
           if (!eventosMap[q.vencimiento]) eventosMap[q.vencimiento] = [];
@@ -260,6 +274,7 @@
             creditoId: c.id,
             clienteNombre: c.clienteNombre || 'Cliente',
             numeroCuota: q.numero,
+            totalCuotas: c.cantidadCuotas || cuotas.length,
             monto: q.monto,
             pagado: q.pagado || 0,
             estado: q.estado || 'pendiente'
@@ -289,7 +304,7 @@
         
         const eventosDelDia = eventosMap[fechaKey] || [];
         let tieneEventos = eventosDelDia.length > 0;
-        let todasPagadas = tieneEventos && eventosDelDia.every(e => e.estado === 'pagada');
+        let todasPagadas = tieneEventos && eventosDelDia.every(e => e.estado === 'pagada' || e.pagado >= e.monto);
 
         let cellHtml = `
           <div class="day-cell-top">
@@ -298,11 +313,10 @@
           </div>
         `;
 
-        // Vista previa en Escritorio (PC)
         if (tieneEventos) {
           let previewHtml = `<div class="events-preview-box">`;
           eventosDelDia.slice(0, 2).forEach(ev => {
-            const cls = ev.estado === 'pagada' ? 'pagada' : '';
+            const cls = (ev.estado === 'pagada' || ev.pagado >= ev.monto) ? 'pagada' : '';
             previewHtml += `<div class="event-pill-mini ${cls}">#${ev.numero} $${Math.round(ev.monto).toLocaleString()}</div>`;
           });
           if (eventosDelDia.length > 2) {
@@ -317,7 +331,7 @@
         daysGrid.appendChild(cell);
       }
 
-      // Días del siguiente mes para rellenar la grilla
+      // Días del siguiente mes para completar la grilla
       const totalCellsPrinted = adjustedFirstDay + totalDays;
       const remainingCells = (totalCellsPrinted <= 35) ? (35 - totalCellsPrinted) : (42 - totalCellsPrinted);
       for (let i = 1; i <= remainingCells; i++) {
@@ -340,18 +354,22 @@
       }
 
       eventos.forEach(ev => {
-        const restante = ev.monto - ev.pagado;
+        const pagadoVal = parseFloat(ev.pagado) || 0;
+        const restante = ev.monto - pagadoVal;
+        const estadoFinal = (ev.estado === 'pagada' || pagadoVal >= ev.monto) ? 'PAGADA' : (pagadoVal > 0 ? 'PARCIAL' : 'PENDIENTE');
+        const colorEstado = estadoFinal === 'PAGADA' ? 'var(--status-success)' : (estadoFinal === 'PARCIAL' ? '#93c5fd' : 'var(--status-warning)');
+
         const card = document.createElement('div');
         card.className = 'day-detail-card';
         card.innerHTML = `
           <div class="client-title">${ev.clienteNombre}</div>
           <div class="meta-info">
-            <span>Cuota #${ev.numero}</span>
+            <span>Cuota #${ev.numero} de ${ev.totalCuotas}</span>
             <span>Total: $${ev.monto.toLocaleString('es-AR', {minimumFractionDigits: 2})}</span>
           </div>
           <div class="meta-info">
-            <span>Estado: <strong style="color:${ev.estado === 'pagada' ? 'var(--status-success)' : 'var(--status-warning)'};">${ev.estado.toUpperCase()}</strong></span>
-            <span>Restante: $${restante.toLocaleString('es-AR', {minimumFractionDigits: 2})}</span>
+            <span>Estado: <strong style="color:${colorEstado};">${estadoFinal}</strong></span>
+            <span>Restante: $${restante > 0 ? restante.toLocaleString('es-AR', {minimumFractionDigits: 2}) : '0.00'}</span>
           </div>
         `;
         content.appendChild(card);
@@ -374,12 +392,13 @@
       renderizarCalendario();
     };
 
-    sincronizarClientes().then(() => {
-      onSnapshot(collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos"), snap => {
-        creditosCache = [];
-        snap.forEach(d => creditosCache.push({ id: d.id, ...d.data() }));
-        renderizarCalendario();
+    // Sincronización en tiempo real de TODOS los créditos del prestamista desde Firestore
+    onSnapshot(collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos"), snap => {
+      creditosCache = [];
+      snap.forEach(d => {
+        creditosCache.push({ id: d.id, ...d.data() });
       });
+      renderizarCalendario();
     });
   </script>
 </body>
