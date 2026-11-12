@@ -328,11 +328,11 @@
       });
     };
 
-    // Generar y copiar enlace de firma.html (exacto como depositocreditos.html)
-    window.compartirEnlaceFirma = (id) => {
-      const link = `${window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1)}firma.html?id=${id}&p=${prestamistaId}`;
+    // Generar y copiar enlace de vercredito.html con su respectivo ID
+    window.compartirEnlaceVerCredito = (id) => {
+      const link = `${window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1)}vercredito.html?id=${id}&p=${prestamistaId}`;
       navigator.clipboard.writeText(link).then(() => {
-        window.mostrarAlerta("Enlace Copiado", "El enlace de firma/crédito fue copiado al portapapeles.");
+        window.mostrarAlerta("Enlace Copiado", "El enlace de visualización del crédito (vercredito.html) fue copiado al portapapeles.");
       });
     };
 
@@ -428,7 +428,7 @@
                     <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                   </button>
                 </span>
-                <button class="btn-action-icon" onclick="window.compartirEnlaceFirma('${c.id}')" title="Copiar Enlace de Firma / Crédito">
+                <button class="btn-action-icon" onclick="window.compartirEnlaceVerCredito('${c.id}')" title="Copiar Enlace para ver Crédito (vercredito.html)">
                   <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
                 </button>
               </div>
@@ -512,7 +512,7 @@
             <button class="btn-copy-pro" onclick="window.copiarIdCredito('${creditIdTag}')" title="Copiar ID">
               <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
             </button>
-            <button class="btn-copy-pro" onclick="window.compartirEnlaceFirma('${id}')" title="Copiar Enlace de Firma / Crédito" style="color:#60a5fa; margin-left:4px;">
+            <button class="btn-copy-pro" onclick="window.compartirEnlaceVerCredito('${id}')" title="Copiar Enlace (vercredito.html)" style="color:#60a5fa; margin-left:4px;">
               <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
             </button>
           </div>
