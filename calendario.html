@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>COUT.APP | Calendario Inteligente de Vencimientos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-base: #06080d;
+      --bg-surface: #0e121d;
+      --bg-surface-hover: #161d2e;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --accent-flame: #f97316;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-tertiary: #64748b;
+      --status-success: #10b981;
+      --status-warning: #f59e0b;
+      --status-danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    html, body { width: 100%; min-height: 100vh; background-color: var(--bg-base); color: var(--text-primary); overflow-x: hidden; scrollbar-width: none; }
+    html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; width: 100%; }
+
+    header {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 16px;
+      padding: 14px 20px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
+    }
+    .btn-back {
+      display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle); color: var(--text-secondary); text-decoration: none;
+      font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 10px; transition: all 0.2s;
+    }
+    .btn-back:hover { background: rgba(255, 255, 255, 0.08); color: var(--text-primary); border-color: rgba(249, 115, 22, 0.3); }
+    .btn-back svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2; }
+    .brand-section { display: flex; align-items: center; gap: 8px; }
+    .logo-text { font-size: 20px; font-weight: 800; color: var(--text-primary); }
+    .logo-text span { color: var(--accent-flame); }
+
+    .calendar-header-card {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px;
+      padding: 20px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px; box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+    .calendar-title-area h1 { font-size: 22px; font-weight: 800; }
+    .calendar-title-area h1 span { color: var(--accent-flame); }
+    .calendar-title-area p { font-size: 13px; color: var(--text-secondary); }
+
+    .calendar-nav-controls { display: flex; align-items: center; gap: 12px; }
+    .month-display { font-size: 16px; font-weight: 700; font-family: 'JetBrains Mono', monospace; min-width: 180px; text-align: center; }
+    .btn-nav {
+      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-subtle); color: var(--text-primary);
+      width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-nav:hover { background: var(--accent-flame); border-color: var(--accent-flame); }
+    .btn-nav svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2; }
+
+    /* Estructura del Calendario Mensual */
+    .calendar-grid-wrapper {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px;
+      padding: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); overflow: hidden;
+    }
+    .weekdays-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 12px; text-align: center; }
+    .weekday-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); font-family: 'JetBrains Mono', monospace; }
+
+    .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+    .day-cell {
+      background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px;
+      min-height: 95px; padding: 8px; display: flex; flex-direction: column; justify-content: flex-start;
+      gap: 6px; transition: all 0.2s; position: relative; cursor: pointer;
+    }
+    .day-cell:hover { border-color: rgba(249, 115, 22, 0.4); background: var(--bg-surface-hover); }
+    .day-cell.other-month { opacity: 0.35; background: rgba(255, 255, 255, 0.01); }
+    .day-cell.today { border-color: var(--accent-flame); box-shadow: 0 0 10px rgba(249, 115, 22, 0.2); }
+    
+    .day-number { font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--text-secondary); }
+    .day-cell.today .day-number { color: var(--accent-flame); }
+
+    .event-pill {
+      font-size: 10px; font-weight: 600; padding: 3px 6px; border-radius: 6px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'JetBrains Mono', monospace;
+      display: flex; align-items: center; justify-content: space-between; gap: 4px;
+    }
+    .event-pill.pendiente { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .event-pill.pagada { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+
+    /* Modal de Detalle del Día */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(5, 7, 11, 0.85); backdrop-filter: blur(12px);
+      z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal-overlay.is-open { opacity: 1; pointer-events: auto; }
+    .modal-container {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px;
+      width: 100%; max-width: 520px; padding: 24px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+      max-height: 85vh; display: flex; flex-direction: column;
+    }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .modal-header h3 { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .btn-close-modal { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-subtle); color: var(--text-secondary); cursor: pointer; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .modal-body-scroll { overflow-y: auto; flex: 1; padding-right: 4px; display: flex; flex-direction: column; gap: 10px; }
+
+    .day-detail-card { background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+    .day-detail-card .client-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+    .day-detail-card .meta-info { font-size: 12px; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; display: flex; justify-content: space-between; }
+
+    /* Alerta Custom */
+    .custom-alert-overlay { position: fixed; inset: 0; background: rgba(5, 7, 11, 0.88); backdrop-filter: blur(12px); z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+    .custom-alert-overlay.is-open { opacity: 1; pointer-events: auto; }
+    .custom-alert-box { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px; width: 100%; max-width: 380px; padding: 22px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.8); }
+    .custom-alert-box h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .custom-alert-box p { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
+    .btn-alert-primary { width: 100%; height: 40px; background: var(--accent-flame); border: none; border-radius: 8px; color: white; font-weight: 700; font-size: 13px; cursor: pointer; }
+
+    @media (max-width: 768px) {
+      .day-cell { min-height: 75px; padding: 4px; }
+      .event-pill { font-size: 9px; padding: 2px 4px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="custom-alert-overlay" id="customAlertOverlay">
+    <div class="custom-alert-box">
+      <h4 id="alertTitle">Atención</h4>
+      <p id="alertMessage">...</p>
+      <button class="btn-alert-primary" id="alertOkBtn">Aceptar</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <header>
+      <a href="gestionprestamista.html" class="btn-back">
+        <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Volver al Panel
+      </a>
+      <div class="brand-section"><h1 class="logo-text">cout<span>.app</span></h1></div>
+    </header>
+
+    <main>
+      <div class="calendar-header-card">
+        <div class="calendar-title-area">
+          <h1>Calendario de <span>Vencimientos</span></h1>
+          <p>Visualiza todas las cuotas programadas y cobros previstos por fecha.</p>
+        </div>
+        <div class="calendar-nav-controls">
+          <button class="btn-nav" id="prevMonthBtn" title="Mes Anterior">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          </button>
+          <div class="month-display" id="monthDisplay">Enero 2026</div>
+          <button class="btn-nav" id="nextMonthBtn" title="Mes Siguiente">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="calendar-grid-wrapper">
+        <div class="weekdays-grid">
+          <span class="weekday-lbl">Lun</span>
+          <span class="weekday-lbl">Mar</span>
+          <span class="weekday-lbl">Mié</span>
+          <span class="weekday-lbl">Jue</span>
+          <span class="weekday-lbl">Vie</span>
+          <span class="weekday-lbl">Sáb</span>
+          <span class="weekday-lbl">Dom</span>
+        </div>
+        <div class="days-grid" id="daysGrid"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL: DETALLE DEL DÍA SELECCIONADO -->
+  <div class="modal-overlay" id="dayDetailModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 id="dayModalTitle">Vencimientos del Día</h3>
+        <button class="btn-close-modal" id="closeDayModalBtn">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <div class="modal-body-scroll" id="dayModalContent"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { db } from './app.js';
+    import { collection, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const prestamistaId = localStorage.getItem('cout_prestamista_id');
+    if (!prestamistaId) window.location.replace('loginprestamista.html');
+
+    let creditosCache = [];
+    let clientesCache = {};
+    let fechaActualNav = new Date();
+
+    window.mostrarAlerta = (t, m) => {
+      document.getElementById('alertTitle').textContent = t;
+      document.getElementById('alertMessage').textContent = m;
+      document.getElementById('customAlertOverlay').classList.add('is-open');
+    };
+    document.getElementById('alertOkBtn').onclick = () => document.getElementById('customAlertOverlay').classList.remove('is-open');
+
+    async function sincronizarClientes() {
+      try {
+        const snap = await getDocs(collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "clientes"));
+        snap.forEach(d => { clientesCache[d.id] = d.data(); });
+      } catch(err) {
+        console.error("Error sincronizando clientes:", err);
+      }
+    }
+
+    const mesesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+    function renderizarCalendario() {
+      const year = fechaActualNav.getFullYear();
+      const month = fechaActualNav.getMonth();
+      document.getElementById('monthDisplay').textContent = `${mesesNombres[month]} ${year}`;
+
+      const firstDayIndex = new Date(year, month, 1).getDay();
+      // Ajustar para que la semana comience en Lunes (0 = Lunes, 6 = Domingo)
+      const adjustedFirstDay = (firstDayIndex === 0) ? 6 : firstDayIndex - 1;
+      const totalDays = new Date(year, month + 1, 0).getDate();
+      const prevTotalDays = new Date(year, month, 0).getDate();
+
+      const daysGrid = document.getElementById('daysGrid');
+      daysGrid.innerHTML = '';
+
+      // Mapear eventos por fecha "YYYY-MM-DD"
+      const eventosMap = {};
+      creditosCache.forEach(c => {
+        const cuotas = c.cuotasDetalle || [];
+        cuotas.forEach(q => {
+          if (!q.vencimiento) return;
+          if (!eventosMap[q.vencimiento]) eventosMap[q.vencimiento] = [];
+          eventosMap[q.vencimiento].push({
+            creditoId: c.id,
+            clienteNombre: c.clienteNombre || 'Cliente',
+            numeroCuota: q.numero,
+            monto: q.monto,
+            pagado: q.pagado || 0,
+            estado: q.estado || 'pendiente'
+          });
+        });
+      });
+
+      const hoyStr = new Date().toISOString().split('T')[0];
+
+      // Días del mes anterior
+      for (let i = adjustedFirstDay; i > 0; i--) {
+        const dNum = prevTotalDays - i + 1;
+        const cell = document.createElement('div');
+        cell.className = 'day-cell other-month';
+        cell.innerHTML = `<span class="day-number">${dNum}</span>`;
+        daysGrid.appendChild(cell);
+      }
+
+      // Días del mes actual
+      for (let i = 1; i <= totalDays; i++) {
+        const mesFmt = String(month + 1).padStart(2, '0');
+        const diaFmt = String(i).padStart(2, '0');
+        const fechaKey = `${year}-${mesFmt}-${diaFmt}`;
+
+        const cell = document.createElement('div');
+        cell.className = `day-cell ${fechaKey === hoyStr ? 'today' : ''}`;
+        
+        let htmlCuotas = `<span class="day-number">${i}</span>`;
+        const eventosDelDia = eventosMap[fechaKey] || [];
+
+        eventosDelDia.slice(0, 2).forEach(ev => {
+          const cls = ev.estado === 'pagada' ? 'pagada' : 'pendiente';
+          htmlCuotas += `
+            <div class="event-pill ${cls}" title="Cuota #${ev.numero} - ${ev.clienteNombre}">
+              <span>#${ev.numero} ${ev.clienteNombre}</span>
+              <span>$${Math.round(ev.monto).toLocaleString()}</span>
+            </div>
+          `;
+        });
+
+        if (eventosDelDia.length > 2) {
+          htmlCuotas += `<span style="font-size:9px; color:var(--accent-flame); font-weight:700; text-align:center;">+${eventosDelDia.length - 2} más</span>`;
+        }
+
+        cell.innerHTML = htmlCuotas;
+        cell.onclick = () => abrirDetalleDia(fechaKey, eventosDelDia);
+        daysGrid.appendChild(cell);
+      }
+
+      // Días del siguiente mes para completar la grilla
+      const totalCellsPrinted = adjustedFirstDay + totalDays;
+      const remainingCells = (totalCellsPrinted <= 35) ? (35 - totalCellsPrinted) : (42 - totalCellsPrinted);
+      for (let i = 1; i <= remainingCells; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'day-cell other-month';
+        cell.innerHTML = `<span class="day-number">${i}</span>`;
+        daysGrid.appendChild(cell);
+      }
+    }
+
+    function abrirDetalleDia(fecha, eventos) {
+      document.getElementById('dayModalTitle').textContent = `Vencimientos: ${fecha.split('-').reverse().join('/')}`;
+      const content = document.getElementById('dayModalContent');
+      content.innerHTML = '';
+
+      if (!eventos || eventos.length === 0) {
+        content.innerHTML = '<div style="text-align: center; color: var(--text-tertiary); padding: 30px; font-size: 13px;">No hay cuotas programadas para esta fecha.</div>';
+        document.getElementById('dayDetailModal').classList.add('is-open');
+        return;
+      }
+
+      eventos.forEach(ev => {
+        const card = document.createElement('div');
+        card.className = 'day-detail-card';
+        card.innerHTML = `
+          <div class="client-title">${ev.clienteNombre}</div>
+          <div class="meta-info">
+            <span>Cuota #${ev.numero}</span>
+            <span>Total: $${ev.monto.toLocaleString('es-AR', {minimumFractionDigits: 2})}</span>
+          </div>
+          <div class="meta-info">
+            <span>Estado: <strong style="color:${ev.estado === 'pagada' ? 'var(--status-success)' : 'var(--status-warning)'};">${ev.estado.toUpperCase()}</strong></span>
+            <span>Pagado: $${ev.pagado.toLocaleString('es-AR', {minimumFractionDigits: 2})}</span>
+          </div>
+        `;
+        content.appendChild(card);
+      });
+
+      document.getElementById('dayDetailModal').classList.add('is-open');
+    }
+
+    document.getElementById('closeDayModalBtn').onclick = () => {
+      document.getElementById('dayDetailModal').classList.remove('is-open');
+    };
+
+    document.getElementById('prevMonthBtn').onclick = () => {
+      fechaActualNav.setMonth(fechaActualNav.getMonth() - 1);
+      renderizarCalendario();
+    };
+
+    document.getElementById('nextMonthBtn').onclick = () => {
+      fechaActualNav.setMonth(fechaActualNav.getMonth() + 1);
+      renderizarCalendario();
+    };
+
+    sincronizarClientes().then(() => {
+      onSnapshot(collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos"), snap => {
+        creditosCache = [];
+        snap.forEach(d => creditosCache.push({ id: d.id, ...d.data() }));
+        renderizarCalendario();
+      });
+    });
+  </script>
+</body>
+</html>
