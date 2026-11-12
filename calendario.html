@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>COUT.APP | Calendario Inteligente de Vencimientos</title>
+  <title>COUT.APP | Calendario Inteligente de Cobros</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -20,13 +20,12 @@
       --text-tertiary: #64748b;
       --status-success: #10b981;
       --status-warning: #f59e0b;
-      --status-danger: #ef4444;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
     html, body { width: 100%; min-height: 100vh; background-color: var(--bg-base); color: var(--text-primary); overflow-x: hidden; scrollbar-width: none; }
     html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
-    .container { max-width: 1200px; margin: 0 auto; padding: 20px; width: 100%; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 20px; width: 100%; }
 
     header {
       background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 16px;
@@ -54,7 +53,7 @@
     .calendar-title-area p { font-size: 13px; color: var(--text-secondary); }
 
     .calendar-nav-controls { display: flex; align-items: center; gap: 12px; }
-    .month-display { font-size: 16px; font-weight: 700; font-family: 'JetBrains Mono', monospace; min-width: 180px; text-align: center; }
+    .month-display { font-size: 15px; font-weight: 700; font-family: 'JetBrains Mono', monospace; min-width: 170px; text-align: center; }
     .btn-nav {
       background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-subtle); color: var(--text-primary);
       width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
@@ -63,34 +62,56 @@
     .btn-nav:hover { background: var(--accent-flame); border-color: var(--accent-flame); }
     .btn-nav svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2; }
 
-    /* Estructura del Calendario Mensual */
+    /* Grilla del Calendario */
     .calendar-grid-wrapper {
       background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px;
-      padding: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); overflow: hidden;
+      padding: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); overflow: hidden;
     }
-    .weekdays-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 12px; text-align: center; }
+    .weekdays-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 10px; text-align: center; }
     .weekday-lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); font-family: 'JetBrains Mono', monospace; }
 
-    .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+    .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
     .day-cell {
       background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px;
-      min-height: 95px; padding: 8px; display: flex; flex-direction: column; justify-content: flex-start;
-      gap: 6px; transition: all 0.2s; position: relative; cursor: pointer;
+      min-height: 85px; padding: 8px; display: flex; flex-direction: column; justify-content: space-between;
+      transition: all 0.2s; position: relative; cursor: pointer;
     }
     .day-cell:hover { border-color: rgba(249, 115, 22, 0.4); background: var(--bg-surface-hover); }
-    .day-cell.other-month { opacity: 0.35; background: rgba(255, 255, 255, 0.01); }
-    .day-cell.today { border-color: var(--accent-flame); box-shadow: 0 0 10px rgba(249, 115, 22, 0.2); }
+    .day-cell.other-month { opacity: 0.3; background: rgba(255, 255, 255, 0.01); }
+    .day-cell.today { border-color: var(--accent-flame); box-shadow: 0 0 12px rgba(249, 115, 22, 0.2); }
     
+    .day-cell-top { display: flex; align-items: center; justify-content: space-between; width: 100%; }
     .day-number { font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--text-secondary); }
     .day-cell.today .day-number { color: var(--accent-flame); }
 
-    .event-pill {
-      font-size: 10px; font-weight: 600; padding: 3px 6px; border-radius: 6px;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'JetBrains Mono', monospace;
-      display: flex; align-items: center; justify-content: space-between; gap: 4px;
+    /* Indicador de Punto Animado */
+    .event-dot-indicator {
+      width: 7px; height: 7px; background: var(--accent-flame); border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-flame); animation: pulseDot 2s infinite;
     }
-    .event-pill.pendiente { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
-    .event-pill.pagada { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .event-dot-indicator.pagada { background: var(--status-success); box-shadow: 0 0 8px var(--status-success); }
+    @keyframes pulseDot {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+
+    /* Vista previa de eventos en escritorio */
+    .events-preview-box { display: flex; flex-direction: column; gap: 3px; width: 100%; margin-top: 4px; overflow: hidden; }
+    .event-pill-mini {
+      font-size: 9px; font-weight: 600; padding: 2px 5px; border-radius: 5px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'JetBrains Mono', monospace;
+      background: rgba(249, 115, 22, 0.12); color: #fdba74; border: 1px solid rgba(249, 115, 22, 0.25);
+    }
+    .event-pill-mini.pagada { background: rgba(16, 185, 129, 0.12); color: #6ee7b7; border-color: rgba(16, 185, 129, 0.25); }
+
+    /* Adaptabilidad Móvil Extrema */
+    @media (max-width: 640px) {
+      .day-cell { min-height: 60px; padding: 6px; }
+      .events-preview-box { display: none; } /* En celular dejamos los puntitos limpios y al tocar se abre el modal */
+      .day-cell-top { justify-content: center; }
+      .day-number { font-size: 13px; }
+    }
 
     /* Modal de Detalle del Día */
     .modal-overlay {
@@ -101,7 +122,7 @@
     .modal-overlay.is-open { opacity: 1; pointer-events: auto; }
     .modal-container {
       background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px;
-      width: 100%; max-width: 520px; padding: 24px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+      width: 100%; max-width: 480px; padding: 24px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
       max-height: 85vh; display: flex; flex-direction: column;
     }
     .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
@@ -109,7 +130,7 @@
     .btn-close-modal { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-subtle); color: var(--text-secondary); cursor: pointer; width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
     .modal-body-scroll { overflow-y: auto; flex: 1; padding-right: 4px; display: flex; flex-direction: column; gap: 10px; }
 
-    .day-detail-card { background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+    .day-detail-card { background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
     .day-detail-card .client-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
     .day-detail-card .meta-info { font-size: 12px; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; display: flex; justify-content: space-between; }
 
@@ -120,11 +141,6 @@
     .custom-alert-box h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
     .custom-alert-box p { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
     .btn-alert-primary { width: 100%; height: 40px; background: var(--accent-flame); border: none; border-radius: 8px; color: white; font-weight: 700; font-size: 13px; cursor: pointer; }
-
-    @media (max-width: 768px) {
-      .day-cell { min-height: 75px; padding: 4px; }
-      .event-pill { font-size: 9px; padding: 2px 4px; }
-    }
   </style>
 </head>
 <body>
@@ -149,8 +165,8 @@
     <main>
       <div class="calendar-header-card">
         <div class="calendar-title-area">
-          <h1>Calendario de <span>Vencimientos</span></h1>
-          <p>Visualiza todas las cuotas programadas y cobros previstos por fecha.</p>
+          <h1>Calendario de <span>Cobros</span></h1>
+          <p>Controla las cuotas y vencimientos día a día en tiempo real.</p>
         </div>
         <div class="calendar-nav-controls">
           <button class="btn-nav" id="prevMonthBtn" title="Mes Anterior">
@@ -182,7 +198,7 @@
   <div class="modal-overlay" id="dayDetailModal">
     <div class="modal-container">
       <div class="modal-header">
-        <h3 id="dayModalTitle">Vencimientos del Día</h3>
+        <h3 id="dayModalTitle">Cobros del Día</h3>
         <button class="btn-close-modal" id="closeDayModalBtn">
           <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
@@ -226,7 +242,6 @@
       document.getElementById('monthDisplay').textContent = `${mesesNombres[month]} ${year}`;
 
       const firstDayIndex = new Date(year, month, 1).getDay();
-      // Ajustar para que la semana comience en Lunes (0 = Lunes, 6 = Domingo)
       const adjustedFirstDay = (firstDayIndex === 0) ? 6 : firstDayIndex - 1;
       const totalDays = new Date(year, month + 1, 0).getDate();
       const prevTotalDays = new Date(year, month, 0).getDate();
@@ -259,7 +274,7 @@
         const dNum = prevTotalDays - i + 1;
         const cell = document.createElement('div');
         cell.className = 'day-cell other-month';
-        cell.innerHTML = `<span class="day-number">${dNum}</span>`;
+        cell.innerHTML = `<div class="day-cell-top"><span class="day-number">${dNum}</span></div>`;
         daysGrid.appendChild(cell);
       }
 
@@ -272,41 +287,49 @@
         const cell = document.createElement('div');
         cell.className = `day-cell ${fechaKey === hoyStr ? 'today' : ''}`;
         
-        let htmlCuotas = `<span class="day-number">${i}</span>`;
         const eventosDelDia = eventosMap[fechaKey] || [];
+        let tieneEventos = eventosDelDia.length > 0;
+        let todasPagadas = tieneEventos && eventosDelDia.every(e => e.estado === 'pagada');
 
-        eventosDelDia.slice(0, 2).forEach(ev => {
-          const cls = ev.estado === 'pagada' ? 'pagada' : 'pendiente';
-          htmlCuotas += `
-            <div class="event-pill ${cls}" title="Cuota #${ev.numero} - ${ev.clienteNombre}">
-              <span>#${ev.numero} ${ev.clienteNombre}</span>
-              <span>$${Math.round(ev.monto).toLocaleString()}</span>
-            </div>
-          `;
-        });
+        let cellHtml = `
+          <div class="day-cell-top">
+            <span class="day-number">${i}</span>
+            ${tieneEventos ? `<div class="event-dot-indicator ${todasPagadas ? 'pagada' : ''}" title="Hay cuotas programadas"></div>` : ''}
+          </div>
+        `;
 
-        if (eventosDelDia.length > 2) {
-          htmlCuotas += `<span style="font-size:9px; color:var(--accent-flame); font-weight:700; text-align:center;">+${eventosDelDia.length - 2} más</span>`;
+        // Vista previa en Escritorio (PC)
+        if (tieneEventos) {
+          let previewHtml = `<div class="events-preview-box">`;
+          eventosDelDia.slice(0, 2).forEach(ev => {
+            const cls = ev.estado === 'pagada' ? 'pagada' : '';
+            previewHtml += `<div class="event-pill-mini ${cls}">#${ev.numero} $${Math.round(ev.monto).toLocaleString()}</div>`;
+          });
+          if (eventosDelDia.length > 2) {
+            previewHtml += `<span style="font-size:8px; color:var(--text-tertiary); font-weight:700;">+${eventosDelDia.length - 2} más</span>`;
+          }
+          previewHtml += `</div>`;
+          cellHtml += previewHtml;
         }
 
-        cell.innerHTML = htmlCuotas;
+        cell.innerHTML = cellHtml;
         cell.onclick = () => abrirDetalleDia(fechaKey, eventosDelDia);
         daysGrid.appendChild(cell);
       }
 
-      // Días del siguiente mes para completar la grilla
+      // Días del siguiente mes para rellenar la grilla
       const totalCellsPrinted = adjustedFirstDay + totalDays;
       const remainingCells = (totalCellsPrinted <= 35) ? (35 - totalCellsPrinted) : (42 - totalCellsPrinted);
       for (let i = 1; i <= remainingCells; i++) {
         const cell = document.createElement('div');
         cell.className = 'day-cell other-month';
-        cell.innerHTML = `<span class="day-number">${i}</span>`;
+        cell.innerHTML = `<div class="day-cell-top"><span class="day-number">${i}</span></div>`;
         daysGrid.appendChild(cell);
       }
     }
 
     function abrirDetalleDia(fecha, eventos) {
-      document.getElementById('dayModalTitle').textContent = `Vencimientos: ${fecha.split('-').reverse().join('/')}`;
+      document.getElementById('dayModalTitle').textContent = `Cobros del ${fecha.split('-').reverse().join('/')}`;
       const content = document.getElementById('dayModalContent');
       content.innerHTML = '';
 
@@ -317,6 +340,7 @@
       }
 
       eventos.forEach(ev => {
+        const restante = ev.monto - ev.pagado;
         const card = document.createElement('div');
         card.className = 'day-detail-card';
         card.innerHTML = `
@@ -327,7 +351,7 @@
           </div>
           <div class="meta-info">
             <span>Estado: <strong style="color:${ev.estado === 'pagada' ? 'var(--status-success)' : 'var(--status-warning)'};">${ev.estado.toUpperCase()}</strong></span>
-            <span>Pagado: $${ev.pagado.toLocaleString('es-AR', {minimumFractionDigits: 2})}</span>
+            <span>Restante: $${restante.toLocaleString('es-AR', {minimumFractionDigits: 2})}</span>
           </div>
         `;
         content.appendChild(card);
