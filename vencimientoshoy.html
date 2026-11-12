@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>COUT.APP | Vencimientos de Hoy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-base: #06080d;
+      --bg-surface: #0e121d;
+      --bg-surface-hover: #161d2e;
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --accent-flame: #f97316;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-tertiary: #64748b;
+      --status-success: #10b981;
+      --status-warning: #f59e0b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    html, body { width: 100%; min-height: 100vh; background-color: var(--bg-base); color: var(--text-primary); overflow-x: hidden; scrollbar-width: none; }
+    html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
+    .container { max-width: 900px; margin: 0 auto; padding: 20px; width: 100%; }
+
+    header {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 16px;
+      padding: 14px 20px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
+    }
+    .btn-back {
+      display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle); color: var(--text-secondary); text-decoration: none;
+      font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 10px; transition: all 0.2s;
+    }
+    .btn-back:hover { background: rgba(255, 255, 255, 0.08); color: var(--text-primary); border-color: rgba(249, 115, 22, 0.3); }
+    .btn-back svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.2; }
+    .brand-section { display: flex; align-items: center; gap: 8px; }
+    .logo-text { font-size: 20px; font-weight: 800; color: var(--text-primary); }
+    .logo-text span { color: var(--accent-flame); }
+
+    .today-header-card {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px;
+      padding: 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    }
+    .today-title-area h1 { font-size: 24px; font-weight: 800; }
+    .today-title-area h1 span { color: var(--accent-flame); }
+    .today-title-area p { font-size: 13px; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; margin-top: 4px; }
+
+    .daily-total-badge {
+      background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 14px; padding: 14px 20px; display: flex; flex-direction: column; align-items: flex-end;
+    }
+    .daily-total-badge span:first-child { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; }
+    .daily-total-badge .total-amount { font-size: 22px; font-weight: 800; color: var(--status-success); font-family: 'JetBrains Mono', monospace; }
+
+    /* Listado de tarjetas de hoy */
+    .vencimientos-list { display: flex; flex-direction: column; gap: 14px; }
+    
+    .vencimiento-card {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 16px;
+      padding: 18px; display: flex; flex-direction: column; gap: 12px; transition: all 0.2s;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    }
+    .vencimiento-card:hover { border-color: rgba(249, 115, 22, 0.3); background: var(--bg-surface-hover); }
+    
+    .card-top-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .client-name { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+    
+    .card-actions-group { display: flex; align-items: center; gap: 8px; }
+
+    .id-tag-badge {
+      font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--accent-flame); font-weight: 700;
+      background: rgba(249, 115, 22, 0.1); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(249, 115, 22, 0.3);
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-copy-pro { background: none; border: none; cursor: pointer; color: var(--text-secondary); display: inline-flex; align-items: center; transition: color 0.2s; }
+    .btn-copy-pro:hover { color: var(--text-primary); }
+    .btn-copy-pro svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    .btn-wsp-pro {
+      background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399;
+      height: 32px; padding: 0 12px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 600; transition: all 0.2s;
+    }
+    .btn-wsp-pro:hover { background: rgba(16, 185, 129, 0.3); transform: scale(1.02); }
+    .btn-wsp-pro svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    .card-info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--text-secondary); background: #090e18; padding: 12px; border-radius: 10px; border: 1px solid var(--border-subtle); }
+    .card-info-grid strong { color: var(--text-primary); }
+
+    /* Estado Vacío */
+    .empty-state {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px;
+      padding: 50px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    }
+    .empty-state svg { width: 54px; height: 54px; stroke: var(--text-tertiary); fill: none; stroke-width: 1.5; }
+    .empty-state h3 { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+    .empty-state p { font-size: 13px; color: var(--text-secondary); max-width: 320px; }
+
+    /* Alerta Custom */
+    .custom-alert-overlay { position: fixed; inset: 0; background: rgba(5, 7, 11, 0.88); backdrop-filter: blur(12px); z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+    .custom-alert-overlay.is-open { opacity: 1; pointer-events: auto; }
+    .custom-alert-box { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px; width: 100%; max-width: 380px; padding: 22px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.8); }
+    .custom-alert-box h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .custom-alert-box p { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
+    .btn-alert-primary { width: 100%; height: 40px; background: var(--accent-flame); border: none; border-radius: 8px; color: white; font-weight: 700; font-size: 13px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <div class="custom-alert-overlay" id="customAlertOverlay">
+    <div class="custom-alert-box">
+      <h4 id="alertTitle">Atención</h4>
+      <p id="alertMessage">...</p>
+      <button class="btn-alert-primary" id="alertOkBtn">Aceptar</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <header>
+      <a href="gestionprestamista.html" class="btn-back">
+        <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Volver al Panel
+      </a>
+      <div class="brand-section"><h1 class="logo-text">cout<span>.app</span></h1></div>
+    </header>
+
+    <main>
+      <div class="today-header-card">
+        <div class="today-title-area">
+          <h1>Vencimientos de <span>Hoy</span></h1>
+          <p id="todayDateLabel">Cargando fecha...</p>
+        </div>
+        <div class="daily-total-badge">
+          <span>Total a cobrar hoy</span>
+          <span class="total-amount" id="totalHoyAmount">$0.00</span>
+        </div>
+      </div>
+
+      <div class="vencimientos-list" id="vencimientosListContainer">
+        <!-- Contenido dinámico -->
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { db } from './app.js';
+    import { collection, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const prestamistaId = localStorage.getItem('cout_prestamista_id');
+    if (!prestamistaId) window.location.replace('loginprestamista.html');
+
+    let creditosCache = [];
+    let clientesCache = {};
+
+    window.mostrarAlerta = (t, m) => {
+      document.getElementById('alertTitle').textContent = t;
+      document.getElementById('alertMessage').textContent = m;
+      document.getElementById('customAlertOverlay').classList.add('is-open');
+    };
+    document.getElementById('alertOkBtn').onclick = () => document.getElementById('customAlertOverlay').classList.remove('is-open');
+
+    async function sincronizarClientes() {
+      try {
+        const snap = await getDocs(collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "clientes"));
+        snap.forEach(d => { clientesCache[d.id] = { id: d.id, ...d.data() }; });
+      } catch(err) {
+        console.error("Error sincronizando clientes:", err);
+      }
+    }
+
+    window.copiarIdCredito = (idUnico) => {
+      navigator.clipboard.writeText(idUnico).then(() => {
+        window.mostrarAlerta("Copiado", `ID del crédito (${idUnico}) copiado al portapapeles.`);
+      });
+    };
+
+    window.enviarRecordatorioWsp = (clienteNombre, creditoIdTag, cuotaNum, montoCuota, fechaVto, telefonoWsp) => {
+      let telClean = (telefonoWsp || '').replace(/\D/g, '');
+      if (!telClean) {
+        window.mostrarAlerta("Sin WhatsApp", "Este cliente no tiene un número de WhatsApp registrado en el sistema.");
+        return;
+      }
+      if (telClean.length === 10 && !telClean.startsWith('54')) {
+        telClean = '549' + telClean;
+      }
+
+      const mensaje = `Hola *${clienteNombre}* 👋\n\nEstimado cliente, le escribimos desde el departamento de gestión para recordarle que *hoy* vence su cuota programada:\n\n📄 *Comprobante / Crédito:* ${creditoIdTag}\n📌 *Cuota:* #${cuotaNum}\n💵 *Monto a Abonar:* $${parseFloat(montoCuota).toLocaleString('es-AR', {minimumFractionDigits: 2})}\n📅 *Fecha de Vencimiento:* ${fechaVto.split('-').reverse().join('/')}\n\nPor favor, recuerde realizar su pago a tiempo para mantener su excelente historial crediticio al día y seguir accediendo a mayores beneficios y montos. 🚀📈\n\nMuchas gracias por su confianza y cumplimiento. 🙌`;
+
+      const urlWsp = `https://wa.me/${telClean}?text=${encodeURIComponent(mensaje)}`;
+      window.open(urlWsp, '_blank');
+    };
+
+    function asegurarCuotasLocal(c) {
+      let cuotasArr = c.cuotasDetalle || [];
+      if (!Array.isArray(cuotasArr) || cuotasArr.length === 0) {
+        cuotasArr = [];
+        const cantidad = parseInt(c.cantidadCuotas) || 1;
+        const totalInt = parseFloat(c.totalConInteres) || 0;
+        const valorCuota = c.valorCuota || (totalInt / cantidad);
+        let fechaBase = new Date(c.fechaInicio || Date.now());
+
+        for (let i = 1; i <= cantidad; i++) {
+          if (c.frecuencia === 'semanal') fechaBase.setDate(fechaBase.getDate() + 7);
+          else if (c.frecuencia === 'quincenal') fechaBase.setDate(fechaBase.getDate() + 15);
+          else if (c.frecuencia === 'mensual') fechaBase.setMonth(fechaBase.getMonth() + 1);
+
+          cuotasArr.push({
+            numero: i,
+            vencimiento: fechaBase.toISOString().split('T')[0],
+            monto: valorCuota,
+            pagado: 0,
+            estado: 'pendiente'
+          });
+        }
+      }
+      return cuotasArr;
+    }
+
+    function procesarVencimientosHoy() {
+      const hoyStr = new Date().toISOString().split('T')[0];
+      const opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('todayDateLabel').textContent = new Date().toLocaleDateString('es-AR', opcionesFecha).toUpperCase();
+
+      let vencimientosHoy = [];
+
+      creditosCache.forEach(c => {
+        const cuotas = asegurarCuotasLocal(c);
+        const creditIdTag = c.codigoUnico || `#CRED-${c.id.substring(0, 6).toUpperCase()}`;
+        const clienteInfo = clientesCache[c.clienteId] || {};
+        const wspCliente = clienteInfo.whatsapp || clienteInfo.telefono || c.whatsapp || c.clienteTelefono || '';
+
+        cuotas.forEach(q => {
+          if (q.vencimiento === hoyStr) {
+            vencimientosHoy.push({
+              creditoId: c.id,
+              creditIdTag: creditIdTag,
+              clienteNombre: c.clienteNombre || clienteInfo.nombre || 'Cliente',
+              whatsappCliente: wspCliente,
+              numeroCuota: q.numero,
+              totalCuotas: c.cantidadCuotas || cuotas.length,
+              monto: q.monto,
+              pagado: q.pagado || 0,
+              estado: q.estado || 'pendiente',
+              vencimiento: q.vencimiento
+            });
+          }
+        });
+      });
+
+      const container = document.getElementById('vencimientosListContainer');
+      container.innerHTML = '';
+
+      const totalHoy = vencimientosHoy.reduce((sum, ev) => sum + (parseFloat(ev.monto) || 0), 0);
+      document.getElementById('totalHoyAmount').textContent = `$${totalHoy.toLocaleString('es-AR', {minimumFractionDigits: 2})}`;
+
+      if (vencimientosHoy.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <h3>Hoy no hay ningún vencimiento</h3>
+            <p>No se registran cuotas ni cobros programados para el día de la fecha.</p>
+          </div>
+        `;
+        return;
+      }
+
+      vencimientosHoy.forEach((ev, idx) => {
+        const pagadoVal = parseFloat(ev.pagado) || 0;
+        const restante = ev.monto - pagadoVal;
+        const estadoFinal = (ev.estado === 'pagada' || pagadoVal >= ev.monto) ? 'PAGADA' : (pagadoVal > 0 ? 'PARCIAL' : 'PENDIENTE');
+        const colorEstado = estadoFinal === 'PAGADA' ? 'var(--status-success)' : (estadoFinal === 'PARCIAL' ? '#93c5fd' : 'var(--status-warning)');
+
+        const card = document.createElement('div');
+        card.className = 'vencimiento-card';
+        card.innerHTML = `
+          <div class="card-top-row">
+            <span class="client-name">${ev.clienteNombre}</span>
+            <div class="card-actions-group">
+              <button class="btn-wsp-pro" id="wspBtn_${idx}">
+                <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                Avisar WhatsApp
+              </button>
+              <span class="id-tag-badge">
+                ${ev.creditIdTag}
+                <button class="btn-copy-pro" title="Copiar ID del Crédito" id="copyIdBtn_${idx}">
+                  <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                </button>
+              </span>
+            </div>
+          </div>
+          <div class="card-info-grid">
+            <div>Cuota: <strong>#${ev.numero} de ${ev.totalCuotas}</strong></div>
+            <div>Monto Total: <strong>$${ev.monto.toLocaleString('es-AR', {minimumFractionDigits: 2})}</strong></div>
+            <div>Estado: <strong style="color:${colorEstado};">${estadoFinal}</strong></div>
+            <div>Restante: <strong>$${restante > 0 ? restante.toLocaleString('es-AR', {minimumFractionDigits: 2}) : '0.00'}</strong></div>
+          </div>
+        `;
+
+        card.querySelector(`#copyIdBtn_${idx}`).onclick = () => window.copiarIdCredito(ev.creditIdTag);
+        card.querySelector(`#wspBtn_${idx}`).onclick = () => window.enviarRecordatorioWsp(ev.clienteNombre, ev.creditIdTag, ev.numero, ev.monto, ev.vencimiento, ev.whatsappCliente);
+
+        container.appendChild(card);
+      });
+    }
+
+    sincronizarClientes().then(() => {
+      onSnapshot(collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos"), snap => {
+        creditosCache = [];
+        snap.forEach(d => {
+          creditosCache.push({ id: d.id, ...d.data() });
+        });
+        procesarVencimientosHoy();
+      });
+    });
+  </script>
+</body>
+</html>
