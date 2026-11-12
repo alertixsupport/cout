@@ -129,7 +129,18 @@
     .modal-body-scroll { overflow-y: auto; flex: 1; padding-right: 4px; display: flex; flex-direction: column; gap: 10px; }
 
     .day-detail-card { background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+    .day-detail-card .card-top-row { display: flex; align-items: center; justify-content: space-between; }
     .day-detail-card .client-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+    
+    .id-tag-badge {
+      font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--accent-flame); font-weight: 700;
+      background: rgba(249, 115, 22, 0.1); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(249, 115, 22, 0.3);
+      display: inline-flex; align-items: center; gap: 4px;
+    }
+    .btn-copy-pro { background: none; border: none; cursor: pointer; color: var(--text-secondary); display: inline-flex; align-items: center; transition: color 0.2s; }
+    .btn-copy-pro:hover { color: var(--text-primary); }
+    .btn-copy-pro svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
     .day-detail-card .meta-info { font-size: 12px; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; display: flex; justify-content: space-between; }
 
     .custom-alert-overlay { position: fixed; inset: 0; background: rgba(5, 7, 11, 0.88); backdrop-filter: blur(12px); z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
@@ -163,7 +174,7 @@
       <div class="calendar-header-card">
         <div class="calendar-title-area">
           <h1>Calendario de <span>Cobros</span></h1>
-          <p>Controla el 100% de los créditos y sus cuotas día a día en tiempo real.</p>
+          <p>Controla el 100% de los créditos, sus IDs y cuotas día a día en tiempo real.</p>
         </div>
         <div class="calendar-nav-controls">
           <button class="btn-nav" id="prevMonthBtn" title="Mes Anterior">
@@ -221,7 +232,12 @@
     };
     document.getElementById('alertOkBtn').onclick = () => document.getElementById('customAlertOverlay').classList.remove('is-open');
 
-    // Generar cuotas automáticamente si el crédito en Firestore no las tiene creadas
+    window.copiarIdCredito = (idUnico) => {
+      navigator.clipboard.writeText(idUnico).then(() => {
+        window.mostrarAlerta("Copiado", `ID del crédito (${idUnico}) copiado al portapapeles.`);
+      });
+    };
+
     function asegurarCuotasLocal(c) {
       let cuotasArr = c.cuotasDetalle || [];
       if (!Array.isArray(cuotasArr) || cuotasArr.length === 0) {
@@ -263,15 +279,17 @@
       const daysGrid = document.getElementById('daysGrid');
       daysGrid.innerHTML = '';
 
-      // Mapear el 100% de las cuotas de TODOS los créditos del usuario prestamista
       const eventosMap = {};
       creditosCache.forEach(c => {
         const cuotas = asegurarCuotasLocal(c);
+        const creditIdTag = c.codigoUnico || `#CRED-${c.id.substring(0, 6).toUpperCase()}`;
+
         cuotas.forEach(q => {
           if (!q.vencimiento) return;
           if (!eventosMap[q.vencimiento]) eventosMap[q.vencimiento] = [];
           eventosMap[q.vencimiento].push({
             creditoId: c.id,
+            creditIdTag: creditIdTag,
             clienteNombre: c.clienteNombre || 'Cliente',
             numeroCuota: q.numero,
             totalCuotas: c.cantidadCuotas || cuotas.length,
@@ -284,7 +302,6 @@
 
       const hoyStr = new Date().toISOString().split('T')[0];
 
-      // Días del mes anterior
       for (let i = adjustedFirstDay; i > 0; i--) {
         const dNum = prevTotalDays - i + 1;
         const cell = document.createElement('div');
@@ -293,7 +310,6 @@
         daysGrid.appendChild(cell);
       }
 
-      // Días del mes actual
       for (let i = 1; i <= totalDays; i++) {
         const mesFmt = String(month + 1).padStart(2, '0');
         const diaFmt = String(i).padStart(2, '0');
@@ -331,7 +347,6 @@
         daysGrid.appendChild(cell);
       }
 
-      // Días del siguiente mes para completar la grilla
       const totalCellsPrinted = adjustedFirstDay + totalDays;
       const remainingCells = (totalCellsPrinted <= 35) ? (35 - totalCellsPrinted) : (42 - totalCellsPrinted);
       for (let i = 1; i <= remainingCells; i++) {
@@ -353,7 +368,7 @@
         return;
       }
 
-      eventos.forEach(ev => {
+      eventos.forEach((ev, idx) => {
         const pagadoVal = parseFloat(ev.pagado) || 0;
         const restante = ev.monto - pagadoVal;
         const estadoFinal = (ev.estado === 'pagada' || pagadoVal >= ev.monto) ? 'PAGADA' : (pagadoVal > 0 ? 'PARCIAL' : 'PENDIENTE');
@@ -362,7 +377,15 @@
         const card = document.createElement('div');
         card.className = 'day-detail-card';
         card.innerHTML = `
-          <div class="client-title">${ev.clienteNombre}</div>
+          <div class="card-top-row">
+            <span class="client-title">${ev.clienteNombre}</span>
+            <span class="id-tag-badge">
+              ${ev.creditIdTag}
+              <button class="btn-copy-pro" title="Copiar ID del Crédito" id="copyIdBtn_${fecha}_${idx}">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              </button>
+            </span>
+          </div>
           <div class="meta-info">
             <span>Cuota #${ev.numero} de ${ev.totalCuotas}</span>
             <span>Total: $${ev.monto.toLocaleString('es-AR', {minimumFractionDigits: 2})}</span>
@@ -372,6 +395,12 @@
             <span>Restante: $${restante > 0 ? restante.toLocaleString('es-AR', {minimumFractionDigits: 2}) : '0.00'}</span>
           </div>
         `;
+
+        card.querySelector(`#copyIdBtn_${fecha}_${idx}`).onclick = (e) => {
+          e.stopPropagation();
+          window.copiarIdCredito(ev.creditIdTag);
+        };
+
         content.appendChild(card);
       });
 
@@ -392,7 +421,6 @@
       renderizarCalendario();
     };
 
-    // Sincronización en tiempo real de TODOS los créditos del prestamista desde Firestore
     onSnapshot(collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos"), snap => {
       creditosCache = [];
       snap.forEach(d => {
