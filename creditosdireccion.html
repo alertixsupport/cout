@@ -45,10 +45,23 @@
     .logo-text { font-size: 20px; font-weight: 800; color: var(--text-primary); }
     .logo-text span { color: var(--accent-flame); }
 
-    .dashboard-hero { margin-bottom: 20px; }
+    .dashboard-hero { margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
     .hero-text h1 { font-size: 22px; font-weight: 800; margin-bottom: 2px; }
     .hero-text h1 span { color: var(--accent-flame); }
     .hero-text p { font-size: 13px; color: var(--text-secondary); }
+
+    /* Contadores Estadísticos */
+    .stats-container { display: flex; gap: 12px; }
+    .stat-pill {
+      background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 12px;
+      padding: 8px 14px; display: flex; align-items: center; gap: 10px;
+    }
+    .stat-pill .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .stat-pill.active .dot { background: var(--status-success); box-shadow: 0 0 8px rgba(16, 185, 129, 0.5); }
+    .stat-pill.danger .dot { background: var(--status-danger); box-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
+    .stat-info { display: flex; flex-direction: column; }
+    .stat-info .lbl { font-size: 10px; text-transform: uppercase; color: var(--text-tertiary); font-weight: 700; }
+    .stat-info .val { font-size: 14px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
 
     .search-container { margin-bottom: 24px; width: 100%; }
     .search-input-wrapper { position: relative; display: flex; align-items: center; width: 100%; }
@@ -176,7 +189,7 @@
     /* Alerta Custom */
     .custom-alert-overlay { position: fixed; inset: 0; background: rgba(5, 7, 11, 0.88); backdrop-filter: blur(12px); z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
     .custom-alert-overlay.is-open { opacity: 1; pointer-events: auto; }
-    .custom-alert-box { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px; width: 100%; max-width: 380px; padding: 22px; text-align: center; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8); }
+    .custom-alert-box { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px; width: 100%; max-width: 380px; padding: 22px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.8); }
     .custom-alert-box h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
     .custom-alert-box p { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
     .btn-alert-primary { width: 100%; height: 40px; background: var(--accent-flame); border: none; border-radius: 8px; color: white; font-weight: 700; font-size: 13px; cursor: pointer; }
@@ -205,7 +218,24 @@
       <div class="dashboard-hero">
         <div class="hero-text">
           <h1>Dirección de <span>Créditos</span></h1>
-          <p>Visualice la cartera en tarjetas compactas y gestione los abonos y auditoría desde la ficha de cada crédito.</p>
+          <p>Gestión de cartera, abonos y auditoría en tiempo real.</p>
+        </div>
+        <!-- Contadores de Créditos Activos y Morosos -->
+        <div class="stats-container">
+          <div class="stat-pill active">
+            <div class="dot"></div>
+            <div class="stat-info">
+              <span class="lbl">Activos</span>
+              <span class="val" id="countActivos">0</span>
+            </div>
+          </div>
+          <div class="stat-pill danger">
+            <div class="dot"></div>
+            <div class="stat-info">
+              <span class="lbl">Morosos</span>
+              <span class="val" id="countMorosos">0</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -328,7 +358,7 @@
       });
     };
 
-    // Generar y copiar enlace de vercredito.html con su respectivo ID
+    // Generar y copiar enlace de vercredito.html con ícono de link profesional
     window.compartirEnlaceVerCredito = (id) => {
       const link = `${window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1)}vercredito.html?id=${id}&p=${prestamistaId}`;
       navigator.clipboard.writeText(link).then(() => {
@@ -384,7 +414,19 @@
       }
     };
 
+    function actualizarContadores(arr) {
+      let activos = 0;
+      let morosos = 0;
+      arr.forEach(c => {
+        if (c.estado === 'moroso') morosos++;
+        else activos++;
+      });
+      document.getElementById('countActivos').textContent = activos;
+      document.getElementById('countMorosos').textContent = morosos;
+    }
+
     function renderizarCreditosGrid(arr) {
+      actualizarContadores(arr);
       const grid = document.getElementById('creditsGrid');
       grid.innerHTML = '';
 
@@ -428,8 +470,9 @@
                     <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                   </button>
                 </span>
-                <button class="btn-action-icon" onclick="window.compartirEnlaceVerCredito('${c.id}')" title="Copiar Enlace para ver Crédito (vercredito.html)">
-                  <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                <!-- Ícono de Enlace / Link Profesional -->
+                <button class="btn-action-icon" onclick="window.compartirEnlaceVerCredito('${c.id}')" title="Copiar Enlace del Crédito (vercredito.html)">
+                  <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
                 </button>
               </div>
               <button class="btn-action-view" onclick="window.verFichaCredito('${c.id}')">
@@ -512,8 +555,9 @@
             <button class="btn-copy-pro" onclick="window.copiarIdCredito('${creditIdTag}')" title="Copiar ID">
               <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
             </button>
+            <!-- Ícono de Enlace / Link Profesional en Ficha -->
             <button class="btn-copy-pro" onclick="window.compartirEnlaceVerCredito('${id}')" title="Copiar Enlace (vercredito.html)" style="color:#60a5fa; margin-left:4px;">
-              <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
             </button>
           </div>
           <button class="btn-toggle-moroso ${esMoroso ? 'es-moroso' : ''}" onclick="window.iniciarToggleMoroso('${id}')">
