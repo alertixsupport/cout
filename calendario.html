@@ -157,7 +157,6 @@
     .btn-copy-pro:hover { color: var(--text-primary); }
     .btn-copy-pro svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
 
-    /* Botón de WhatsApp empresarial */
     .btn-wsp-pro {
       background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399;
       width: 28px; height: 28px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
@@ -170,7 +169,7 @@
 
     .custom-alert-overlay { position: fixed; inset: 0; background: rgba(5, 7, 11, 0.88); backdrop-filter: blur(12px); z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
     .custom-alert-overlay.is-open { opacity: 1; pointer-events: auto; }
-    .custom-alert-box { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px; width: 100%; max-width: 380px; padding: 22px; text-align: center; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8); }
+    .custom-alert-box { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px; width: 100%; max-width: 380px; padding: 22px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.8); }
     .custom-alert-box h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
     .custom-alert-box p { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
     .btn-alert-primary { width: 100%; height: 40px; background: var(--accent-flame); border: none; border-radius: 8px; color: white; font-weight: 700; font-size: 13px; cursor: pointer; }
@@ -273,14 +272,12 @@
       });
     };
 
-    // Función para enviar mensaje profesional por WhatsApp al cliente
-    window.enviarRecordatorioWsp = (clienteNombre, creditoIdTag, cuotaNum, montoCuota, fechaVto, telefonoCliente) => {
-      let telClean = (telefonoCliente || '').replace(/\D/g, '');
+    window.enviarRecordatorioWsp = (clienteNombre, creditoIdTag, cuotaNum, montoCuota, fechaVto, telefonoWsp) => {
+      let telClean = (telefonoWsp || '').replace(/\D/g, '');
       if (!telClean) {
-        window.mostrarAlerta("Sin Teléfono", "Este cliente no tiene un número de teléfono registrado en el sistema.");
+        window.mostrarAlerta("Sin WhatsApp", "Este cliente no tiene un número de WhatsApp registrado en el sistema.");
         return;
       }
-      // Asegurar formato internacional si es necesario (ej. Argentina sin 15)
       if (telClean.length === 10 && !telClean.startsWith('54')) {
         telClean = '549' + telClean;
       }
@@ -337,7 +334,9 @@
         const cuotas = asegurarCuotasLocal(c);
         const creditIdTag = c.codigoUnico || `#CRED-${c.id.substring(0, 6).toUpperCase()}`;
         const clienteInfo = clientesCache[c.clienteId] || {};
-        const telefonoCliente = clienteInfo.telefono || c.clienteTelefono || '';
+        
+        // Detectar WhatsApp priorizando el campo "whatsapp" del cliente o del crédito
+        const wspCliente = clienteInfo.whatsapp || clienteInfo.telefono || c.whatsapp || c.clienteTelefono || '';
 
         cuotas.forEach(q => {
           if (!q.vencimiento) return;
@@ -346,7 +345,7 @@
             creditoId: c.id,
             creditIdTag: creditIdTag,
             clienteNombre: c.clienteNombre || clienteInfo.nombre || 'Cliente',
-            telefonoCliente: telefonoCliente,
+            whatsappCliente: wspCliente,
             numeroCuota: q.numero,
             totalCuotas: c.cantidadCuotas || cuotas.length,
             monto: q.monto,
@@ -475,7 +474,7 @@
 
         card.querySelector(`#wspBtn_${fecha}_${idx}`).onclick = (e) => {
           e.stopPropagation();
-          window.enviarRecordatorioWsp(ev.clienteNombre, ev.creditIdTag, ev.numero, ev.monto, ev.vencimiento, ev.telefonoCliente);
+          window.enviarRecordatorioWsp(ev.clienteNombre, ev.creditIdTag, ev.numero, ev.monto, ev.vencimiento, ev.whatsappCliente);
         };
 
         content.appendChild(card);
