@@ -146,6 +146,8 @@
     .day-detail-card .card-top-row { display: flex; align-items: center; justify-content: space-between; }
     .day-detail-card .client-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
     
+    .card-actions-group { display: flex; align-items: center; gap: 6px; }
+    
     .id-tag-badge {
       font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--accent-flame); font-weight: 700;
       background: rgba(249, 115, 22, 0.1); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(249, 115, 22, 0.3);
@@ -155,11 +157,20 @@
     .btn-copy-pro:hover { color: var(--text-primary); }
     .btn-copy-pro svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
 
+    /* Botón de WhatsApp empresarial */
+    .btn-wsp-pro {
+      background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399;
+      width: 28px; height: 28px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+    .btn-wsp-pro:hover { background: rgba(16, 185, 129, 0.3); transform: scale(1.05); }
+    .btn-wsp-pro svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
     .day-detail-card .meta-info { font-size: 12px; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; display: flex; justify-content: space-between; }
 
     .custom-alert-overlay { position: fixed; inset: 0; background: rgba(5, 7, 11, 0.88); backdrop-filter: blur(12px); z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
     .custom-alert-overlay.is-open { opacity: 1; pointer-events: auto; }
-    .custom-alert-box { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px; width: 100%; max-width: 380px; padding: 22px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.8); }
+    .custom-alert-box { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px; width: 100%; max-width: 380px; padding: 22px; text-align: center; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8); }
     .custom-alert-box h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
     .custom-alert-box p { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
     .btn-alert-primary { width: 100%; height: 40px; background: var(--accent-flame); border: none; border-radius: 8px; color: white; font-weight: 700; font-size: 13px; cursor: pointer; }
@@ -237,6 +248,7 @@
     if (!prestamistaId) window.location.replace('loginprestamista.html');
 
     let creditosCache = [];
+    let clientesCache = {};
     let fechaActualNav = new Date();
 
     window.mostrarAlerta = (t, m) => {
@@ -246,10 +258,37 @@
     };
     document.getElementById('alertOkBtn').onclick = () => document.getElementById('customAlertOverlay').classList.remove('is-open');
 
+    async function sincronizarClientes() {
+      try {
+        const snap = await getDocs(collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "clientes"));
+        snap.forEach(d => { clientesCache[d.id] = { id: d.id, ...d.data() }; });
+      } catch(err) {
+        console.error("Error sincronizando clientes:", err);
+      }
+    }
+
     window.copiarIdCredito = (idUnico) => {
       navigator.clipboard.writeText(idUnico).then(() => {
         window.mostrarAlerta("Copiado", `ID del crédito (${idUnico}) copiado al portapapeles.`);
       });
+    };
+
+    // Función para enviar mensaje profesional por WhatsApp al cliente
+    window.enviarRecordatorioWsp = (clienteNombre, creditoIdTag, cuotaNum, montoCuota, fechaVto, telefonoCliente) => {
+      let telClean = (telefonoCliente || '').replace(/\D/g, '');
+      if (!telClean) {
+        window.mostrarAlerta("Sin Teléfono", "Este cliente no tiene un número de teléfono registrado en el sistema.");
+        return;
+      }
+      // Asegurar formato internacional si es necesario (ej. Argentina sin 15)
+      if (telClean.length === 10 && !telClean.startsWith('54')) {
+        telClean = '549' + telClean;
+      }
+
+      const mensaje = `Hola *${clienteNombre}* 👋\n\nEstimado cliente, le escribimos desde el departamento de gestión para recordarle el vencimiento de su cuota programada:\n\n📄 *Comprobante / Crédito:* ${creditoIdTag}\n📌 *Cuota:* #${cuotaNum}\n💵 *Monto a Abonar:* $${parseFloat(montoCuota).toLocaleString('es-AR', {minimumFractionDigits: 2})}\n📅 *Fecha de Vencimiento:* ${fechaVto.split('-').reverse().join('/')}\n\nPor favor, recuerde realizar su pago a tiempo para mantener su excelente historial crediticio al día y seguir accediendo a mayores beneficios y montos. 🚀📈\n\nMuchas gracias por su confianza y cumplimiento. 🙌`;
+
+      const urlWsp = `https://wa.me/${telClean}?text=${encodeURIComponent(mensaje)}`;
+      window.open(urlWsp, '_blank');
     };
 
     function asegurarCuotasLocal(c) {
@@ -297,6 +336,8 @@
       creditosCache.forEach(c => {
         const cuotas = asegurarCuotasLocal(c);
         const creditIdTag = c.codigoUnico || `#CRED-${c.id.substring(0, 6).toUpperCase()}`;
+        const clienteInfo = clientesCache[c.clienteId] || {};
+        const telefonoCliente = clienteInfo.telefono || c.clienteTelefono || '';
 
         cuotas.forEach(q => {
           if (!q.vencimiento) return;
@@ -304,12 +345,14 @@
           eventosMap[q.vencimiento].push({
             creditoId: c.id,
             creditIdTag: creditIdTag,
-            clienteNombre: c.clienteNombre || 'Cliente',
+            clienteNombre: c.clienteNombre || clienteInfo.nombre || 'Cliente',
+            telefonoCliente: telefonoCliente,
             numeroCuota: q.numero,
             totalCuotas: c.cantidadCuotas || cuotas.length,
             monto: q.monto,
             pagado: q.pagado || 0,
-            estado: q.estado || 'pendiente'
+            estado: q.estado || 'pendiente',
+            vencimiento: q.vencimiento
           });
         });
       });
@@ -382,10 +425,8 @@
         return;
       }
 
-      // Calcular el total a cobrar en el día
       const totalDelDia = eventos.reduce((sum, ev) => sum + (parseFloat(ev.monto) || 0), 0);
       
-      // Inyectar la tarjeta de total general arriba del todo
       const summaryCard = document.createElement('div');
       summaryCard.className = 'daily-total-summary';
       summaryCard.innerHTML = `
@@ -394,7 +435,6 @@
       `;
       content.appendChild(summaryCard);
 
-      // Inyectar el resto de las tarjetas por cliente
       eventos.forEach((ev, idx) => {
         const pagadoVal = parseFloat(ev.pagado) || 0;
         const restante = ev.monto - pagadoVal;
@@ -406,12 +446,17 @@
         card.innerHTML = `
           <div class="card-top-row">
             <span class="client-title">${ev.clienteNombre}</span>
-            <span class="id-tag-badge">
-              ${ev.creditIdTag}
-              <button class="btn-copy-pro" title="Copiar ID del Crédito" id="copyIdBtn_${fecha}_${idx}">
-                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <div class="card-actions-group">
+              <button class="btn-wsp-pro" title="Enviar Recordatorio por WhatsApp" id="wspBtn_${fecha}_${idx}">
+                <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
               </button>
-            </span>
+              <span class="id-tag-badge">
+                ${ev.creditIdTag}
+                <button class="btn-copy-pro" title="Copiar ID del Crédito" id="copyIdBtn_${fecha}_${idx}">
+                  <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                </button>
+              </span>
+            </div>
           </div>
           <div class="meta-info">
             <span>Cuota #${ev.numero} de ${ev.totalCuotas}</span>
@@ -426,6 +471,11 @@
         card.querySelector(`#copyIdBtn_${fecha}_${idx}`).onclick = (e) => {
           e.stopPropagation();
           window.copiarIdCredito(ev.creditIdTag);
+        };
+
+        card.querySelector(`#wspBtn_${fecha}_${idx}`).onclick = (e) => {
+          e.stopPropagation();
+          window.enviarRecordatorioWsp(ev.clienteNombre, ev.creditIdTag, ev.numero, ev.monto, ev.vencimiento, ev.telefonoCliente);
         };
 
         content.appendChild(card);
@@ -448,12 +498,14 @@
       renderizarCalendario();
     };
 
-    onSnapshot(collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos"), snap => {
-      creditosCache = [];
-      snap.forEach(d => {
-        creditosCache.push({ id: d.id, ...d.data() });
+    sincronizarClientes().then(() => {
+      onSnapshot(collection(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos"), snap => {
+        creditosCache = [];
+        snap.forEach(d => {
+          creditosCache.push({ id: d.id, ...d.data() });
+        });
+        renderizarCalendario();
       });
-      renderizarCalendario();
     });
   </script>
 </body>
