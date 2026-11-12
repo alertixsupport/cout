@@ -370,24 +370,67 @@
       });
     };
 
-    // Función segura para abrir el modal de pago vinculada por delegación de eventos y dataset
-    window.abrirModalPago = (creditoId, cuotaIndex) => {
+    // --- FUNCIÓN BLINDADA: AUTOCREA CUOTAS EN FIREBASE SI NO EXISTEN ---
+    async function asegurarYObtenerCuotas(c, creditoId) {
+      let cuotasArr = c.cuotasDetalle || [];
+      if (!Array.isArray(cuotasArr) || cuotasArr.length === 0) {
+        cuotasArr = [];
+        const cantidad = parseInt(c.cantidadCuotas) || 1;
+        const totalInt = parseFloat(c.totalConInteres) || 0;
+        const valorCuota = c.valorCuota || (totalInt / cantidad);
+        let fechaBase = new Date(c.fechaInicio || Date.now());
+
+        for (let i = 1; i <= cantidad; i++) {
+          if (c.frecuencia === 'semanal') fechaBase.setDate(fechaBase.getDate() + 7);
+          else if (c.frecuencia === 'quincenal') fechaBase.setDate(fechaBase.getDate() + 15);
+          else if (c.frecuencia === 'mensual') fechaBase.setMonth(fechaBase.getMonth() + 1);
+
+          cuotasArr.push({
+            numero: i,
+            vencimiento: fechaBase.toISOString().split('T')[0],
+            monto: valorCuota,
+            pagado: 0,
+            estado: 'pendiente'
+          });
+        }
+
+        // Auto-crear y sincronizar en Firebase para que otros usuarios nunca encuentren datos vacíos
+        try {
+          const ref = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos", creditoId);
+          await updateDoc(ref, { cuotasDetalle: cuotasArr });
+          c.cuotasDetalle = cuotasArr; // Actualizar caché local
+        } catch(err) {
+          console.error("Error auto-creando cuotas faltantes en Firebase:", err);
+        }
+      }
+      return cuotasArr;
+    }
+
+    // Abrir modal de pago con validación estricta
+    window.abrirModalPago = async (creditoId, cuotaIndex) => {
       activeCreditIdForPay = creditoId;
       activeCuotaIndexForPay = parseInt(cuotaIndex);
       const c = creditosCacheGlobal.find(item => item.id === creditoId);
       if (!c) return;
 
-      const cuota = (c.cuotasDetalle || [])[activeCuotaIndexForPay];
-      if (!cuota) return;
+      const cuotasArr = await asegurarYObtenerCuotas(c, creditoId);
+      const cuota = cuotasArr[activeCuotaIndexForPay];
+      if (!cuota) {
+        window.mostrarAlerta("Atención", "No se encontró la cuota seleccionada.");
+        return;
+      }
 
-      const restante = cuota.monto - (cuota.pagado || 0);
-      document.getElementById('payCuotaInfoLabel').textContent = `Cuota #${cuota.numero} (Restante: $${restante.toLocaleString('es-AR')})`;
-      document.getElementById('montoPagoInput').value = restante;
+      const pagado = parseFloat(cuota.pagado) || 0;
+      const montoTotalCuota = parseFloat(cuota.monto) || 0;
+      const restante = montoTotalCuota - pagado;
+
+      document.getElementById('payCuotaInfoLabel').textContent = `Cuota #${cuota.numero} (Restante: $${restante.toLocaleString('es-AR', {minimumFractionDigits: 2})})`;
+      document.getElementById('montoPagoInput').value = restante > 0 ? restante : 0;
       document.getElementById('notaPagoInput').value = '';
       paymentModalOverlay.classList.add('is-open');
     };
 
-    // Confirmar Pago a Cuota
+    // Confirmar Pago a Cuota guardando correctamente en Firebase
     document.getElementById('confirmPaymentBtn').onclick = async () => {
       const confirmBtn = document.getElementById('confirmPaymentBtn');
       const montoAbonado = parseFloat(document.getElementById('montoPagoInput').value) || 0;
@@ -404,9 +447,9 @@
       confirmBtn.disabled = true;
       confirmBtn.textContent = "Guardando...";
 
-      let cuotasArr = JSON.parse(JSON.stringify(c.cuotasDetalle || []));
+      let cuotasArr = await asegurarYObtenerCuotas(c, activeCreditIdForPay);
       let cuota = cuotasArr[activeCuotaIndexForPay];
-      let pagadoActual = (cuota.pagado || 0) + montoAbonado;
+      let pagadoActual = (parseFloat(cuota.pagado) || 0) + montoAbonado;
 
       if (pagadoActual >= cuota.monto) {
         cuota.pagado = cuota.monto;
@@ -429,7 +472,7 @@
         window.mostrarAlerta("Éxito", "Pago registrado y descontado correctamente.");
       } catch (err) {
         console.error(err);
-        window.mostrarAlerta("Error", "No se pudo registrar el pago.");
+        window.mostrarAlerta("Error", "No se pudo registrar el pago en la base de datos.");
       } finally {
         confirmBtn.disabled = false;
         confirmBtn.textContent = "Confirmar y Descontar";
@@ -533,22 +576,21 @@
             <div class="footer-left-group">
               <span class="id-tag-badge">
                 ${creditIdTag}
-                <button class="btn-copy-pro" title="Copiar ID" data-action="copy-id" data-id="${creditIdTag}">
+                <button class="btn-copy-pro" title="Copiar ID" data-action="copy-id">
                   <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                 </button>
               </span>
-              <button class="btn-action-icon" title="Copiar Enlace del Crédito (vercredito.html)" data-action="share-link" data-id="${c.id}">
+              <button class="btn-action-icon" title="Copiar Enlace del Crédito (vercredito.html)" data-action="share-link">
                 <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
               </button>
             </div>
-            <button class="btn-action-view" data-action="view-ficha" data-id="${c.id}">
+            <button class="btn-action-view" data-action="view-ficha">
               <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
               Ver Ficha
             </button>
           </div>
         `;
 
-        // Event listeners seguros en lugar de onclick en string
         card.querySelector('[data-action="copy-id"]').onclick = () => window.copiarIdCredito(creditIdTag);
         card.querySelector('[data-action="share-link"]').onclick = () => window.compartirEnlaceVerCredito(c.id);
         card.querySelector('[data-action="view-ficha"]').onclick = () => window.verFichaCredito(c.id);
@@ -557,7 +599,7 @@
       });
     }
 
-    window.verFichaCredito = (id) => {
+    window.verFichaCredito = async (id) => {
       currentOpenCreditoId = id;
       const c = creditosCacheGlobal.find(item => item.id === id);
       if (!c) return;
@@ -567,38 +609,27 @@
       const creditIdTag = c.codigoUnico || `#CRED-${c.id.substring(0, 6).toUpperCase()}`;
       const esMoroso = c.estado === 'moroso';
 
-      let cuotasArr = c.cuotasDetalle || [];
-      if (cuotasArr.length === 0) {
-        cuotasArr = [];
-        const valorCuota = c.valorCuota || (c.totalConInteres / c.cantidadCuotas);
-        let fechaBase = new Date(c.fechaInicio || Date.now());
-        for (let i = 1; i <= c.cantidadCuotas; i++) {
-          if (c.frecuencia === 'semanal') fechaBase.setDate(fechaBase.getDate() + 7);
-          else if (c.frecuencia === 'quincenal') fechaBase.setDate(fechaBase.getDate() + 15);
-          else if (c.frecuencia === 'mensual') fechaBase.setMonth(fechaBase.getMonth() + 1);
-
-          cuotasArr.push({ numero: i, vencimiento: fechaBase.toISOString().split('T')[0], monto: valorCuota, pagado: 0, estado: 'pendiente' });
-        }
-      }
+      // Asegurar que las cuotas existan localmente y en Firebase
+      const cuotasArr = await asegurarYObtenerCuotas(c, id);
 
       const cuotasContainer = document.createElement('div');
       cuotasContainer.className = 'cuotas-table-container';
 
       cuotasArr.forEach((cuota, index) => {
-        const pagado = cuota.pagado || 0;
-        const restante = cuota.monto - pagado;
+        const pagado = parseFloat(cuota.pagado) || 0;
+        const restante = parseFloat(cuota.monto) - pagado;
         const statusClass = cuota.estado === 'pagada' ? 'pagada' : (cuota.estado === 'parcial' ? 'parcial' : 'pendiente');
 
         const cuotaRow = document.createElement('div');
         cuotaRow.className = 'cuota-row-item';
         cuotaRow.innerHTML = `
           <div class="cuota-info">
-            <span class="num">Cuota #${cuota.numero} - Total: $${cuota.monto.toLocaleString('es-AR', {minimumFractionDigits: 2})}</span>
+            <span class="num">Cuota #${cuota.numero} - Total: $${parseFloat(cuota.monto).toLocaleString('es-AR', {minimumFractionDigits: 2})}</span>
             <span class="fec">Vence: ${cuota.vencimiento} | Pagado: $${pagado.toLocaleString('es-AR', {minimumFractionDigits: 2})} (Restante: $${restante.toLocaleString('es-AR', {minimumFractionDigits: 2})})</span>
           </div>
           <div class="cuota-actions">
-            <span class="cuota-status-tag ${statusClass}">${cuota.estado.toUpperCase()}</span>
-            ${cuota.estado !== 'pagada' ? `<button class="btn-pagar-cuota" data-credito="${id}" data-index="${index}">Abonar</button>` : ''}
+            <span class="cuota-status-tag ${statusClass}">${(cuota.estado || 'pendiente').toUpperCase()}</span>
+            ${cuota.estado !== 'pagada' ? `<button class="btn-pagar-cuota">Abonar</button>` : ''}
           </div>
         `;
 
