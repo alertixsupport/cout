@@ -87,15 +87,24 @@
     .data-item .val { font-size: 12px; font-weight: 600; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; }
 
     .credit-card-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border-subtle); padding-top: 12px; }
+    .footer-left-group { display: flex; align-items: center; gap: 6px; }
     .id-tag-badge { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--accent-flame); font-weight: 700; background: rgba(249, 115, 22, 0.1); padding: 3px 8px; border-radius: 6px; border: 1px solid rgba(249, 115, 22, 0.3); display: inline-flex; align-items: center; gap: 4px; }
     
+    .btn-action-icon {
+      width: 32px; height: 32px; border-radius: 8px; background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border-subtle); color: #60a5fa; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+    }
+    .btn-action-icon:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(96, 165, 250, 0.4); }
+    .btn-action-icon svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
     .btn-action-view {
-      height: 34px; background: rgba(249, 115, 22, 0.12); border: 1px solid rgba(249, 115, 22, 0.3);
+      height: 32px; background: rgba(249, 115, 22, 0.12); border: 1px solid rgba(249, 115, 22, 0.3);
       border-radius: 8px; color: var(--accent-flame); font-size: 12px; font-weight: 700; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 14px; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 12px; transition: all 0.2s;
     }
     .btn-action-view:hover { background: rgba(249, 115, 22, 0.25); }
-    .btn-action-view svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .btn-action-view svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
 
     /* Modales */
     .modal-overlay {
@@ -116,7 +125,7 @@
     .modal-body-scroll { overflow-y: auto; flex: 1; padding-right: 4px; display: flex; flex-direction: column; gap: 14px; }
 
     /* Ficha Técnica dentro del Modal */
-    .ficha-top-bar { display: flex; justify-content: space-between; align-items: center; background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 12px 16px; }
+    .ficha-top-bar { display: flex; justify-content: space-between; align-items: center; background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 12px 16px; flex-wrap: wrap; gap: 10px; }
     .ficha-id-display { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--accent-flame); }
     .btn-copy-pro { background: none; border: none; cursor: pointer; color: var(--text-secondary); display: inline-flex; align-items: center; transition: color 0.2s; }
     .btn-copy-pro:hover { color: var(--text-primary); }
@@ -152,7 +161,7 @@
     .btn-pagar-cuota { background: var(--accent-flame); border: none; color: white; font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: opacity 0.2s; }
     .btn-pagar-cuota:hover { opacity: 0.85; }
 
-    /* Auditoría (Colores dinámicos) */
+    /* Auditoría (Colores dinámicos: Verde para pagos, Rojo para morosos) */
     .timeline-box { background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
     .timeline-item { border-left: 2px solid var(--text-tertiary); padding-left: 10px; margin-bottom: 6px; font-size: 12px; }
     .timeline-item.pago { border-left-color: var(--status-success); }
@@ -160,14 +169,14 @@
     .timeline-item .t-date { font-size: 10px; color: var(--text-tertiary); font-family: 'JetBrains Mono', monospace; }
     .timeline-item .t-desc { color: var(--text-primary); font-weight: 600; margin-top: 2px; }
 
-    /* Formulario de Pago dentro de su Modal */
+    /* Formulario de Pago y Morosidad */
     .payment-form-box { background: #090e18; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
     .payment-form-box input, .payment-form-box textarea { width: 100%; padding: 10px; background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-primary); font-size: 13px; outline: none; }
 
     /* Alerta Custom */
     .custom-alert-overlay { position: fixed; inset: 0; background: rgba(5, 7, 11, 0.88); backdrop-filter: blur(12px); z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
     .custom-alert-overlay.is-open { opacity: 1; pointer-events: auto; }
-    .custom-alert-box { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px; width: 100%; max-width: 380px; padding: 22px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.8); }
+    .custom-alert-box { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 20px; width: 100%; max-width: 380px; padding: 22px; text-align: center; box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8); }
     .custom-alert-box h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
     .custom-alert-box p { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
     .btn-alert-primary { width: 100%; height: 40px; background: var(--accent-flame); border: none; border-radius: 8px; color: white; font-weight: 700; font-size: 13px; cursor: pointer; }
@@ -254,6 +263,21 @@
     </div>
   </div>
 
+  <!-- MODAL: MOTIVO DE MOROSIDAD / CAMBIO DE ESTADO -->
+  <div class="modal-overlay" id="morosoModalOverlay">
+    <div class="modal-container" style="max-width: 400px; z-index: 2500;">
+      <div class="modal-header">
+        <h3 id="morosoModalTitle">Motivo de Estado</h3>
+        <button class="btn-close-modal" id="closeMorosoModalBtn">✕</button>
+      </div>
+      <div class="payment-form-box">
+        <span style="font-size: 12px; color: var(--text-secondary);" id="morosoModalDesc">Indique brevemente el motivo:</span>
+        <textarea id="motivoMorosoInput" rows="3" placeholder="Ej. Atraso en el pago de cuotas vencidas..."></textarea>
+        <button class="btn-alert-primary" id="confirmMorosoBtn">Guardar y Actualizar</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { db } from './app.js';
     import { collection, doc, updateDoc, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -295,21 +319,53 @@
     const paymentModalOverlay = document.getElementById('paymentModalOverlay');
     document.getElementById('closePayModalBtn').onclick = () => paymentModalOverlay.classList.remove('is-open');
 
+    const morosoModalOverlay = document.getElementById('morosoModalOverlay');
+    document.getElementById('closeMorosoModalBtn').onclick = () => morosoModalOverlay.classList.remove('is-open');
+
     window.copiarIdCredito = (idUnico) => {
       navigator.clipboard.writeText(idUnico).then(() => {
         window.mostrarAlerta("Copiado", `ID del crédito (${idUnico}) copiado al portapapeles.`);
       });
     };
 
-    // Cambiar estado entre activo y moroso profesionalmente con icono
-    window.toggleEstadoMoroso = async (creditoId) => {
+    // Generar y copiar enlace de firma.html (exacto como depositocreditos.html)
+    window.compartirEnlaceFirma = (id) => {
+      const link = `${window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1)}firma.html?id=${id}&p=${prestamistaId}`;
+      navigator.clipboard.writeText(link).then(() => {
+        window.mostrarAlerta("Enlace Copiado", "El enlace de firma/crédito fue copiado al portapapeles.");
+      });
+    };
+
+    // --- MANEJO DE CAMBIO DE ESTADO CON MOTIVO (MOROSO / ACTIVO) ---
+    let pendingCreditoIdForState = null;
+    let targetNewState = null;
+
+    window.iniciarToggleMoroso = (creditoId) => {
       const c = creditosCacheGlobal.find(item => item.id === creditoId);
       if (!c) return;
 
-      const nuevoEstado = (c.estado === 'moroso') ? 'activo' : 'moroso';
-      const descAuditoria = nuevoEstado === 'moroso' 
-        ? '[AUDITORÍA] Crédito marcado como MOROSO.' 
-        : '[AUDITORÍA] Crédito reactivado a ACTIVO.';
+      pendingCreditoIdForState = creditoId;
+      targetNewState = (c.estado === 'moroso') ? 'activo' : 'moroso';
+
+      document.getElementById('morosoModalTitle').textContent = targetNewState === 'moroso' ? 'Marcar Crédito como Moroso' : 'Reactivar Crédito';
+      document.getElementById('morosoModalDesc').textContent = targetNewState === 'moroso' ? 'Indique el motivo del atraso o morosidad:' : 'Indique el acuerdo o motivo para reactivar:';
+      document.getElementById('motivoMorosoInput').value = '';
+      morosoModalOverlay.classList.add('is-open');
+    };
+
+    document.getElementById('confirmMorosoBtn').onclick = async () => {
+      const motivo = document.getElementById('motivoMorosoInput').value.trim();
+      if (!motivo) {
+        window.mostrarAlerta("Requerido", "Por favor, ingresa un motivo breve.");
+        return;
+      }
+
+      const c = creditosCacheGlobal.find(item => item.id === pendingCreditoIdForState);
+      if (!c) return;
+
+      const descAuditoria = targetNewState === 'moroso'
+        ? `[MOROSO] Crédito marcado en mora. Motivo: ${motivo}`
+        : `[ACTIVO] Crédito reactivado. Detalle: ${motivo}`;
 
       const auditoria = c.auditoria || [];
       auditoria.unshift({
@@ -318,9 +374,10 @@
       });
 
       try {
-        const ref = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos", creditoId);
-        await updateDoc(ref, { estado: nuevoEstado, auditoria });
-        window.mostrarAlerta("Actualizado", `El estado del crédito ahora es: ${nuevoEstado.toUpperCase()}`);
+        const ref = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos", pendingCreditoIdForState);
+        await updateDoc(ref, { estado: targetNewState, auditoria });
+        morosoModalOverlay.classList.remove('is-open');
+        window.mostrarAlerta("Actualizado", `El estado del crédito ahora es: ${targetNewState.toUpperCase()}`);
       } catch(err) {
         console.error(err);
         window.mostrarAlerta("Error", "No se pudo actualizar el estado.");
@@ -364,12 +421,17 @@
             </div>
 
             <div class="credit-card-footer">
-              <span class="id-tag-badge">
-                ${creditIdTag}
-                <button class="btn-copy-pro" onclick="window.copiarIdCredito('${creditIdTag}')" title="Copiar ID">
-                  <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <div class="footer-left-group">
+                <span class="id-tag-badge">
+                  ${creditIdTag}
+                  <button class="btn-copy-pro" onclick="window.copiarIdCredito('${creditIdTag}')" title="Copiar ID">
+                    <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                  </button>
+                </span>
+                <button class="btn-action-icon" onclick="window.compartirEnlaceFirma('${c.id}')" title="Copiar Enlace de Firma / Crédito">
+                  <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
                 </button>
-              </span>
+              </div>
               <button class="btn-action-view" onclick="window.verFichaCredito('${c.id}')">
                 <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                 Ver Ficha
@@ -427,12 +489,11 @@
       let timelineHtml = '';
       (c.auditoria || [{ fecha: c.creadoEn || new Date().toISOString(), descripcion: 'Crédito emitido y registrado en el sistema.' }]).forEach(log => {
         const descLower = (log.descripcion || '').toLowerCase();
-        // Determinar si es auditoría de pago (verde) o moroso (rojo)
         let tipoAuditoriaCls = '';
-        if (descLower.includes('abono') || descLower.includes('pago')) {
-          tipoAuditoriaCls = 'pago';
-        } else if (descLower.includes('moroso') || descLower.includes('atraso')) {
-          tipoAuditoriaCls = 'moroso';
+        if (descLower.includes('abono') || descLower.includes('pago') || descLower.includes('activo')) {
+          tipoAuditoriaCls = 'pago'; // Verde
+        } else if (descLower.includes('moroso') || descLower.includes('atraso') || descLower.includes('mora')) {
+          tipoAuditoriaCls = 'moroso'; // Rojo
         }
 
         timelineHtml += `
@@ -451,8 +512,11 @@
             <button class="btn-copy-pro" onclick="window.copiarIdCredito('${creditIdTag}')" title="Copiar ID">
               <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
             </button>
+            <button class="btn-copy-pro" onclick="window.compartirEnlaceFirma('${id}')" title="Copiar Enlace de Firma / Crédito" style="color:#60a5fa; margin-left:4px;">
+              <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            </button>
           </div>
-          <button class="btn-toggle-moroso ${esMoroso ? 'es-moroso' : ''}" onclick="window.toggleEstadoMoroso('${id}')">
+          <button class="btn-toggle-moroso ${esMoroso ? 'es-moroso' : ''}" onclick="window.iniciarToggleMoroso('${id}')">
             <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
             ${esMoroso ? 'Marcar Activo' : 'Marcar Moroso'}
           </button>
