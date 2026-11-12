@@ -22,6 +22,7 @@
       --status-success: #10b981;
       --status-warning: #f59e0b;
       --status-danger: #ef4444;
+      --status-finalized: #64748b;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
@@ -51,17 +52,18 @@
     .hero-text p { font-size: 13px; color: var(--text-secondary); }
 
     /* Contadores Estadísticos */
-    .stats-container { display: flex; gap: 12px; }
+    .stats-container { display: flex; gap: 10px; flex-wrap: wrap; }
     .stat-pill {
       background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: 12px;
-      padding: 8px 14px; display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px; display: flex; align-items: center; gap: 8px;
     }
     .stat-pill .dot { width: 8px; height: 8px; border-radius: 50%; }
     .stat-pill.active .dot { background: var(--status-success); box-shadow: 0 0 8px rgba(16, 185, 129, 0.5); }
     .stat-pill.danger .dot { background: var(--status-danger); box-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
+    .stat-pill.finalized .dot { background: var(--status-finalized); box-shadow: 0 0 8px rgba(100, 116, 139, 0.5); }
     .stat-info { display: flex; flex-direction: column; }
-    .stat-info .lbl { font-size: 10px; text-transform: uppercase; color: var(--text-tertiary); font-weight: 700; }
-    .stat-info .val { font-size: 14px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+    .stat-info .lbl { font-size: 9px; text-transform: uppercase; color: var(--text-tertiary); font-weight: 700; }
+    .stat-info .val { font-size: 13px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
 
     .search-container { margin-bottom: 24px; width: 100%; }
     .search-input-wrapper { position: relative; display: flex; align-items: center; width: 100%; }
@@ -84,6 +86,7 @@
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); transition: all 0.25s ease;
     }
     .credit-card:hover { transform: translateY(-3px); border-color: rgba(249, 115, 22, 0.4); background: var(--bg-surface-hover); }
+    .credit-card.is-finalized { opacity: 0.75; border-style: dashed; }
 
     .credit-header { display: flex; align-items: center; justify-content: space-between; }
     .client-name-title { font-size: 15px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; }
@@ -92,7 +95,7 @@
     .status-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; }
     .status-badge.activo { background: rgba(16, 185, 129, 0.12); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
     .status-badge.moroso { background: rgba(239, 68, 68, 0.12); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
-    .status-badge.finalizado { background: rgba(100, 116, 139, 0.12); color: #94a3b8; border: 1px solid rgba(100, 116, 139, 0.3); }
+    .status-badge.finalizado { background: rgba(100, 116, 139, 0.15); color: #94a3b8; border: 1px solid rgba(100, 116, 139, 0.3); }
 
     .credit-compact-data { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #090e18; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 10px; }
     .data-item { display: flex; flex-direction: column; gap: 2px; }
@@ -236,7 +239,7 @@
           <h1>Dirección de <span>Créditos</span></h1>
           <p>Gestión de cartera, abonos y auditoría en tiempo real.</p>
         </div>
-        <!-- Contadores Estadísticos -->
+        <!-- Contadores Estadísticos (Activos, Morosos, Finalizados) -->
         <div class="stats-container">
           <div class="stat-pill active">
             <div class="dot"></div>
@@ -250,6 +253,13 @@
             <div class="stat-info">
               <span class="lbl">Morosos</span>
               <span class="val" id="countMorosos">0</span>
+            </div>
+          </div>
+          <div class="stat-pill finalized">
+            <div class="dot"></div>
+            <div class="stat-info">
+              <span class="lbl">Finalizados</span>
+              <span class="val" id="countFinalizados">0</span>
             </div>
           </div>
         </div>
@@ -410,7 +420,6 @@
       });
     };
 
-    // --- ELIMINAR CRÉDITO ---
     window.eliminarCredito = (creditoId) => {
       window.mostrarConfirmacion(
         "¿Eliminar Crédito?",
@@ -461,6 +470,26 @@
         }
       }
       return cuotasArr;
+    }
+
+    // Verificar si todas las cuotas están pagadas al 100% y actualizar estado a "finalizado" si corresponde
+    async function verificarEstadoFinalizado(c, creditoId) {
+      const cuotas = c.cuotasDetalle || [];
+      if (cuotas.length === 0) return c.estado || 'activo';
+
+      const todasPagadas = cuotas.every(q => (q.pagado || 0) >= q.monto || q.estado === 'pagada');
+      let estadoActual = c.estado || 'activo';
+
+      if (todasPagadas && estadoActual !== 'finalizado') {
+        estadoActual = 'finalizado';
+        try {
+          const ref = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos", creditoId);
+          await updateDoc(ref, { estado: 'finalizado' });
+        } catch(err) {
+          console.error("Error actualizando estado a finalizado en Firebase:", err);
+        }
+      }
+      return estadoActual;
     }
 
     window.abrirModalPago = async (creditoId, cuotaIndex) => {
@@ -516,11 +545,22 @@
         descripcion: `[PAGO] Abono de $${montoAbonado.toLocaleString('es-AR')} en Cuota #${cuota.numero}. Detalle: ${nota}`
       });
 
+      // Chequear si con este pago se completa el 100% del crédito
+      const todasPagadas = cuotasArr.every(q => (q.pagado || 0) >= q.monto || q.estado === 'pagada');
+      let nuevoEstado = todasPagadas ? 'finalizado' : (c.estado === 'finalizado' ? 'activo' : (c.estado || 'activo'));
+
+      if (todasPagadas) {
+        auditoria.unshift({
+          fecha: new Date().toISOString(),
+          descripcion: `[FINALIZADO] Crédito completado al 100%.`
+        });
+      }
+
       try {
         const ref = doc(db, "carpetacout", "configuracion_general", "usuariosprestamistas", prestamistaId, "creditos", activeCreditIdForPay);
-        await updateDoc(ref, { cuotasDetalle: cuotasArr, auditoria });
+        await updateDoc(ref, { cuotasDetalle: cuotasArr, estado: nuevoEstado, auditoria });
         paymentModalOverlay.classList.remove('is-open');
-        window.mostrarAlerta("Éxito", "Pago registrado y descontado correctamente.");
+        window.mostrarAlerta("Éxito", todasPagadas ? "¡Crédito completado al 100% y finalizado!" : "Pago registrado y descontado correctamente.");
       } catch (err) {
         console.error(err);
         window.mostrarAlerta("Error", "No se pudo registrar el pago.");
@@ -577,12 +617,17 @@
     function actualizarContadores(arr) {
       let activos = 0;
       let morosos = 0;
+      let finalizados = 0;
+
       arr.forEach(c => {
         if (c.estado === 'moroso') morosos++;
+        else if (c.estado === 'finalizado') finalizados++;
         else activos++;
       });
+
       document.getElementById('countActivos').textContent = activos;
       document.getElementById('countMorosos').textContent = morosos;
+      document.getElementById('countFinalizados').textContent = finalizados;
     }
 
     function renderizarCreditosGrid(arr) {
@@ -595,14 +640,24 @@
         return;
       }
 
-      arr.forEach((c) => {
+      // ORDENAR: Primero Activos y Morosos, y al FINAL de todo los Finalizados
+      const arrOrdenado = [...arr].sort((a, b) => {
+        const estA = a.estado || 'activo';
+        const estB = b.estado || 'activo';
+        if (estA === 'finalizado' && estB !== 'finalizado') return 1;
+        if (estA !== 'finalizado' && estB === 'finalizado') return -1;
+        return 0;
+      });
+
+      arrOrdenado.forEach((c) => {
         const clienteInfo = clientesCache[c.clienteId] || {};
         const dniCliente = clienteInfo.dni || c.clienteDni || 'N/D';
         const estado = c.estado || 'activo';
         const creditIdTag = c.codigoUnico || `#CRED-${c.id.substring(0, 6).toUpperCase()}`;
+        const esFinalizado = estado === 'finalizado';
 
         const card = document.createElement('div');
-        card.className = 'credit-card';
+        card.className = `credit-card ${esFinalizado ? 'is-finalized' : ''}`;
         card.innerHTML = `
           <div class="credit-header">
             <div>
@@ -658,9 +713,12 @@
       const clienteInfo = clientesCache[c.clienteId] || {};
       const dniCliente = clienteInfo.dni || c.clienteDni || 'N/D';
       const creditIdTag = c.codigoUnico || `#CRED-${c.id.substring(0, 6).toUpperCase()}`;
-      const esMoroso = c.estado === 'moroso';
-
+      
+      // Sincronizar y verificar si está finalizado
       const cuotasArr = await asegurarYObtenerCuotas(c, id);
+      const estadoReal = await verificarEstadoFinalizado(c, id);
+      const esMoroso = estadoReal === 'moroso';
+      const esFinalizado = estadoReal === 'finalizado';
 
       const cuotasContainer = document.createElement('div');
       cuotasContainer.className = 'cuotas-table-container';
@@ -668,7 +726,7 @@
       cuotasArr.forEach((cuota, index) => {
         const pagado = parseFloat(cuota.pagado) || 0;
         const restante = parseFloat(cuota.monto) - pagado;
-        const statusClass = cuota.estado === 'pagada' ? 'pagada' : (cuota.estado === 'parcial' ? 'parcial' : 'pendiente');
+        const statusClass = cuota.estado === 'pagada' || pagado >= cuota.monto ? 'pagada' : (cuota.estado === 'parcial' ? 'parcial' : 'pendiente');
 
         const cuotaRow = document.createElement('div');
         cuotaRow.className = 'cuota-row-item';
@@ -678,8 +736,8 @@
             <span class="fec">Vence: ${cuota.vencimiento} | Pagado: $${pagado.toLocaleString('es-AR', {minimumFractionDigits: 2})} (Restante: $${restante.toLocaleString('es-AR', {minimumFractionDigits: 2})})</span>
           </div>
           <div class="cuota-actions">
-            <span class="cuota-status-tag ${statusClass}">${(cuota.estado || 'pendiente').toUpperCase()}</span>
-            ${cuota.estado !== 'pagada' ? `<button class="btn-pagar-cuota">Abonar</button>` : ''}
+            <span class="cuota-status-tag ${statusClass}">${statusClass.toUpperCase()}</span>
+            ${statusClass !== 'pagada' ? `<button class="btn-pagar-cuota">Abonar</button>` : ''}
           </div>
         `;
 
@@ -722,10 +780,12 @@
               <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
             </button>
           </div>
-          <button class="btn-toggle-moroso ${esMoroso ? 'es-moroso' : ''}" id="modalToggleMorosoBtn">
-            <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-            ${esMoroso ? 'Marcar Activo' : 'Marcar Moroso'}
-          </button>
+          ${!esFinalizado ? `
+            <button class="btn-toggle-moroso ${esMoroso ? 'es-moroso' : ''}" id="modalToggleMorosoBtn">
+              <svg viewBox="0 0 24 24" width="13" height="13" stroke="currentColor" fill="none" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              ${esMoroso ? 'Marcar Activo' : 'Marcar Moroso'}
+            </button>
+          ` : '<span class="status-badge finalizado">FINALIZADO 100%</span>'}
         </div>
 
         <div class="profile-details-table">
@@ -733,7 +793,7 @@
           <div class="profile-row"><span class="lbl">DNI:</span><span class="val">${dniCliente}</span></div>
           <div class="profile-row"><span class="lbl">Monto Total:</span><span class="val">$${(c.totalConInteres || 0).toLocaleString('es-AR')}</span></div>
           <div class="profile-row"><span class="lbl">Frecuencia:</span><span class="val" style="text-transform: uppercase;">${c.frecuencia}</span></div>
-          <div class="profile-row"><span class="lbl">Estado:</span><span class="val" style="text-transform: uppercase; color: var(--accent-flame);">${c.estado || 'activo'}</span></div>
+          <div class="profile-row"><span class="lbl">Estado:</span><span class="val" style="text-transform: uppercase; color: var(--accent-flame);">${estadoReal}</span></div>
         </div>
 
         <div style="width: 100%; text-align: left;"><span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary);">Cronograma de Cuotas</span></div>
@@ -755,7 +815,9 @@
 
       document.getElementById('modalCopyIdBtn').onclick = () => window.copiarIdCredito(creditIdTag);
       document.getElementById('modalShareLinkBtn').onclick = () => window.compartirEnlaceVerCredito(id);
-      document.getElementById('modalToggleMorosoBtn').onclick = () => window.iniciarToggleMoroso(id);
+      if (document.getElementById('modalToggleMorosoBtn')) {
+        document.getElementById('modalToggleMorosoBtn').onclick = () => window.iniciarToggleMoroso(id);
+      }
       document.getElementById('modalDeleteCreditBtn').onclick = () => window.eliminarCredito(id);
 
       viewModalOverlay.classList.add('is-open');
